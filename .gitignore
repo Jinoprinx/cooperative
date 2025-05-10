@@ -1,0 +1,73 @@
+# Node.js and Next.js
+node_modules/
+.next/
+.next.typescript-ls.json
+.next/cache/
+.next/server/
+.next/static/
+.next/standalone/
+.next/types/
+.next/build-manifest.json
+.next/react-loadable-manifest.json
+.next/serverless/
+.next/export/
+.next/server/pages/
+.next/server/chunks/
+.next/server/media/
+.next/server/pages-manifest.json
+.next/server/prerender-manifest.json
+.next/server/required-server-files.json
+.next/server/routes-manifest.json
+.next/server/sitemap-manifest.json
+.next/serverless/pages/
+.next/serverless/pages-manifest.json
+.next/serverless/routes-manifest.json
+.next/serverless/sitemap-manifest.json
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# TypeScript
+tsconfig.tsbuildinfo
+
+# Logs and cache
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.cache/
+
+# IDE-specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Tailwind CSS and DaisyUI (no specific exclusions needed)
+
+# General exclusions
+*.tmp
+*.swp
+*.bak
+*.orig
+
+# MongoDB-related (if applicable)
+*.mongo
+*.dump
