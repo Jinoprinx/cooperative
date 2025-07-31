@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { FaSearch, FaEye, FaCheck, FaTimes } from 'react-icons/fa';
-import { mockAllLoans, mockMembers, Loan } from '@/app/types'; // Adjust the import path as necessary
+import axios from 'axios';
+import { Loan, Member } from '@/app/types';
 
 export default function Loans() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -10,23 +11,26 @@ export default function Loans() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [loans, setLoans] = useState<Loan[]>([]);
-  const [members, setMembers] = useState(mockMembers);
+  const [members, setMembers] = useState<Member[]>([]);
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLoans = async () => {
+    const fetchData = async () => {
       try {
-        // In a real app: const response = await fetch('/api/admin/loans');
-        // setLoans(await response.json());
-        setLoans(mockAllLoans);
+        const [loansResponse, membersResponse] = await Promise.all([
+          axios.get('http://localhost:5000/api/loans'),
+          axios.get('http://localhost:5000/api/members'),
+        ]);
+        setLoans(loansResponse.data);
+        setMembers(membersResponse.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching loans:', error);
+        console.error('Error fetching loans or members:', error);
         setLoading(false);
       }
     };
-    fetchLoans();
+    fetchData();
   }, []);
 
   const filteredLoans = loans.filter(loan => {
@@ -51,21 +55,31 @@ export default function Loans() {
       return (!start || paymentDate >= start) && (!end || paymentDate <= end) ? acc + payment.amount : acc;
     }, 0), 0);
 
-  const handleApproveLoan = (id: number) => {
-    // In a real app: POST to '/api/admin/loans/:id/approve'
-    setLoans(loans.map(l => l.id === id ? { 
-      ...l, 
-      status: 'approved', 
-      startDate: new Date().toISOString().split('T')[0], 
-      monthlyPayment: l.amount / 6, 
-      endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0], 
-      nextPaymentDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0] 
-    } : l));
+  const handleApproveLoan = async (id: string) => {
+    try {
+      const loan = loans.find(l => l.id === id);
+      if (!loan) return;
+      const updatedLoan: Partial<Loan> = {
+        status: 'approved',
+        startDate: new Date().toISOString().split('T')[0],
+        monthlyPayment: loan.amount / 6,
+        endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0],
+        nextPaymentDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+      };
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/loans/${id}`, updatedLoan);
+      setLoans(loans.map(l => l.id === id ? { ...l, ...updatedLoan } : l));
+    } catch (error) {
+      console.error('Error approving loan:', error);
+    }
   };
 
-  const handleRejectLoan = (id: number) => {
-    // In a real app: POST to '/api/admin/loans/:id/reject'
-    setLoans(loans.map(l => l.id === id ? { ...l, status: 'rejected' } : l));
+  const handleRejectLoan = async (id: string) => {
+    try {
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/loans/${id}`, { status: 'rejected' } as Partial<Loan>);
+      setLoans(loans.map(l => l.id === id ? { ...l, status: 'rejected' } : l));
+    } catch (error) {
+      console.error('Error rejecting loan:', error);
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -136,6 +150,7 @@ export default function Loans() {
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Purpose</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Remaining Balance</th>
                 <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
@@ -159,6 +174,7 @@ export default function Loans() {
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{loan.purpose}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.remainingAmount)}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                       <button onClick={() => setSelectedLoan(loan)} className="btn btn-info btn-sm mr-2">
                         <FaEye />

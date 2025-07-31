@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   FaHome, 
   FaHistory, 
@@ -12,6 +12,7 @@ import {
   FaUserCircle, 
   FaBars 
 } from 'react-icons/fa';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function DashboardLayout({
   children,
@@ -19,7 +20,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, loading, logout, isAuthenticated } = useAuth();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -31,6 +34,27 @@ export default function DashboardLayout({
     { name: 'Loans', href: '/dashboard/loans', icon: FaMoneyBillWave },
     { name: 'Account', href: '/dashboard/account', icon: FaUserCircle },
   ];
+
+  const handleSignOut = () => {
+    logout();
+  };
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/auth/login');
+    }
+  }, [loading, isAuthenticated, router]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -89,16 +113,16 @@ export default function DashboardLayout({
                   {item.name}
                 </Link>
               ))}
-              <Link
-                href="/auth/login"
-                className="group flex items-center rounded-md px-2 py-2 text-base font-medium text-white hover:bg-primary-light"
+              <button
+                onClick={handleSignOut}
+                className="group flex items-center rounded-md px-2 py-2 text-base font-medium text-white hover:bg-primary-light w-full text-left"
               >
                 <FaSignOutAlt
                   className="mr-4 h-6 w-6 flex-shrink-0 text-white"
                   aria-hidden="true"
                 />
                 Sign out
-              </Link>
+              </button>
             </nav>
           </div>
         </div>
@@ -131,16 +155,16 @@ export default function DashboardLayout({
                   {item.name}
                 </Link>
               ))}
-              <Link
-                href="/auth/login"
-                className="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-white hover:bg-primary-light"
+              <button
+                onClick={handleSignOut}
+                className="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-white hover:bg-primary-light w-full text-left"
               >
                 <FaSignOutAlt
                   className="mr-3 h-6 w-6 flex-shrink-0 text-white"
                   aria-hidden="true"
                 />
                 Sign out
-              </Link>
+              </button>
             </nav>
           </div>
         </div>
@@ -164,8 +188,16 @@ export default function DashboardLayout({
             <div className="ml-4 flex items-center md:ml-6">
               <div className="relative">
                 <div className="flex items-center">
-                  <span className="text-sm font-medium text-gray-500 mr-2">John Doe</span>
-                  <FaUserCircle className="h-8 w-8 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-500 mr-2">Welcome {user?.firstName || 'User'}</span>
+                  {user?.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt="Profile"
+                      className="h-8 w-8 rounded-full"
+                    />
+                  ) : (
+                    <FaUserCircle className="h-8 w-8 text-gray-400" />
+                  )}
                 </div>
               </div>
             </div>

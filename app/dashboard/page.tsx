@@ -1,50 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle } from 'react-icons/fa';
 import Link from 'next/link';
-import { mockTransactions} from "@/app/types";
-import { mockUserData } from "@/app/types";
-import { mockActiveLoan } from "@/app/types";
+import { useUser } from '@/app/hooks/useUser';
+import { useDashboardData } from '@/app/hooks/useDashboardData';
+import PayNowButton from '../components/PayNowButton';
+//import dynamic from 'next/dynamic';
 
+//const PayNowButton = dynamic(() => import('@/app/components/PayNowButton'), { ssr: false });
 
 export default function Dashboard() {
-  const [user, setUser] = useState(mockUserData);
-  const [transactions, setTransactions] = useState(mockTransactions);
-  const [activeLoan, setActiveLoan] = useState(mockActiveLoan);
-  const [loading, setLoading] = useState(true);
+  const { user, loading: userLoading, error: userError } = useUser();
+  const { transactions, activeLoan, summary, loading: dataLoading, error: dataError, refetch } = useDashboardData();
 
-  useEffect(() => {
-    // Simulate API fetching
-    const fetchData = async () => {
-      try {
-        // In a real app, these would be actual API calls
-        // const userData = await fetchUserData();
-        // const transactionsData = await fetchTransactions();
-        // const loanData = await fetchActiveLoan();
-        
-        // setUser(userData);
-        // setTransactions(transactionsData);
-        // setActiveLoan(loanData);
-        
-        // Using mock data for now
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const loading = userLoading || dataLoading;
+  const error = userError || dataError;
 
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p>Loading dashboard...</p>
+          <p className="text-black">Loading dashboard...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-red-500">{error}</p>
       </div>
     );
   }
@@ -75,8 +61,8 @@ export default function Dashboard() {
               <FaMoneyBillWave className="h-6 w-6" />
             </div>
           </div>
-          <p className="mt-4 text-3xl font-bold text-primary">{formatCurrency(user.accountBalance)}</p>
-          <p className="mt-2 text-sm text-gray-500">Account Number: {user.accountNumber}</p>
+          <p className="mt-4 text-3xl font-bold text-primary">{formatCurrency(user?.accountBalance || 0)}</p>
+          <p className="mt-2 text-sm text-gray-500">Account Number: {user?.accountNumber}</p>
         </div>
 
         {/* Loan Summary Card (if there's an active loan) */}
@@ -88,7 +74,7 @@ export default function Dashboard() {
                 <FaHandHoldingUsd className="h-6 w-6" />
               </div>
             </div>
-            <p className="mt-4 text-3xl font-bold text-secondary">{formatCurrency(activeLoan.remainingAmount)}</p>
+            <p className="mt-4 text-3xl font-bold text-red-600">{formatCurrency(activeLoan.remainingAmount)}</p>
             <p className="mt-2 text-sm text-gray-500">Outstanding Balance</p>
             <div className="mt-4 flex justify-between">
               <span className="text-sm text-gray-500">Next Payment: {formatDate(activeLoan.nextPaymentDate)}</span>
@@ -97,13 +83,13 @@ export default function Dashboard() {
             <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
               <div
                 className="h-2 rounded-full bg-secondary"
-                style={{ width: `${(activeLoan.amountPaid / (activeLoan.amountPaid + activeLoan.remainingAmount)) * 100}%` }}
+                style={{ width: `${(activeLoan.amountPaid / activeLoan.totalRepayment) * 100}%` }}
               ></div>
             </div>
             <div className="mt-4">
               <Link
                 href="/dashboard/loans"
-                className="text-sm font-medium text-secondary hover:text-secondary-dark"
+                className="text-sm font-medium text-red-600 hover:text-red-800"
               >
                 View Details
               </Link>
@@ -123,27 +109,19 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <FaArrowUp className="mr-2 h-4 w-4 text-secondary" />
-                <span className="text-sm text-gray-600">Deposits</span>
+                <span className="text-sm text-gray-600">Recent Deposit</span>
               </div>
               <span className="text-sm font-medium text-secondary">
-                {formatCurrency(
-                  transactions
-                    .filter((t) => t.type === 'deposit')
-                    .reduce((sum, t) => sum + t.amount, 0)
-                )}
+                {formatCurrency(summary.lastDepositAmount || 0)}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <FaArrowDown className="mr-2 h-4 w-4 text-red-500" />
-                <span className="text-sm text-gray-600">Withdrawals</span>
+                <span className="text-sm text-gray-600">Loan Balance</span>
               </div>
               <span className="text-sm font-medium text-red-500">
-                {formatCurrency(
-                  transactions
-                    .filter((t) => t.type === 'withdrawal')
-                    .reduce((sum, t) => sum + t.amount, 0)
-                )}
+                {formatCurrency(activeLoan.remainingAmount)}
               </span>
             </div>
           </div>
@@ -157,7 +135,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
       {/* Recent Transactions */}
       <div className="rounded-lg bg-white p-6 shadow-md">
         <div className="flex items-center justify-between pb-4">
@@ -229,12 +206,12 @@ export default function Dashboard() {
                   </td>
                   <td
                     className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${
-                      transaction.type === 'deposit'
+                      ['deposit', 'loan_disbursement'].includes(transaction.type)
                         ? 'text-green-600'
                         : 'text-red-600'
                     }`}
                   >
-                    {transaction.type === 'deposit' ? '+' : '-'} {formatCurrency(transaction.amount)}
+                    {['deposit', 'loan_disbursement'].includes(transaction.type) ? '+' : '-'} {formatCurrency(transaction.amount)}
                   </td>
                 </tr>
               ))}
@@ -246,6 +223,9 @@ export default function Dashboard() {
       {/* Actions Card */}
       <div className="rounded-lg bg-white p-6 shadow-md">
         <h2 className="mb-4 text-lg font-medium text-gray-800">Quick Actions</h2>
+          <div className="flex items-center justify-between mb-3">
+            <PayNowButton/>
+          </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <Link
             href="/dashboard/loans"

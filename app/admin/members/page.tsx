@@ -2,21 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { FaSearch, FaUserPlus, FaTrash } from 'react-icons/fa';
-import { mockMembers, Member } from '@/app/types'; // Adjust the import path as necessary
+import axios from 'axios';
+import { Member } from '@/app/types';
+import Link from 'next/link';
 
 export default function Members() {
   const [searchQuery, setSearchQuery] = useState('');
   const [members, setMembers] = useState<Member[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newMember, setNewMember] = useState({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0 });
+  const [newMember, setNewMember] = useState({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '' });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        // In a real app: const response = await fetch('/api/admin/members');
-        // setMembers(await response.json());
-        setMembers(mockMembers);
+        const token = localStorage.getItem('token'); // Assuming token is stored here after login
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMembers(response.data.members);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -31,17 +35,45 @@ export default function Members() {
     member.lastName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddMember = (e: React.FormEvent) => {
+  const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app: POST to '/api/admin/members'
-    setMembers([...members, { ...newMember, id: members.length + 1, accountBalance: Number(newMember.accountBalance) }]);
-    setNewMember({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0 });
-    setShowAddModal(false);
+    try {
+      const token = localStorage.getItem('token');
+      const memberToAdd = { ...newMember, accountBalance: Number(newMember.accountBalance) };
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`, memberToAdd, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMembers([...members, response.data.member]);
+      setNewMember({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '' });
+      setShowAddModal(false);
+    } catch (error) {
+      console.error('Error adding member:', error);
+    }
   };
 
-  const handleRemoveMember = (id: number) => {
-    // In a real app: DELETE to '/api/admin/members/:id'
-    setMembers(members.filter(member => member.id !== id));
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
+
+  const handleDeleteClick = (id: string) => {
+    setMemberToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!memberToDelete) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/admin/members/${memberToDelete}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMembers(members.filter(member => member.id !== memberToDelete));
+      setShowDeleteModal(false);
+      setMemberToDelete(null);
+    } catch (error) {
+      console.error('Error deleting member:', error);
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -96,12 +128,16 @@ export default function Members() {
             <tbody className="divide-y divide-gray-200 bg-white">
               {filteredMembers.map((member) => (
                 <tr key={member.id}>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{`${member.firstName} ${member.lastName}`}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                    <Link href={`/admin/members/${member.id}/payment-ledger`} className="text-primary hover:underline">
+                      {`${member.firstName} ${member.lastName}`}
+                    </Link>
+                  </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member.accountNumber}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(member.joinDate)}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(member.accountBalance)}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                    <button onClick={() => handleRemoveMember(member.id)} className="btn btn-error btn-sm">
+                    <button onClick={() => handleDeleteClick(member.id)} className="btn btn-error btn-sm">
                       <FaTrash />
                     </button>
                   </td>
@@ -141,6 +177,14 @@ export default function Members() {
                 required
               />
               <input
+                type="text"
+                placeholder="Phone Number"
+                value={newMember.phoneNumber}
+                onChange={(e) => setNewMember({ ...newMember, phoneNumber: e.target.value })}
+                className="input input-bordered w-full mt-2"
+                required
+              />
+              <input
                 type="date"
                 value={newMember.joinDate}
                 onChange={(e) => setNewMember({ ...newMember, joinDate: e.target.value })}
@@ -160,6 +204,18 @@ export default function Members() {
                 <button type="button" onClick={() => setShowAddModal(false)} className="btn">Close</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {showDeleteModal && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="text-lg font-bold">Confirm Deletion</h3>
+            <p>Are you sure you want to delete this member? This action cannot be undone.</p>
+            <div className="modal-action">
+              <button onClick={handleConfirmDelete} className="btn btn-error">Delete</button>
+              <button onClick={() => setShowDeleteModal(false)} className="btn">Cancel</button>
+            </div>
           </div>
         </div>
       )}

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { mockAllTransactions, mockAllLoans, mockMembers } from '@/app/types'; // Adjust the import path as necessary
+import axios from 'axios';
+import { Transaction, Loan, Member } from '@/app/types';
 
 export default function Reports() {
   const [reportType, setReportType] = useState<'monthly' | 'yearly'>('monthly');
@@ -21,7 +22,7 @@ export default function Reports() {
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(amount);
   };
 
-  const handleGenerateReport = () => {
+  const handleGenerateReport = async () => {
     if (reportType === 'monthly' && !selectedMonth) {
       alert('Please select a month');
       return;
@@ -44,58 +45,72 @@ export default function Reports() {
       endDate = new Date(year, 11, 31);
     }
 
-    // Filter transactions within the period
-    const transactionsInPeriod = mockAllTransactions.filter(t => {
-      const date = new Date(t.date);
-      return date >= startDate && date <= endDate;
-    });
+    try {
+      const [transactionsResponse, loansResponse, membersResponse] = await Promise.all([
+        axios.get('${process.env.NEXT_PUBLIC_API_URL}/api/transactions'),
+        axios.get('${process.env.NEXT_PUBLIC_API_URL}/api/loans'),
+        axios.get('${process.env.NEXT_PUBLIC_API_URL}/api/members'),
+      ]);
 
-    const totalDeposits = transactionsInPeriod
-      .filter(t => t.type === 'deposit')
-      .reduce((sum, t) => sum + t.amount, 0);
+      const transactions: Transaction[] = transactionsResponse.data;
+      const loans: Loan[] = loansResponse.data;
+      const members: Member[] = membersResponse.data;
 
-    const totalWithdrawals = transactionsInPeriod
-      .filter(t => t.type === 'withdrawal')
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    // Filter loans disbursed in the period
-    const loansDisbursed = mockAllLoans.filter(l => {
-      if (!l.startDate) return false;
-      const date = new Date(l.startDate);
-      return date >= startDate && date <= endDate;
-    });
-
-    const totalLoanDisbursements = loansDisbursed.reduce((sum, l) => sum + l.amount, 0);
-
-    // Filter loan repayments in the period
-    const totalLoanRepayments = mockAllLoans.reduce((sum, l) => {
-      const repaymentsInPeriod = l.repaymentHistory.filter(r => {
-        const date = new Date(r.date);
+      // Filter transactions within the period
+      const transactionsInPeriod = transactions.filter(t => {
+        const date = new Date(t.date);
         return date >= startDate && date <= endDate;
       });
-      return sum + repaymentsInPeriod.reduce((acc, r) => acc + r.amount, 0);
-    }, 0);
 
-    // Total members as of endDate
-    const totalMembers = mockMembers.filter(m => new Date(m.joinDate) <= endDate).length;
+      const totalDeposits = transactionsInPeriod
+        .filter(t => t.type === 'deposit')
+        .reduce((sum, t) => sum + t.amount, 0);
 
-    // Total balance as of endDate (approximation using current balances)
-    const totalBalance = mockMembers
-      .filter(m => new Date(m.joinDate) <= endDate)
-      .reduce((sum, m) => sum + m.accountBalance, 0);
+      const totalWithdrawals = transactionsInPeriod
+        .filter(t => t.type === 'withdrawal')
+        .reduce((sum, t) => sum + t.amount, 0);
 
-    // Net cash flow (simplified profit metric)
-    const netCashFlow = totalDeposits + totalLoanRepayments - totalWithdrawals - totalLoanDisbursements;
+      // Filter loans disbursed in the period
+      const loansDisbursed = loans.filter(l => {
+        if (!l.startDate) return false;
+        const date = new Date(l.startDate);
+        return date >= startDate && date <= endDate;
+      });
 
-    setReportData({
-      totalDeposits,
-      totalWithdrawals,
-      totalLoanDisbursements,
-      totalLoanRepayments,
-      netCashFlow,
-      totalMembers,
-      totalBalance,
-    });
+      const totalLoanDisbursements = loansDisbursed.reduce((sum, l) => sum + l.amount, 0);
+
+      // Filter loan repayments in the period
+      const totalLoanRepayments = loans.reduce((sum, l) => {
+        const repaymentsInPeriod = l.repaymentHistory.filter(r => {
+          const date = new Date(r.date);
+          return date >= startDate && date <= endDate;
+        });
+        return sum + repaymentsInPeriod.reduce((acc, r) => acc + r.amount, 0);
+      }, 0);
+
+      // Total members as of endDate
+      const totalMembers = members.filter(m => new Date(m.joinDate) <= endDate).length;
+
+      // Total balance as of endDate
+      const totalBalance = members
+        .filter(m => new Date(m.joinDate) <= endDate)
+        .reduce((sum, m) => sum + m.accountBalance, 0);
+
+      // Net cash flow (simplified profit metric)
+      const netCashFlow = totalDeposits + totalLoanRepayments - totalWithdrawals - totalLoanDisbursements;
+
+      setReportData({
+        totalDeposits,
+        totalWithdrawals,
+        totalLoanDisbursements,
+        totalLoanRepayments,
+        netCashFlow,
+        totalMembers,
+        totalBalance,
+      });
+    } catch (error) {
+      console.error('Error generating report:', error);
+    }
   };
 
   return (

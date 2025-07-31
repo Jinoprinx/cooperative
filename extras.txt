@@ -1,0 +1,26 @@
+-- Create a tenants table to store cooperative details and branding
+CREATE TABLE tenants (
+    tenant_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    subdomain VARCHAR(100) UNIQUE NOT NULL,
+    logo_url VARCHAR(255),
+    primary_color VARCHAR(7) DEFAULT '#000000',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Add tenant_id to existing tables (example: users table)
+ALTER TABLE users
+ADD COLUMN tenant_id INT NOT NULL,
+ADD FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id);
+
+-- Example query with tenant filter
+SELECT * FROM transactions
+WHERE tenant_id = (SELECT tenant_id FROM users WHERE user_id = ?);
+
+-- Insert your cooperative as the first tenant
+INSERT INTO tenants (name, subdomain, logo_url, primary_color)
+VALUES ('My Cooperative', 'mycooperative', 'https://example.com/logo.png', '#1a73e8');
+
+-- Update existing data with your tenant_id (assuming your tenant_id is 1)
+UPDATE users SET tenant_id = 1;
+UPDATE transactions SET tenant_id = 1;

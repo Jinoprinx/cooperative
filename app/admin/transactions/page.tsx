@@ -2,43 +2,75 @@
 
 import { useState, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
-import { mockAllTransactions, mockMembers, Transaction} from '@/app/types'; // Adjust the import path as necessary
+import axios from 'axios';
+import { Transaction, Member } from '@/app/types';
 
 export default function Transactions() {
   const [searchQuery, setSearchQuery] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [members, setMembers] = useState(mockMembers);
+  const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchData = async () => {
       try {
-        // In a real app: const response = await fetch('/api/admin/transactions');
-        // setTransactions(await response.json());
-        setTransactions(mockAllTransactions);
+        const [transactionsResponse, membersResponse, loansResponse] = await Promise.all([
+          axios.get('http://localhost:5000/api/transactions'),
+          axios.get('http://localhost:5000/api/members'),
+          axios.get('http://localhost:5000/api/loans'),
+        ]);
+
+        const combinedTransactions = [
+          ...transactionsResponse.data,
+          ...loansResponse.data.map((loan: any) => ({ ...loan, type: 'loan' }))
+        ];
+
+        setTransactions(combinedTransactions);
+        setMembers(membersResponse.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching transactions:', error);
+        console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
-    fetchTransactions();
+    fetchData();
   }, []);
 
-  const filteredTransactions = transactions.filter(transaction =>
-    transaction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    members.find(m => m.id === transaction.memberId)?.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    members.find(m => m.id === transaction.memberId)?.lastName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTransactions = transactions.filter(transaction => {
+    const member = members.find(m => m.id === transaction.memberId);
+    const searchString = searchQuery.toLowerCase();
 
-  const handleApprove = (id: number) => {
-    // In a real app: POST to '/api/admin/transactions/:id/approve'
-    setTransactions(transactions.map(t => t.id === id ? { ...t, status: 'approved' } : t));
+    if (transaction.type === 'loan') {
+      return (
+        member?.firstName.toLowerCase().includes(searchString) ||
+        member?.lastName.toLowerCase().includes(searchString) ||
+        transaction.purpose.toLowerCase().includes(searchString)
+      );
+    } else {
+      return (
+        member?.firstName.toLowerCase().includes(searchString) ||
+        member?.lastName.toLowerCase().includes(searchString) ||
+        transaction.description.toLowerCase().includes(searchString)
+      );
+    }
+  });
+
+  const handleApproveTransaction = async (id: string) => {
+    try {
+      await axios.patch(`http://localhost:5000/api/transactions/${id}`, { status: 'approved' } as Partial<Transaction>);
+      setTransactions(transactions.map(t => t.id === id ? { ...t, status: 'approved' } : t));
+    } catch (error) {
+      console.error('Error approving transaction:', error);
+    }
   };
 
-  const handleReject = (id: number) => {
-    // In a real app: POST to '/api/admin/transactions/:id/reject'
-    setTransactions(transactions.map(t => t.id === id ? { ...t, status: 'rejected' } : t));
+  const handleRejectTransaction = async (id: string) => {
+    try {
+      await axios.patch(`http://localhost:5000/api/transactions/${id}`, { status: 'rejected' } as Partial<Transaction>);
+      setTransactions(transactions.map(t => t.id === id ? { ...t, status: 'rejected' } : t));
+    } catch (error) {
+      console.error('Error rejecting transaction:', error);
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -86,15 +118,16 @@ export default function Transactions() {
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Description</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Remaining Balance</th>
                 <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {filteredTransactions.map((transaction) => {
-                const member = members.find(m => m.id === transaction.memberId);
+                const member = members.find(m => m.id === (transaction.memberId || transaction.user));
                 return (
                   <tr key={transaction.id}>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(transaction.date)}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(transaction.date || transaction.createdAt)}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member ? `${member.firstName} ${member.lastName}` : 'Unknown'}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       <span
@@ -103,6 +136,8 @@ export default function Transactions() {
                             ? 'bg-green-100 text-green-800'
                             : transaction.type === 'withdrawal'
                             ? 'bg-red-100 text-red-800'
+                            : transaction.type === 'loan'
+                            ? 'bg-purple-100 text-purple-800'
                             : 'bg-blue-100 text-blue-800'
                         }`}
                       >
@@ -110,7 +145,7 @@ export default function Transactions() {
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(transaction.amount)}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{transaction.description}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{transaction.description || transaction.purpose}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       <span
                         className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
@@ -124,13 +159,14 @@ export default function Transactions() {
                         {transaction.status}
                       </span>
                     </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{transaction.type === 'loan' ? formatCurrency(transaction.remainingAmount) : '-'}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                       {transaction.status === 'pending' && (
                         <>
-                          <button onClick={() => handleApprove(transaction.id)} className="btn btn-success btn-sm mr-2">
+                          <button onClick={() => handleApproveTransaction(transaction.id)} className="btn btn-success btn-sm mr-2">
                             Approve
                           </button>
-                          <button onClick={() => handleReject(transaction.id)} className="btn btn-error btn-sm">
+                          <button onClick={() => handleRejectTransaction(transaction.id)} className="btn btn-error btn-sm">
                             Reject
                           </button>
                         </>

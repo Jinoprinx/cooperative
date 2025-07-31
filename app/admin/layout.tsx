@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   FaHome, 
   FaUsers, 
@@ -14,12 +14,25 @@ import {
   FaFileAlt,
   FaHandshake
 } from 'react-icons/fa';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const { user, loading, logout } = useAuth();
+
+  useEffect(() => {
+    if (!loading && (!user || user.role !== 'admin')) {
+      router.push('/auth/login');
+    }
+  }, [loading, user, router]);
+
+  const handleSignOut = () => {
+    logout();
+  };
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -31,8 +44,10 @@ export default function AdminLayout({
     { name: 'Dashboard', href: '/admin/dashboard', icon: FaHome },
     { name: 'Members', href: '/admin/members', icon: FaUsers },
     { name: 'Transactions', href: '/admin/transactions', icon: FaMoneyBillWave },
+    { name: 'Pending Payments', href: '/admin/payments/pending', icon: FaFileAlt },
     { name: 'Loans', href: '/admin/loans', icon: FaHandshake },
     { name: 'Reports', href: '/admin/reports', icon: FaChartLine },
+    { name: 'Account', href: '/admin/account', icon: FaUserCircle },
   ];
 
   return (
@@ -167,8 +182,12 @@ export default function AdminLayout({
             <div className="ml-4 flex items-center md:ml-6">
               <div className="relative">
                 <div className="flex items-center">
-                  <span className="text-sm font-medium text-gray-500 mr-2">Admin User</span>
-                  <FaUserCircle className="h-8 w-8 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-500 mr-2">Welcome {user?.firstName || 'Admin'}</span>
+                  {user?.profileImage ? (
+                    <img src={`${process.env.NEXT_PUBLIC_API_URL}/${user.profileImage}`} alt="Profile" className="h-8 w-8 rounded-full" />
+                  ) : (
+                    <FaUserCircle className="h-8 w-8 text-gray-400" />
+                  )}
                 </div>
               </div>
             </div>
