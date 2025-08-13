@@ -19,8 +19,8 @@ export default function Loans() {
     const fetchData = async () => {
       try {
         const [loansResponse, membersResponse] = await Promise.all([
-          axios.get('http://localhost:5000/api/loans'),
-          axios.get('http://localhost:5000/api/members'),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/loans`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/members`),
         ]);
         setLoans(loansResponse.data);
         setMembers(membersResponse.data);

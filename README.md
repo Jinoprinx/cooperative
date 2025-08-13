@@ -45,7 +45,7 @@ yarn install
 
 3. Create a `.env.local` file in the root directory with the following variables:
 ```
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_API_URL=https://coopbkend-acfb9cb075e5.herokuapp.com/api
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your_nextauth_secret
 ```

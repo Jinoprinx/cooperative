@@ -15,9 +15,9 @@ export default function Transactions() {
     const fetchData = async () => {
       try {
         const [transactionsResponse, membersResponse, loansResponse] = await Promise.all([
-          axios.get('http://localhost:5000/api/transactions'),
-          axios.get('http://localhost:5000/api/members'),
-          axios.get('http://localhost:5000/api/loans'),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/members`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/loans`),
         ]);
 
         const combinedTransactions = [
@@ -57,7 +57,7 @@ export default function Transactions() {
 
   const handleApproveTransaction = async (id: string) => {
     try {
-      await axios.patch(`http://localhost:5000/api/transactions/${id}`, { status: 'approved' } as Partial<Transaction>);
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${id}`, { status: 'approved' } as Partial<Transaction>);
       setTransactions(transactions.map(t => t._id === id ? { ...t, status: 'approved' } : t));
     } catch (error) {
       console.error('Error approving transaction:', error);
@@ -66,7 +66,7 @@ export default function Transactions() {
 
   const handleRejectTransaction = async (id: string) => {
     try {
-      await axios.patch(`http://localhost:5000/api/transactions/${id}`, { status: 'rejected' } as Partial<Transaction>);
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${id}`, { status: 'rejected' } as Partial<Transaction>);
       setTransactions(transactions.map(t => t._id === id ? { ...t, status: 'rejected' } : t));
     } catch (error) {
       console.error('Error rejecting transaction:', error);
