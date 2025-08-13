@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaHandHoldingUsd, FaCheckCircle, FaTimesCircle, FaHourglassHalf } from 'react-icons/fa';
+import { FaHandHoldingUsd, FaCheckCircle, FaTimesCircle, FaHourglassHalf, FaPlus, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { Loan, Transaction } from '@/app/types';
-import { useDashboardData } from '@/app/hooks/useDashboardData'; // Import useDashboardData
+import { Loan, Transaction, User } from '@/app/types';
+import { useDashboardData } from '@/app/hooks/useDashboardData';
 
 export default function Loans() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -13,10 +13,11 @@ export default function Loans() {
   const [loanAmount, setLoanAmount] = useState('');
   const [purpose, setPurpose] = useState('');
   const [durationMonths, setDurationMonths] = useState('');
+  const [sureties, setSureties] = useState<{ phone: string; name: string; found: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { refetch: refetchDashboardData } = useDashboardData(); // Get refetch from useDashboardData
+  const { refetch: refetchDashboardData } = useDashboardData();
 
   useEffect(() => {
     const fetchLoanData = async () => {
@@ -63,6 +64,10 @@ export default function Loans() {
       alert('Please enter the purpose of the loan.');
       return;
     }
+    if (sureties.length < 1) {
+      alert('You need at least one surety to apply for a loan.');
+      return;
+    }
 
     try {
       const token = localStorage.getItem('token');
@@ -71,26 +76,64 @@ export default function Loans() {
         return;
       }
 
+      const suretyIds = sureties.map(s => s.phone);
+
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/loans/apply`,
-        { amount: parseFloat(loanAmount), purpose, durationMonths: parseInt(durationMonths) },
+        { amount: parseFloat(loanAmount), purpose, durationMonths: parseInt(durationMonths), sureties: suretyIds },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert('Loan application submitted successfully!');
+      alert('Loan application submitted successfully! Your surety requests have been sent.');
       setLoanAmount('');
       setPurpose('');
-      setDurationMonths(''); // Clear durationMonths after successful application
+      setDurationMonths('');
+      setSureties([]);
       // Refresh loan data
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans/history`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setLoans(response.data.history); // Use .history as per backend change
-      refetchDashboardData(); // Refetch dashboard data after successful loan application
-    } catch (error) {
+      setLoans(response.data.history);
+      refetchDashboardData();
+    } catch (error: any) {
       console.error('Error applying for loan:', error);
       const errorMessage = error.response?.data?.message || 'Failed to apply for loan. Please try again.';
       alert(errorMessage);
     }
+  };
+
+  const handleSuretyChange = async (index: number, phone: string) => {
+    const newSureties = [...sureties];
+    newSureties[index].phone = phone;
+    newSureties[index].name = '';
+    newSureties[index].found = false;
+
+    if (phone.length === 11) { // Only search when the phone number has 11 digits
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/search?phone=${phone}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (response.data) {
+          newSureties[index].name = response.data.name;
+          newSureties[index].found = true;
+        }
+      } catch (error) {
+        console.error('Error searching for member:', error);
+        newSureties[index].name = 'Member not found';
+      }
+    }
+    setSureties(newSureties);
+  };
+
+  const addSurety = () => {
+    if (sureties.length < 5) { // Limit to 5 sureties
+      setSureties([...sureties, { phone: '', name: '', found: false }]);
+    }
+  };
+
+  const removeSurety = (index: number) => {
+    const newSureties = sureties.filter((_, i) => i !== index);
+    setSureties(newSureties);
   };
 
   if (loading) {
@@ -153,6 +196,30 @@ export default function Loans() {
             onChange={(e) => setPurpose(e.target.value)}
             className="textarea textarea-bordered w-full"
           />
+          {/* Sureties */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Sureties (at least 2)</label>
+            {sureties.map((surety, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <input
+                  type="tel"
+                  placeholder="Surety Phone Number"
+                  value={surety.phone}
+                  onChange={(e) => handleSuretyChange(index, e.target.value)}
+                  className="input input-bordered w-full"
+                />
+                <span className={`text-sm ${surety.found ? 'text-green-600' : 'text-red-600'}`}>{surety.name}</span>
+                <button onClick={() => removeSurety(index)} className="btn btn-ghost btn-sm">
+                  <FaTrash className="text-red-500" />
+                </button>
+              </div>
+            ))}
+            {sureties.length < 5 && (
+              <button onClick={addSurety} className="btn btn-outline btn-sm">
+                <FaPlus className="mr-2" /> Add Surety
+              </button>
+            )}
+          </div>
           <button onClick={handleApplyLoan} className="btn btn-primary">
             <FaHandHoldingUsd className="mr-2" /> Apply
           </button>
@@ -174,12 +241,12 @@ export default function Loans() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {(loans || []).map((item) => (
-                <tr key={item._id || item.id}>
+                <tr key={item._id}>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    {formatDate('createdAt' in item ? item.createdAt : item.date)}
+                    {formatDate(item.startDate || item.createdAt)}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    {'purpose' in item ? `Loan Application: ${item.purpose}` : `Loan ${item.type === 'loan_disbursement' ? 'Disbursement' : 'Repayment'}`}
+                    {`Loan Application: ${item.purpose}`}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                     <span

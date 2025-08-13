@@ -10,7 +10,8 @@ import {
   FaChartLine, 
   FaSignOutAlt, 
   FaUserCircle, 
-  FaBars 
+  FaBars,
+  FaUserShield
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 
@@ -32,6 +33,7 @@ export default function DashboardLayout({
     { name: 'Dashboard', href: '/dashboard', icon: FaHome },
     { name: 'Transactions', href: '/dashboard/transactions', icon: FaHistory },
     { name: 'Loans', href: '/dashboard/loans', icon: FaMoneyBillWave },
+    { name: 'Surety Requests', href: '/dashboard/loans/surety', icon: FaUserShield },
     { name: 'Account', href: '/dashboard/account', icon: FaUserCircle },
   ];
 

@@ -10,7 +10,7 @@ export default function Members() {
   const [searchQuery, setSearchQuery] = useState('');
   const [members, setMembers] = useState<Member[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newMember, setNewMember] = useState({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '' });
+  const [newMember, setNewMember] = useState({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '', email: '' });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function Members() {
         },
       });
       setMembers([...members, response.data.member]);
-      setNewMember({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '' });
+      setNewMember({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '', email: '' });
       setShowAddModal(false);
     } catch (error) {
       console.error('Error adding member:', error);
@@ -68,7 +68,7 @@ export default function Members() {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/admin/members/${memberToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMembers(members.filter(member => member.id !== memberToDelete));
+      setMembers(members.filter(member => member._id !== memberToDelete));
       setShowDeleteModal(false);
       setMemberToDelete(null);
     } catch (error) {
@@ -127,9 +127,9 @@ export default function Members() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {filteredMembers.map((member) => (
-                <tr key={member.id}>
+                <tr key={member._id}>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    <Link href={`/admin/members/${member.id}/payment-ledger`} className="text-primary hover:underline">
+                    <Link href={`/admin/members/${member._id}/payment-ledger`} className="text-primary hover:underline">
                       {`${member.firstName} ${member.lastName}`}
                     </Link>
                   </td>
@@ -137,7 +137,7 @@ export default function Members() {
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(member.joinDate)}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(member.accountBalance)}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                    <button onClick={() => handleDeleteClick(member.id)} className="btn btn-error btn-sm">
+                    <button onClick={() => handleDeleteClick(member._id)} className="btn btn-error btn-sm">
                       <FaTrash />
                     </button>
                   </td>
@@ -170,19 +170,18 @@ export default function Members() {
               />
               <input
                 type="text"
-                placeholder="Account Number"
-                value={newMember.accountNumber}
-                onChange={(e) => setNewMember({ ...newMember, accountNumber: e.target.value })}
-                className="input input-bordered w-full mt-2"
-                required
-              />
-              <input
-                type="text"
                 placeholder="Phone Number"
                 value={newMember.phoneNumber}
                 onChange={(e) => setNewMember({ ...newMember, phoneNumber: e.target.value })}
                 className="input input-bordered w-full mt-2"
                 required
+              />
+              <input
+                type="email"
+                placeholder="Email (Optional)"
+                value={newMember.email}
+                onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
+                className="input input-bordered w-full mt-2"
               />
               <input
                 type="date"

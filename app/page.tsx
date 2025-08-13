@@ -18,7 +18,7 @@ export default function Home() {
             <source src="/video.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
-          <div className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-60"></div>
+          <div className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-90"></div>
           <div className="relative z-20 flex h-full flex-col items-center justify-center text-white">
             <div className="container mx-auto px-4 text-center">
               <h1 className="mb-4 text-5xl font-extrabold md:text-7xl">

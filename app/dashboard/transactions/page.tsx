@@ -133,7 +133,7 @@ export default function Transactions() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {filteredTransactions.map((transaction) => (
-                <tr key={transaction.id} className={`${transaction.status === 'rejected' ? 'line-through text-gray-400' : ''}`}>
+                <tr key={transaction._id} className={`${transaction.status === 'rejected' ? 'line-through text-gray-400' : ''}`}>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">{formatDate(transaction.date)}</td>
                   <td className="px-6 py-4 text-sm">{transaction.description}</td>
                   <td className="px-6 py-4 text-sm">
@@ -143,14 +143,30 @@ export default function Transactions() {
                           ? 'bg-green-100 text-green-800'
                           : transaction.type === 'withdrawal'
                           ? 'bg-red-100 text-red-800'
-                          : 'bg-blue-100 text-blue-800'
+                          : transaction.type === 'loan_repayment'
+                          ? 'bg-blue-100 text-blue-800'
+                          : transaction.type === 'loan_disbursement'
+                          ? 'bg-purple-100 text-purple-800'
+                          : transaction.type === 'interest_payment'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : transaction.type === 'fee'
+                          ? 'bg-gray-100 text-gray-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}
                     >
                       {transaction.type === 'deposit'
                         ? 'Deposit'
                         : transaction.type === 'withdrawal'
                         ? 'Withdrawal'
-                        : 'Loan Repayment'}
+                        : transaction.type === 'loan_repayment'
+                        ? 'Loan Repayment'
+                        : transaction.type === 'loan_disbursement'
+                        ? 'Loan Disbursement'
+                        : transaction.type === 'interest_payment'
+                        ? 'Interest Payment'
+                        : transaction.type === 'fee'
+                        ? 'Fee'
+                        : transaction.type}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm capitalize">{transaction.status}</td>

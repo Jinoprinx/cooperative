@@ -65,7 +65,7 @@ export default function MemberPaymentLedger() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {paymentRecords.map((record) => (
-                <tr key={record.id}>
+                <tr key={record._id}>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(record.date)}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(record.amount)}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{record.paymentMethod}</td>

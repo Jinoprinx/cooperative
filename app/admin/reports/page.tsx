@@ -32,82 +32,38 @@ export default function Reports() {
       return;
     }
 
-    let startDate: Date;
-    let endDate: Date;
-
-    if (reportType === 'monthly') {
-      const [year, month] = selectedMonth.split('-').map(Number);
-      startDate = new Date(year, month - 1, 1);
-      endDate = new Date(year, month, 0); // Last day of the month
-    } else {
-      const year = Number(selectedYear);
-      startDate = new Date(year, 0, 1);
-      endDate = new Date(year, 11, 31);
-    }
-
     try {
-      const [transactionsResponse, loansResponse, membersResponse] = await Promise.all([
-        axios.get('${process.env.NEXT_PUBLIC_API_URL}/api/transactions'),
-        axios.get('${process.env.NEXT_PUBLIC_API_URL}/api/loans'),
-        axios.get('${process.env.NEXT_PUBLIC_API_URL}/api/members'),
-      ]);
-
-      const transactions: Transaction[] = transactionsResponse.data;
-      const loans: Loan[] = loansResponse.data;
-      const members: Member[] = membersResponse.data;
-
-      // Filter transactions within the period
-      const transactionsInPeriod = transactions.filter(t => {
-        const date = new Date(t.date);
-        return date >= startDate && date <= endDate;
-      });
-
-      const totalDeposits = transactionsInPeriod
-        .filter(t => t.type === 'deposit')
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      const totalWithdrawals = transactionsInPeriod
-        .filter(t => t.type === 'withdrawal')
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      // Filter loans disbursed in the period
-      const loansDisbursed = loans.filter(l => {
-        if (!l.startDate) return false;
-        const date = new Date(l.startDate);
-        return date >= startDate && date <= endDate;
-      });
-
-      const totalLoanDisbursements = loansDisbursed.reduce((sum, l) => sum + l.amount, 0);
-
-      // Filter loan repayments in the period
-      const totalLoanRepayments = loans.reduce((sum, l) => {
-        const repaymentsInPeriod = l.repaymentHistory.filter(r => {
-          const date = new Date(r.date);
-          return date >= startDate && date <= endDate;
+      let response;
+      if (reportType === 'monthly') {
+        const [year, month] = selectedMonth.split('-');
+                response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/reports/monthly`, {
+          params: { month, year },
         });
-        return sum + repaymentsInPeriod.reduce((acc, r) => acc + r.amount, 0);
-      }, 0);
-
-      // Total members as of endDate
-      const totalMembers = members.filter(m => new Date(m.joinDate) <= endDate).length;
-
-      // Total balance as of endDate
-      const totalBalance = members
-        .filter(m => new Date(m.joinDate) <= endDate)
-        .reduce((sum, m) => sum + m.accountBalance, 0);
-
-      // Net cash flow (simplified profit metric)
-      const netCashFlow = totalDeposits + totalLoanRepayments - totalWithdrawals - totalLoanDisbursements;
-
-      setReportData({
-        totalDeposits,
-        totalWithdrawals,
-        totalLoanDisbursements,
-        totalLoanRepayments,
-        netCashFlow,
-        totalMembers,
-        totalBalance,
-      });
+        const { transactionSummary, memberSummary, financialSummary } = response.data;
+        setReportData({
+          totalDeposits: transactionSummary.totalDeposits,
+          totalWithdrawals: transactionSummary.totalWithdrawals,
+          totalLoanDisbursements: transactionSummary.totalLoanDisbursements,
+          totalLoanRepayments: transactionSummary.totalLoanRepayments,
+          netCashFlow: transactionSummary.netCashFlow,
+          totalMembers: memberSummary.totalActiveMembers,
+          totalBalance: financialSummary.totalCooperativeBalance,
+        });
+      } else {
+        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/reports/annual`, {
+          params: { year: selectedYear },
+        });
+        const { annualTotals, loanStats, totalActiveMembers } = response.data;
+        setReportData({
+          totalDeposits: annualTotals.deposits,
+          totalWithdrawals: annualTotals.withdrawals,
+          totalLoanDisbursements: annualTotals.loanDisbursements,
+          totalLoanRepayments: annualTotals.loanRepayments,
+          netCashFlow: annualTotals.netCashFlow,
+          totalMembers: totalActiveMembers,
+          totalBalance: loanStats.totalLoanAmount,
+        });
+      }
     } catch (error) {
       console.error('Error generating report:', error);
     }
@@ -168,32 +124,32 @@ export default function Reports() {
       {reportData && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="card bg-white shadow-md p-4">
-            <h3 className="text-lg font-medium">Total Deposits</h3>
-            <p className="text-2xl font-bold">{formatCurrency(reportData.totalDeposits)}</p>
+            <h3 className="text-lg font-medium text-gray-900">Total Deposits</h3>
+            <p className="text-2xl font-bold text-gray-900">{formatCurrency(reportData.totalDeposits)}</p>
           </div>
           <div className="card bg-white shadow-md p-4">
-            <h3 className="text-lg font-medium">Total Withdrawals</h3>
-            <p className="text-2xl font-bold">{formatCurrency(reportData.totalWithdrawals)}</p>
+            <h3 className="text-lg font-medium text-gray-900">Total Withdrawals</h3>
+            <p className="text-2xl font-bold text-gray-900">{formatCurrency(reportData.totalWithdrawals)}</p>
           </div>
           <div className="card bg-white shadow-md p-4">
-            <h3 className="text-lg font-medium">Total Loan Disbursements</h3>
-            <p className="text-2xl font-bold">{formatCurrency(reportData.totalLoanDisbursements)}</p>
+            <h3 className="text-lg font-medium text-gray-900">Total Loan Disbursements</h3>
+            <p className="text-2xl font-bold text-gray-900">{formatCurrency(reportData.totalLoanDisbursements)}</p>
           </div>
           <div className="card bg-white shadow-md p-4">
-            <h3 className="text-lg font-medium">Total Loan Repayments</h3>
-            <p className="text-2xl font-bold">{formatCurrency(reportData.totalLoanRepayments)}</p>
+            <h3 className="text-lg font-medium text-gray-900">Total Loan Repayments</h3>
+            <p className="text-2xl font-bold text-gray-900">{formatCurrency(reportData.totalLoanRepayments)}</p>
           </div>
           <div className="card bg-white shadow-md p-4">
-            <h3 className="text-lg font-medium">Net Cash Flow</h3>
-            <p className="text-2xl font-bold">{formatCurrency(reportData.netCashFlow)}</p>
+            <h3 className="text-lg font-medium text-gray-900">Net Cash Flow</h3>
+            <p className="text-2xl font-bold text-gray-900">{formatCurrency(reportData.netCashFlow)}</p>
           </div>
           <div className="card bg-white shadow-md p-4">
-            <h3 className="text-lg font-medium">Total Members</h3>
-            <p className="text-2xl font-bold">{reportData.totalMembers}</p>
+            <h3 className="text-lg font-medium text-gray-900">Total Members</h3>
+            <p className="text-2xl font-bold text-gray-900">{reportData.totalMembers}</p>
           </div>
           <div className="card bg-white shadow-md p-4">
-            <h3 className="text-lg font-medium">Total Balance</h3>
-            <p className="text-2xl font-bold">{formatCurrency(reportData.totalBalance)}</p>
+            <h3 className="text-lg font-medium text-gray-900">Total Balance</h3>
+            <p className="text-2xl font-bold text-gray-900">{formatCurrency(reportData.totalBalance)}</p>
           </div>
         </div>
       )}

@@ -77,7 +77,7 @@ export default function Dashboard() {
             <p className="mt-4 text-3xl font-bold text-red-600">{formatCurrency(activeLoan.remainingAmount)}</p>
             <p className="mt-2 text-sm text-gray-500">Outstanding Balance</p>
             <div className="mt-4 flex justify-between">
-              <span className="text-sm text-gray-500">Next Payment: {formatDate(activeLoan.nextPaymentDate)}</span>
+              <span className="text-sm text-gray-500">Next Payment: {activeLoan.nextPaymentDate ? formatDate(activeLoan.nextPaymentDate) : 'N/A'}</span>
               <span className="text-sm font-medium">{formatCurrency(activeLoan.monthlyPayment)}</span>
             </div>
             <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
@@ -121,7 +121,7 @@ export default function Dashboard() {
                 <span className="text-sm text-gray-600">Loan Balance</span>
               </div>
               <span className="text-sm font-medium text-red-500">
-                {formatCurrency(activeLoan.remainingAmount)}
+                {activeLoan ? formatCurrency(activeLoan.remainingAmount) : formatCurrency(0)}
               </span>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function Dashboard() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {transactions.slice(0, 5).map((transaction) => (
-                <tr key={transaction.id}>
+                <tr key={transaction._id}>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                     {formatDate(transaction.date)}
                   </td>

@@ -34,13 +34,13 @@ export default function Loans() {
   }, []);
 
   const filteredLoans = loans.filter(loan => {
-    const member = members.find(m => m.id === loan.memberId);
+    const member = members.find(m => m._id === loan.memberId);
     const matchesSearch =
       (member?.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
        member?.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
        loan.purpose.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter ? loan.status === statusFilter : true;
-    const loanDate = new Date(loan.startDate || loan.nextPaymentDate);
+    const loanDate = new Date(loan.startDate || loan.nextPaymentDate || '');
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
     const matchesDate = (!start || loanDate >= start) && (!end || loanDate <= end);
@@ -57,7 +57,7 @@ export default function Loans() {
 
   const handleApproveLoan = async (id: string) => {
     try {
-      const loan = loans.find(l => l.id === id);
+      const loan = loans.find(l => l._id === id);
       if (!loan) return;
       const updatedLoan: Partial<Loan> = {
         status: 'approved',
@@ -67,7 +67,7 @@ export default function Loans() {
         nextPaymentDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
       };
       await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/loans/${id}`, updatedLoan);
-      setLoans(loans.map(l => l.id === id ? { ...l, ...updatedLoan } : l));
+      setLoans(loans.map(l => l._id === id ? { ...l, ...updatedLoan } : l));
     } catch (error) {
       console.error('Error approving loan:', error);
     }
@@ -76,7 +76,7 @@ export default function Loans() {
   const handleRejectLoan = async (id: string) => {
     try {
       await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/loans/${id}`, { status: 'rejected' } as Partial<Loan>);
-      setLoans(loans.map(l => l.id === id ? { ...l, status: 'rejected' } : l));
+      setLoans(loans.map(l => l._id === id ? { ...l, status: 'rejected' } : l));
     } catch (error) {
       console.error('Error rejecting loan:', error);
     }
@@ -150,15 +150,17 @@ export default function Loans() {
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Purpose</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Sureties</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Remaining Balance</th>
                 <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {filteredLoans.map((loan) => {
-                const member = members.find(m => m.id === loan.memberId);
+                const member = members.find(m => m._id === loan.memberId);
+                const approvedSureties = loan.sureties?.filter(s => s.status === 'approved').length || 0;
                 return (
-                  <tr key={loan.id}>
+                  <tr key={loan._id}>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member ? `${member.firstName} ${member.lastName}` : 'Unknown'}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.amount)}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
@@ -174,6 +176,11 @@ export default function Loans() {
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{loan.purpose}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                      <div className="tooltip" data-tip={loan.sureties?.map(s => `${s.user.toString()}: ${s.status}`).join('\n')}>
+                        {approvedSureties} / {loan.sureties?.length || 0} approved
+                      </div>
+                    </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.remainingAmount)}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                       <button onClick={() => setSelectedLoan(loan)} className="btn btn-info btn-sm mr-2">
@@ -181,10 +188,10 @@ export default function Loans() {
                       </button>
                       {loan.status === 'pending' && (
                         <>
-                          <button onClick={() => handleApproveLoan(loan.id)} className="btn btn-success btn-sm mr-2">
+                          <button onClick={() => handleApproveLoan(loan._id)} className="btn btn-success btn-sm mr-2" disabled={approvedSureties < 2}>
                             <FaCheck />
                           </button>
-                          <button onClick={() => handleRejectLoan(loan.id)} className="btn btn-error btn-sm">
+                          <button onClick={() => handleRejectLoan(loan._id)} className="btn btn-error btn-sm">
                             <FaTimes />
                           </button>
                         </>
@@ -200,7 +207,7 @@ export default function Loans() {
       {selectedLoan && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="text-lg font-bold">Repayment History for {members.find(m => m.id === selectedLoan.memberId)?.firstName} {members.find(m => m.id === selectedLoan.memberId)?.lastName}</h3>
+            <h3 className="text-lg font-bold">Repayment History for {members.find(m => m._id === selectedLoan.memberId)?.firstName} {members.find(m => m._id === selectedLoan.memberId)?.lastName}</h3>
             <div className="mt-4">
               {selectedLoan.repaymentHistory.length > 0 ? (
                 <table className="min-w-full divide-y divide-gray-200">

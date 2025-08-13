@@ -20,6 +20,7 @@ export default function AdminDashboard() {
   const [recentMembers, setRecentMembers] = useState<RecentMember[]>([]);
   const [pendingLoans, setPendingLoans] = useState<PendingLoan[]>([]);
   const [pendingPayments, setPendingPayments] = useState<PendingPayment[]>([]);
+  const [pendingRegistrations, setPendingRegistrations] = useState<Member[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +53,7 @@ export default function AdminDashboard() {
           .slice(0, 3)
           .map(loan => ({
             ...loan,
-            user: members.find(m => m.id === loan.memberId) || { firstName: 'Unknown', lastName: '', accountNumber: '' },
+            user: members.find(m => m._id === loan.memberId) || { _id: '', firstName: 'Unknown', lastName: '', accountNumber: '' },
             createdAt: loan.createdAt || new Date().toISOString().split('T')[0],
           }));
         setPendingLoans(pending);
@@ -76,6 +77,10 @@ export default function AdminDashboard() {
         // Fetch pending payments
         const pendingPaymentsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/pending-payments`, config);
         setPendingPayments(pendingPaymentsResponse.data.pendingPayments);
+
+        // Fetch pending registrations
+        const pendingRegistrationsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/registrations/pending`, config);
+        setPendingRegistrations(pendingRegistrationsResponse.data);
 
         setLoading(false);
       } catch (error) {
@@ -210,6 +215,54 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleApproveRegistration = async (userId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication required. Please log in.");
+        return;
+      }
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/registrations/${userId}/approve`,
+        {},
+        config
+      );
+
+      setPendingRegistrations((prevRegistrations) =>
+        prevRegistrations.filter((user) => user._id !== userId)
+      );
+    } catch (error) {
+      console.error("Error approving registration:", error);
+      setError("Failed to approve registration. Please try again.");
+    }
+  };
+
+  const handleRejectRegistration = async (userId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication required. Please log in.");
+        return;
+      }
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/registrations/${userId}/reject`,
+        {},
+        config
+      );
+
+      setPendingRegistrations((prevRegistrations) =>
+        prevRegistrations.filter((user) => user._id !== userId)
+      );
+    } catch (error) {
+      console.error("Error rejecting registration:", error);
+      setError("Failed to reject registration. Please try again.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -341,7 +394,7 @@ export default function AdminDashboard() {
           </div>
           <div className="divide-y divide-gray-200">
             {recentMembers.map((member) => (
-              <div key={member.id} className="flex items-center justify-between py-2 sm:py-3">
+              <div key={member._id} className="flex items-center justify-between py-2 sm:py-3">
                 <div className="flex items-center min-w-0">
                   <div className="mr-2 sm:mr-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary-light text-white">
                     <FaUserPlus className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -438,6 +491,44 @@ export default function AdminDashboard() {
                   </button>
                   <button
                     onClick={() => handleRejectPayment(payment._id)}
+                    className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Pending Registrations */}
+      <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
+        <div className="mb-3 sm:mb-4 flex items-center justify-between">
+          <h2 className="text-base sm:text-lg font-medium text-gray-800 truncate">Pending Registrations</h2>
+        </div>
+        <div className="divide-y divide-gray-200">
+          {pendingRegistrations.map((user) => (
+            <div key={user._id} className="flex items-center justify-between py-2 sm:py-3">
+              <div className="flex items-center min-w-0">
+                <div className="mr-2 sm:mr-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-blue-100 text-white">
+                  <FaUserPlus className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900 truncate">{user.firstName} {user.lastName}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                </div>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => handleApproveRegistration(user._id)}
+                    className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleRejectRegistration(user._id)}
                     className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
                   >
                     Reject

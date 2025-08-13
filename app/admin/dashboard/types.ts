@@ -4,6 +4,7 @@ export interface RecentMember extends Member {}
 
 export interface PendingLoan extends Loan {
   user: {
+    _id: string;
     firstName: string;
     lastName: string;
     accountNumber: string;

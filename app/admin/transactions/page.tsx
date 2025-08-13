@@ -37,20 +37,20 @@ export default function Transactions() {
   }, []);
 
   const filteredTransactions = transactions.filter(transaction => {
-    const member = members.find(m => m.id === transaction.memberId);
+    const member = members.find(m => m._id === transaction.memberId);
     const searchString = searchQuery.toLowerCase();
 
     if (transaction.type === 'loan') {
       return (
         member?.firstName.toLowerCase().includes(searchString) ||
         member?.lastName.toLowerCase().includes(searchString) ||
-        transaction.purpose.toLowerCase().includes(searchString)
+        (transaction.purpose?.toLowerCase() || '').includes(searchString)
       );
     } else {
       return (
         member?.firstName.toLowerCase().includes(searchString) ||
         member?.lastName.toLowerCase().includes(searchString) ||
-        transaction.description.toLowerCase().includes(searchString)
+        (transaction.description?.toLowerCase() || '').includes(searchString)
       );
     }
   });
@@ -58,7 +58,7 @@ export default function Transactions() {
   const handleApproveTransaction = async (id: string) => {
     try {
       await axios.patch(`http://localhost:5000/api/transactions/${id}`, { status: 'approved' } as Partial<Transaction>);
-      setTransactions(transactions.map(t => t.id === id ? { ...t, status: 'approved' } : t));
+      setTransactions(transactions.map(t => t._id === id ? { ...t, status: 'approved' } : t));
     } catch (error) {
       console.error('Error approving transaction:', error);
     }
@@ -67,7 +67,7 @@ export default function Transactions() {
   const handleRejectTransaction = async (id: string) => {
     try {
       await axios.patch(`http://localhost:5000/api/transactions/${id}`, { status: 'rejected' } as Partial<Transaction>);
-      setTransactions(transactions.map(t => t.id === id ? { ...t, status: 'rejected' } : t));
+      setTransactions(transactions.map(t => t._id === id ? { ...t, status: 'rejected' } : t));
     } catch (error) {
       console.error('Error rejecting transaction:', error);
     }
@@ -124,10 +124,10 @@ export default function Transactions() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {filteredTransactions.map((transaction) => {
-                const member = members.find(m => m.id === (transaction.memberId || transaction.user));
+                const member = members.find(m => m._id === (transaction.memberId || transaction.user));
                 return (
-                  <tr key={transaction.id}>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(transaction.date || transaction.createdAt)}</td>
+                  <tr key={transaction._id}>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(transaction.date || transaction.createdAt || '')}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member ? `${member.firstName} ${member.lastName}` : 'Unknown'}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       <span
@@ -159,14 +159,14 @@ export default function Transactions() {
                         {transaction.status}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{transaction.type === 'loan' ? formatCurrency(transaction.remainingAmount) : '-'}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{transaction.type === 'loan' ? formatCurrency(transaction.remainingAmount ?? 0) : '-'}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                       {transaction.status === 'pending' && (
                         <>
-                          <button onClick={() => handleApproveTransaction(transaction.id)} className="btn btn-success btn-sm mr-2">
+                          <button onClick={() => handleApproveTransaction(transaction._id)} className="btn btn-success btn-sm mr-2">
                             Approve
                           </button>
-                          <button onClick={() => handleRejectTransaction(transaction.id)} className="btn btn-error btn-sm">
+                          <button onClick={() => handleRejectTransaction(transaction._id)} className="btn btn-error btn-sm">
                             Reject
                           </button>
                         </>

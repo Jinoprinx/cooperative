@@ -130,7 +130,7 @@ export default function Account() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {accountActivity.map((activity) => (
-                <tr key={activity.id}>
+                <tr key={activity._id}>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(activity.date)}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{activity.description}</td>
                   <td
