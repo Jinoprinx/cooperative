@@ -1,3 +1,4 @@
+"use client"
 import Link from 'next/link';
 import { FaUsers, FaMoneyBillWave, FaChartLine, FaHandshake } from 'react-icons/fa';
 import Navbar from '@/app/components/Navbar'
@@ -12,8 +13,16 @@ export default function Home() {
           <video
             autoPlay
             muted
-            loop
+            playsInline
+            preload="auto"
             className="absolute top-0 left-0 z-0 h-full w-full object-cover"
+            onLoadedData={(e) => {
+              const video = e.target as HTMLVideoElement;
+              video.play().catch(() => {
+                // Fallback if autoplay fails
+                console.log('Video autoplay blocked');
+              });
+            }}
           >
             <source src="/video.mp4" type="video/mp4" />
             Your browser does not support the video tag.
