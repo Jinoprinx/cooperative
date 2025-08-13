@@ -7,7 +7,7 @@ export default function LoginPage() {
       title="Sign in to your account"
       subtitle="Or"
       linkText="create a new account"
-      linkHref="/auth/register"
+      linkHref="/auth/register" // Redirect for new registration
     >
       <LoginForm />
     </AuthLayout>
