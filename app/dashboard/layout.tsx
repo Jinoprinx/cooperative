@@ -14,6 +14,7 @@ import {
   FaUserShield
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
+import { getImageUrl } from '@/app/utils/imageUtils';
 
 export default function DashboardLayout({
   children,
@@ -193,7 +194,7 @@ export default function DashboardLayout({
                   <span className="text-sm font-medium text-gray-500 mr-2">Welcome {user?.firstName || 'User'}</span>
                   {user?.profileImage ? (
                     <img
-                      src={user.profileImage}
+                      src={getImageUrl(user.profileImage)}
                       alt="Profile"
                       className="h-8 w-8 rounded-full"
                     />

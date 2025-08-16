@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/app/context/AuthContext';
+import { getImageUrl } from '@/app/utils/imageUtils';
 
 export default function ProfileImageUpload({ setProfileImage }: { setProfileImage: (url: string) => void }) {
   const { user, updateUser } = useAuth();
@@ -89,7 +90,7 @@ export default function ProfileImageUpload({ setProfileImage }: { setProfileImag
         <div className="mt-4">
           <h3 className="text-lg font-medium mb-2">Current Profile Image:</h3>
           <img
-            src={user?.role === 'admin' ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/${user.profileImage}` : user.profileImage}
+            src={getImageUrl(user.profileImage)}
             alt="Profile"
             width="150"
             height="150"

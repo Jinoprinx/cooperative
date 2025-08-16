@@ -15,6 +15,7 @@ import {
   FaHandshake
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
+import { getImageUrl } from '@/app/utils/imageUtils';
 
 export default function AdminLayout({
   children,
@@ -184,7 +185,7 @@ export default function AdminLayout({
                 <div className="flex items-center">
                   <span className="text-sm font-medium text-gray-500 mr-2">Welcome {user?.firstName || 'Admin'}</span>
                   {user?.profileImage ? (
-                    <img src={`${process.env.NEXT_PUBLIC_API_URL}/${user.profileImage}`} alt="Profile" className="h-8 w-8 rounded-full" />
+                    <img src={getImageUrl(user.profileImage)} alt="Profile" className="h-8 w-8 rounded-full" />
                   ) : (
                     <FaUserCircle className="h-8 w-8 text-gray-400" />
                   )}
