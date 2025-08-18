@@ -58,7 +58,7 @@ export default function LoginForm() {
             id="credential"
             type="text"
             autoComplete="email"
-            className={`relative block w-full rounded-t-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+            className={`relative block w-full rounded-t-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
               errors.credential ? 'ring-red-300' : 'ring-gray-300'
             } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
             placeholder="Email or Phone Number"
@@ -81,7 +81,7 @@ export default function LoginForm() {
             id="password"
             type="password"
             autoComplete="current-password"
-            className={`relative block w-full rounded-b-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+            className={`relative block w-full rounded-b-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
               errors.password ? 'ring-red-300' : 'ring-gray-300'
             } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
             placeholder="Password"

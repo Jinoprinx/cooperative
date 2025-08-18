@@ -87,7 +87,7 @@ export default function RegisterForm() {
                 id="firstName"
                 type="text"
                 autoComplete="given-name"
-                className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+                className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
                   errors.firstName ? 'ring-red-300' : 'ring-gray-300'
                 } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
                 placeholder="First Name"
@@ -113,7 +113,7 @@ export default function RegisterForm() {
                 id="lastName"
                 type="text"
                 autoComplete="family-name"
-                className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+                className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
                   errors.lastName ? 'ring-red-300' : 'ring-gray-300'
                 } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
                 placeholder="Last Name"
@@ -140,7 +140,7 @@ export default function RegisterForm() {
               id="email"
               type="email"
               autoComplete="email"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
                 errors.email ? 'ring-red-300' : 'ring-gray-300'
               } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
               placeholder="Email address"
@@ -166,7 +166,7 @@ export default function RegisterForm() {
               id="phoneNumber"
               type="tel"
               autoComplete="tel"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
                 errors.phoneNumber ? 'ring-red-300' : 'ring-gray-300'
               } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
               placeholder="Phone Number"
@@ -192,7 +192,7 @@ export default function RegisterForm() {
               id="password"
               type="password"
               autoComplete="new-password"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
                 errors.password ? 'ring-red-300' : 'ring-gray-300'
               } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
               placeholder="Password"
@@ -218,7 +218,7 @@ export default function RegisterForm() {
               id="confirmPassword"
               type="password"
               autoComplete="new-password"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
                 errors.confirmPassword ? 'ring-red-300' : 'ring-gray-300'
               } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
               placeholder="Confirm Password"
@@ -243,7 +243,7 @@ export default function RegisterForm() {
             <input
               id="superAdminKey"
               type="text"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ${
+              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
                 errors.superAdminKey ? 'ring-red-300' : 'ring-gray-300'
               } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
               placeholder="Super Admin Key (Optional)"
