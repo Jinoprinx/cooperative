@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^3.3.1",
     "axios": "^1.5.0",
     "daisyui": "^3.7.4",
+    "framer-motion": "^12.29.0",
     "next": "^14.0.3",
     "next-auth": "^4.23.1",
     "react": "^18.2.0",

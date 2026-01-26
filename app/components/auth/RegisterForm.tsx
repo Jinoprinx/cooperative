@@ -5,8 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { FaUser, FaEnvelope, FaLock, FaPhone } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaPhone, FaCircleNotch } from 'react-icons/fa';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -15,7 +16,7 @@ const registerSchema = z.object({
   phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(8, 'Confirm password is required'),
-  superAdminKey: z.string().optional(), // New optional field for super admin key
+  superAdminKey: z.string().optional(),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -47,14 +48,11 @@ export default function RegisterForm() {
         email: data.email,
         password: data.password,
         phoneNumber: data.phoneNumber,
-        superAdminKey: data.superAdminKey, // Include superAdminKey in the request
+        superAdminKey: data.superAdminKey,
       });
 
-      // Store the token in localStorage
       const token = response.data.token;
       localStorage.setItem('token', token);
-
-      // Redirect to login page or dashboard
       router.push('/auth/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to register. Please try again.');
@@ -64,209 +62,137 @@ export default function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-      {error && (
-        <div className="rounded-md bg-red-50 p-4">
-          <div className="flex">
-            <div className="text-sm text-red-700">{error}</div>
-          </div>
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="rounded-xl bg-red-500 border border-red-500 p-4"
+          >
+            <div className="flex">
+              <div className="text-sm text-red-400 font-medium">{error}</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="space-y-4">
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label htmlFor="firstName" className="sr-only">
-              First Name
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <FaUser className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="firstName"
-                type="text"
-                autoComplete="given-name"
-                className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-                  errors.firstName ? 'ring-red-300' : 'ring-gray-300'
-                } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-                placeholder="First Name"
-                {...register('firstName')}
-              />
-              {errors.firstName && (
-                <p className="mt-1 text-sm text-red-600" id="firstName-error">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
-          </div>
-          
-          <div className="flex-1">
-            <label htmlFor="lastName" className="sr-only">
-              Last Name
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <FaUser className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="lastName"
-                type="text"
-                autoComplete="family-name"
-                className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-                  errors.lastName ? 'ring-red-300' : 'ring-gray-300'
-                } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-                placeholder="Last Name"
-                {...register('lastName')}
-              />
-              {errors.lastName && (
-                <p className="mt-1 text-sm text-red-600" id="lastName-error">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-        
-        <div>
-          <label htmlFor="email" className="sr-only">
-            Email address
-          </label>
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <FaEnvelope className="h-5 w-5 text-gray-400" />
-            </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">First Name</label>
+          <div className="relative group">
             <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-                errors.email ? 'ring-red-300' : 'ring-gray-300'
-              } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-              placeholder="Email address"
-              {...register('email')}
+              type="text"
+              className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.firstName ? 'border-red-500/50' : ''}`}
+              placeholder="John"
+              {...register('firstName')}
             />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600" id="email-error">
-                {errors.email.message}
-              </p>
-            )}
           </div>
+          {errors.firstName && <p className="text-[10px] text-red-400 font-medium px-1">{errors.firstName.message}</p>}
         </div>
-        
-        <div>
-          <label htmlFor="phoneNumber" className="sr-only">
-            Phone Number
-          </label>
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <FaPhone className="h-5 w-5 text-gray-400" />
-            </div>
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Last Name</label>
+          <div className="relative group">
             <input
-              id="phoneNumber"
-              type="tel"
-              autoComplete="tel"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-                errors.phoneNumber ? 'ring-red-300' : 'ring-gray-300'
-              } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-              placeholder="Phone Number"
-              {...register('phoneNumber')}
+              type="text"
+              className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.lastName ? 'border-red-500/50' : ''}`}
+              placeholder="Doe"
+              {...register('lastName')}
             />
-            {errors.phoneNumber && (
-              <p className="mt-1 text-sm text-red-600" id="phoneNumber-error">
-                {errors.phoneNumber.message}
-              </p>
-            )}
           </div>
+          {errors.lastName && <p className="text-[10px] text-red-400 font-medium px-1">{errors.lastName.message}</p>}
         </div>
-        
-        <div>
-          <label htmlFor="password" className="sr-only">
-            Password
-          </label>
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <FaLock className="h-5 w-5 text-gray-400" />
-            </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Email Address</label>
+        <div className="relative group">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+            <FaEnvelope className="h-3.5 w-3.5 text-white/20 group-focus-within:text-primary transition-colors" />
+          </div>
+          <input
+            type="email"
+            className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.email ? 'border-red-500/50' : ''}`}
+            placeholder="john@example.com"
+            {...register('email')}
+          />
+        </div>
+        {errors.email && <p className="text-[10px] text-red-400 font-medium px-1">{errors.email.message}</p>}
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Phone Number</label>
+        <div className="relative group">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+            <FaPhone className="h-3.5 w-3.5 text-white/20 group-focus-within:text-primary transition-colors" />
+          </div>
+          <input
+            type="tel"
+            className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.phoneNumber ? 'border-red-500/50' : ''}`}
+            placeholder="+1 (555) 000-0000"
+            {...register('phoneNumber')}
+          />
+        </div>
+        {errors.phoneNumber && <p className="text-[10px] text-red-400 font-medium px-1">{errors.phoneNumber.message}</p>}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Password</label>
+          <div className="relative group">
             <input
-              id="password"
               type="password"
-              autoComplete="new-password"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-                errors.password ? 'ring-red-300' : 'ring-gray-300'
-              } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-              placeholder="Password"
+              className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.password ? 'border-red-500/50' : ''}`}
+              placeholder="••••••••"
               {...register('password')}
             />
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600" id="password-error">
-                {errors.password.message}
-              </p>
-            )}
           </div>
+          {errors.password && <p className="text-[10px] text-red-400 font-medium px-1">{errors.password.message}</p>}
         </div>
-        
-        <div>
-          <label htmlFor="confirmPassword" className="sr-only">
-            Confirm Password
-          </label>
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <FaLock className="h-5 w-5 text-gray-400" />
-            </div>
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Confirm</label>
+          <div className="relative group">
             <input
-              id="confirmPassword"
               type="password"
-              autoComplete="new-password"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-                errors.confirmPassword ? 'ring-red-300' : 'ring-gray-300'
-              } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-              placeholder="Confirm Password"
+              className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
+              placeholder="••••••••"
               {...register('confirmPassword')}
             />
-            {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600" id="confirmPassword-error">
-                {errors.confirmPassword.message}
-              </p>
-            )}
           </div>
-        </div>
-
-        <div>
-          <label htmlFor="superAdminKey" className="sr-only">
-            Super Admin Key
-          </label>
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <FaLock className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              id="superAdminKey"
-              type="text"
-              className={`relative block w-full rounded-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-                errors.superAdminKey ? 'ring-red-300' : 'ring-gray-300'
-              } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-              placeholder="Super Admin Key (Optional)"
-              {...register('superAdminKey')}
-            />
-            {errors.superAdminKey && (
-              <p className="mt-1 text-sm text-red-600" id="superAdminKey-error">
-                {errors.superAdminKey.message}
-              </p>
-            )}
-          </div>
+          {errors.confirmPassword && <p className="text-[10px] text-red-400 font-medium px-1">{errors.confirmPassword.message}</p>}
         </div>
       </div>
 
-      <div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="group relative flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-        >
-          {loading ? 'Registering...' : 'Register'}
-        </button>
+      <div className="space-y-1.5">
+        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Super Admin Key (Optional)</label>
+        <div className="relative group">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+            <FaLock className="h-3.5 w-3.5 text-white/20 group-focus-within:text-primary transition-colors" />
+          </div>
+          <input
+            type="text"
+            className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            placeholder="Enter key if applicable"
+            {...register('superAdminKey')}
+          />
+        </div>
       </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="btn-primary w-full py-3.5 relative overflow-hidden group disabled:opacity-70 mt-4"
+      >
+        <span className={loading ? 'opacity-0' : 'opacity-100 flex items-center justify-center font-bold tracking-tight text-sm'}>
+          Create Member Profile
+        </span>
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <FaCircleNotch className="animate-spin text-lg" />
+          </div>
+        )}
+      </button>
     </form>
   );
 }

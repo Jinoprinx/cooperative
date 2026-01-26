@@ -3,15 +3,17 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  FaHome, 
-  FaHistory, 
-  FaMoneyBillWave, 
-  FaChartLine, 
-  FaSignOutAlt, 
-  FaUserCircle, 
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  FaHome,
+  FaHistory,
+  FaMoneyBillWave,
+  FaChartLine,
+  FaSignOutAlt,
+  FaUserCircle,
   FaBars,
-  FaUserShield
+  FaUserShield,
+  FaTimes
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 import { getImageUrl } from '@/app/utils/imageUtils';
@@ -50,167 +52,166 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p>Loading...</p>
+          <FaChartLine className="h-10 w-10 text-primary animate-pulse mx-auto mb-4" />
+          <p className="text-white/40 font-medium tracking-widest uppercase text-xs">Authenticating...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-background text-white selection:bg-primary">
       {/* Mobile sidebar */}
-      <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" 
-          style={{ display: sidebarOpen ? 'block' : 'none' }}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" 
-             onClick={toggleSidebar} aria-hidden="true"></div>
-        
-        <div className="fixed inset-y-0 left-0 flex w-full max-w-xs flex-col bg-primary pt-5 pb-4">
-          <div className="px-4">
-            <div className="flex items-center justify-between">
-              <div className="text-xl font-bold text-white">Cooperative Society</div>
-              <button
-                type="button"
-                className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                onClick={toggleSidebar}
-              >
-                <span className="sr-only">Close sidebar</span>
-                <svg
-                  className="h-6 w-6 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="mt-5 h-0 flex-1 overflow-y-auto">
-            <nav className="space-y-1 px-2">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`group flex items-center rounded-md px-2 py-2 text-base font-medium ${
-                    pathname === item.href
-                      ? 'bg-primary-dark text-white'
-                      : 'text-white hover:bg-primary-light'
-                  }`}
-                >
-                  <item.icon
-                    className={`mr-4 h-6 w-6 flex-shrink-0 ${
-                      pathname === item.href ? 'text-white' : 'text-white'
-                    }`}
-                    aria-hidden="true"
-                  />
-                  {item.name}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              onClick={toggleSidebar}
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col bg-surface border-r border-white/5 pt-5 pb-4"
+            >
+              <div className="px-6 flex items-center justify-between mb-8">
+                <Link href="/" className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transform rotate-12">
+                    <span className="text-white font-bold -rotate-12 italic text-xl">C</span>
+                  </div>
+                  <span className="text-xl font-display font-bold text-white tracking-tight">Coop</span>
                 </Link>
-              ))}
-              <button
-                onClick={handleSignOut}
-                className="group flex items-center rounded-md px-2 py-2 text-base font-medium text-white hover:bg-primary-light w-full text-left"
-              >
-                <FaSignOutAlt
-                  className="mr-4 h-6 w-6 flex-shrink-0 text-white"
-                  aria-hidden="true"
-                />
-                Sign out
-              </button>
-            </nav>
-          </div>
-        </div>
-      </div>
+                <button
+                  type="button"
+                  className="p-2 text-white/40 hover:text-white transition-colors"
+                  onClick={toggleSidebar}
+                >
+                  <FaTimes className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="flex-1 px-4 space-y-1">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`group flex items-center rounded-xl px-4 py-3 text-sm font-bold transition-all ${pathname === item.href
+                      ? 'bg-primary text-primary'
+                      : 'text-white/40 hover:bg-white/5 hover:text-white'
+                      }`}
+                  >
+                    <item.icon className={`mr-4 h-5 w-5 ${pathname === item.href ? 'text-primary' : 'text-current'}`} />
+                    {item.name}
+                  </Link>
+                ))}
+                <button
+                  onClick={handleSignOut}
+                  className="group flex items-center rounded-xl px-4 py-3 text-sm font-bold text-white/40 hover:bg-red-500/10 hover:text-red-400 w-full transition-all"
+                >
+                  <FaSignOutAlt className="mr-4 h-5 w-5" />
+                  Sign out
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex min-h-0 flex-1 flex-col bg-primary">
-          <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-            <div className="flex items-center justify-center px-4">
-              <div className="text-xl font-bold text-white">Cooperative Society</div>
-            </div>
-            <nav className="mt-5 flex-1 space-y-1 px-2">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`group flex items-center rounded-md px-2 py-2 text-sm font-medium ${
-                    pathname === item.href
-                      ? 'bg-primary-dark text-white'
-                      : 'text-white hover:bg-primary-light'
-                  }`}
-                >
-                  <item.icon
-                    className={`mr-3 h-6 w-6 flex-shrink-0 ${
-                      pathname === item.href ? 'text-white' : 'text-white'
-                    }`}
-                    aria-hidden="true"
-                  />
-                  {item.name}
-                </Link>
-              ))}
-              <button
-                onClick={handleSignOut}
-                className="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-white hover:bg-primary-light w-full text-left"
-              >
-                <FaSignOutAlt
-                  className="mr-3 h-6 w-6 flex-shrink-0 text-white"
-                  aria-hidden="true"
-                />
-                Sign out
-              </button>
-            </nav>
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col border-r border-white/5 bg-surface/50">
+        <div className="flex flex-col flex-1 pt-8 pb-4">
+          <div className="px-8 mb-12">
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transform rotate-12 shadow-lg shadow-primary">
+                <span className="text-white font-bold -rotate-12 italic text-2xl">C</span>
+              </div>
+              <span className="text-2xl font-display font-bold text-white tracking-tight">
+                Coop
+              </span>
+            </Link>
           </div>
+          <nav className="flex-1 px-4 space-y-1.5">
+            <div className="px-4 mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Navigation</div>
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`group flex items-center rounded-xl px-4 py-3.5 text-sm font-bold transition-all ${pathname === item.href
+                  ? 'bg-primary text-primary shadow-sm'
+                  : 'text-white/40 hover:bg-white/5 hover:text-white'
+                  }`}
+              >
+                <item.icon className={`mr-4 h-5 w-5 transition-transform group-hover:scale-110 ${pathname === item.href ? 'text-primary' : 'text-current'}`} />
+                {item.name}
+              </Link>
+            ))}
+            <div className="pt-8 px-4 mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Session</div>
+            <button
+              onClick={handleSignOut}
+              className="group flex items-center rounded-xl px-4 py-3.5 text-sm font-bold text-white/40 hover:bg-red-500/10 hover:text-red-400 w-full transition-all"
+            >
+              <FaSignOutAlt className="mr-4 h-5 w-5" />
+              Log Out
+            </button>
+          </nav>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col lg:pl-64">
-        <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white shadow">
+      <div className="flex flex-1 flex-col lg:pl-72">
+        <header className="sticky top-0 z-30 flex h-20 flex-shrink-0 glass-navbar px-4 lg:px-8 items-center justify-between">
           <button
             type="button"
-            className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary lg:hidden"
+            className="p-2 text-white/40 lg:hidden"
             onClick={toggleSidebar}
           >
-            <span className="sr-only">Open sidebar</span>
-            <FaBars className="h-6 w-6" aria-hidden="true" />
+            <FaBars className="h-6 w-6" />
           </button>
-          <div className="flex flex-1 justify-between px-4">
-            <div className="flex flex-1 items-center">
-              <h1 className="text-lg font-semibold text-primary">Member Dashboard</h1>
-            </div>
-            <div className="ml-4 flex items-center md:ml-6">
-              <div className="relative">
-                <div className="flex items-center">
-                  <span className="text-sm font-medium text-gray-500 mr-2">Welcome {user?.firstName || 'User'}</span>
-                  {user?.profileImage ? (
-                    <img
-                      src={getImageUrl(user.profileImage)}
-                      alt="Profile"
-                      className="h-8 w-8 rounded-full"
-                    />
-                  ) : (
-                    <FaUserCircle className="h-8 w-8 text-gray-400" />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <main className="flex-1">
-          <div className="py-6">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">{children}</div>
+          <div className="flex-1 flex items-center lg:px-0">
+            <h2 className="text-lg font-bold text-white/80 hidden sm:block">
+              {navigation.find(n => n.href === pathname)?.name || 'Dashboard'}
+            </h2>
           </div>
+
+          <div className="flex items-center space-x-6">
+            <div className="flex flex-col items-end">
+              <span className="text-sm font-bold text-white tracking-tight">{user?.firstName} {user?.lastName}</span>
+              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-1.5 py-0.5 rounded">Member</span>
+            </div>
+            <div className="relative group cursor-pointer">
+              {user?.profileImage ? (
+                <div className="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-white/5 group-hover:ring-primary transition-all">
+                  <img
+                    src={getImageUrl(user.profileImage)}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-surface-lighter flex items-center justify-center border border-white/10 group-hover:border-primary transition-all">
+                  <FaUserCircle className="h-6 w-6 text-white/20" />
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 p-6 lg:p-10">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mx-auto max-w-6xl"
+          >
+            {children}
+          </motion.div>
         </main>
       </div>
     </div>

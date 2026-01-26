@@ -11,13 +11,20 @@ export const api = axios.create({
   withCredentials: false, // Important for CORS
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and tenant info
 api.interceptors.request.use(
   (config) => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      // Try to get subdomain from current hostname
+      const hostname = window.location.hostname;
+      const parts = hostname.split('.');
+      if (parts.length > 2 && parts[0] !== 'www') {
+        config.headers['x-tenant-subdomain'] = parts[0];
       }
     }
     return config;

@@ -1,22 +1,43 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Outfit } from 'next/font/google';
 import { AuthProvider } from './context/AuthContext';
 
-const inter = Inter({ subsets: ['latin'] });
+import { headers } from 'next/headers';
+import { TenantProvider } from './context/TenantContext';
 
-export const metadata: Metadata = {
-  title: 'Cooperative Society Management System',
-  description: 'A web application for managing cooperative society operations',
-};
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+async function getTenantData() {
+  const headersList = headers();
+  const subdomain = (await headersList).get('x-tenant-subdomain');
+
+  if (!subdomain) return null;
+
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tenants/resolve?subdomain=${subdomain}`, {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+    if (!response.ok) return null;
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching tenant data:', error);
+    return null;
+  }
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const tenant = await getTenantData();
+
   return (
-    <html lang="en" data-theme="dark">
-      <body className={inter.className}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+    <html lang="en" data-theme="dark" className={`${inter.variable} ${outfit.variable}`}>
+      <body className="font-sans antialiased text-white bg-black">
+        <TenantProvider initialTenant={tenant || undefined}>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </TenantProvider>
       </body>
     </html>
   );

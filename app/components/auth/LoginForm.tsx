@@ -5,8 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { FaLock, FaUser } from 'react-icons/fa';
+import { FaLock, FaUser, FaCircleNotch } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const loginSchema = z.object({
   credential: z.string().min(1, 'Email or phone number is required'),
@@ -37,93 +38,105 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-      {error && (
-        <div className="rounded-md bg-red-50 p-4">
-          <div className="flex">
-            <div className="text-sm text-red-700">{error}</div>
-          </div>
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="rounded-xl bg-red-500 border border-red-500 p-4"
+          >
+            <div className="flex">
+              <div className="text-sm text-red-400 font-medium">{error}</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="-space-y-px rounded-md shadow-sm">
-        <div className="relative">
-          <label htmlFor="credential" className="sr-only">
-            Email or Phone Number
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="credential" className="text-xs font-bold text-white/40 uppercase tracking-widest px-1">
+            Email or Phone
           </label>
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <FaUser className="h-5 w-5 text-gray-400" />
+          <div className="relative group">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+              <FaUser className="h-4 w-4 text-white/20 group-focus-within:text-primary transition-colors" />
+            </div>
+            <input
+              id="credential"
+              type="text"
+              autoComplete="email"
+              className={`block w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all ${errors.credential ? 'border-red-500/50 ring-2 ring-red-500/20' : ''
+                }`}
+              placeholder="e.g. name@company.com"
+              {...register('credential')}
+            />
           </div>
-          <input
-            id="credential"
-            type="text"
-            autoComplete="email"
-            className={`relative block w-full rounded-t-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-              errors.credential ? 'ring-red-300' : 'ring-gray-300'
-            } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-            placeholder="Email or Phone Number"
-            {...register('credential')}
-          />
           {errors.credential && (
-            <p className="mt-1 text-sm text-red-600" id="credential-error">
+            <p className="mt-1 text-xs text-red-400 font-medium px-1" id="credential-error">
               {errors.credential.message}
             </p>
           )}
         </div>
-        <div className="relative">
-          <label htmlFor="password" className="sr-only">
-            Password
-          </label>
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <FaLock className="h-5 w-5 text-gray-400" />
+
+        <div className="space-y-2">
+          <div className="flex justify-between items-center px-1">
+            <label htmlFor="password" className="text-xs font-bold text-white/40 uppercase tracking-widest">
+              Password
+            </label>
+            <Link href="/auth/forgot-password" title="Forgot Password" className="text-xs font-bold text-white/30 hover:text-white transition-colors">
+              Forgot?
+            </Link>
           </div>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            className={`relative block w-full rounded-b-md border-0 py-1.5 pl-10 text-white ring-1 ring-inset ${
-              errors.password ? 'ring-red-300' : 'ring-gray-300'
-            } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-            placeholder="Password"
-            {...register('password')}
-          />
+          <div className="relative group">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+              <FaLock className="h-4 w-4 text-white/20 group-focus-within:text-primary transition-colors" />
+            </div>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              className={`block w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all ${errors.password ? 'border-red-500 ring-2 ring-red-500' : ''
+                }`}
+              placeholder="••••••••"
+              {...register('password')}
+            />
+          </div>
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600" id="password-error">
+            <p className="mt-1 text-xs text-red-400 font-medium px-1" id="password-error">
               {errors.password.message}
             </p>
           )}
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <input
-            id="remember-me"
-            name="remember-me"
-            type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-          />
-          <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-            Remember me
-          </label>
-        </div>
-
-        <div className="text-sm">
-          <Link href="/auth/forgot-password" className="font-medium text-secondary hover:text-secondary-dark">
-            Forgot your password?
-          </Link>
-        </div>
+      <div className="flex items-center space-x-2 px-1">
+        <input
+          id="remember-me"
+          name="remember-me"
+          type="checkbox"
+          className="h-4 w-4 rounded border-white/10 bg-white/5 text-primary focus:ring-primary/50"
+        />
+        <label htmlFor="remember-me" className="text-sm text-white/40 font-medium cursor-pointer select-none">
+          Keep me signed in
+        </label>
       </div>
 
-      <div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="group relative flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-        >
-          {loading ? 'Signing in...' : 'Sign in'}
-        </button>
-      </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="btn-primary w-full py-4 relative overflow-hidden group disabled:opacity-70"
+      >
+        <span className={loading ? 'opacity-0' : 'opacity-100 flex items-center justify-center'}>
+          Enter Cooperative
+        </span>
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <FaCircleNotch className="animate-spin text-lg" />
+          </div>
+        )}
+      </button>
     </form>
   );
 }

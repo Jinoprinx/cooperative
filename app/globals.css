@@ -3,48 +3,72 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 10, 10, 11;
+  --primary-color: #3b82f6;
+  --primary-dark-color: #1d4ed8;
+  --primary-light-color: #60a5fa;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@layer base {
+  body {
+    @apply bg-background text-white selection:bg-primary selection:text-primary-light;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
-}
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-  min-height: 100vh;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display tracking-tight;
+  }
 }
 
 @layer components {
+  .glass-card {
+    @apply bg-surface/40 backdrop-blur-xl border border-white/5;
+  }
+
+  .glass-navbar {
+    @apply bg-background/60 backdrop-blur-md border-b border-white/5;
+  }
+
+  .hero-gradient {
+    @apply bg-mesh-gradient animate-pulse;
+    animation-duration: 8s;
+  }
+
   .btn-primary {
-    @apply bg-primary text-black hover:bg-primary-dark;
+    @apply bg-primary text-white hover:bg-primary-dark rounded-full px-6 py-2.5 font-medium transition-all duration-300 hover:shadow-lg hover:shadow-primary active:scale-95;
   }
-  
+
   .btn-secondary {
-    @apply bg-secondary text-black hover:bg-secondary-dark;
+    @apply bg-white/5 text-white hover:bg-white/10 border border-white/10 rounded-full px-6 py-2.5 font-medium transition-all duration-300 active:scale-95;
   }
-  
-  .form-input {
-    @apply w-full rounded-md border border-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary;
+
+  .card-premium {
+    @apply glass-card rounded-2xl p-8 transition-all duration-500 hover:border-white/10 hover:bg-surface/60;
   }
-  
-  .card-container {
-    @apply rounded-lg bg-white p-6 shadow-md;
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/60;
   }
-  
-  .section-title {
-    @apply mb-4 text-2xl font-bold text-primary;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
   }
 }
