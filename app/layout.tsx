@@ -1,5 +1,5 @@
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Outfit } from 'next/font/google';
 import { AuthProvider } from './context/AuthContext';
 
@@ -27,12 +27,23 @@ async function getTenantData() {
   }
 }
 
+export const metadata: Metadata = {
+  title: 'Coop | Modern Collective Finance',
+  description: 'The definitive operating system for modern cooperatives. Experience collective finance engineered for growth and transparency.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const tenant = await getTenantData();
 
   return (
-    <html lang="en" data-theme="dark" className={`${inter.variable} ${outfit.variable}`}>
-      <body className="font-sans antialiased text-white bg-black">
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${outfit.variable} dark`}>
+      <body className="font-sans antialiased text-white bg-[#050505] min-h-screen">
         <TenantProvider initialTenant={tenant || undefined}>
           <AuthProvider>
             {children}

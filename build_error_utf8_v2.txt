@@ -1,0 +1,266 @@
+﻿
+> cooperative-society-app@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.28
+  - Environments: .env.local, .env.production
+
+   Creating an optimized production build ...
+node.exe : Browserslist: 
+browsers data 
+(caniuse-lite) is 9 months 
+old. Please run:
+At C:\Program 
+Files\nodejs\npm.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Bro  
+  wserslist: b...ld. Ple   
+ ase run::String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  npx update-browserslist-d
+b@latest
+  Why you should do it 
+regularly: https://github.c
+om/browserslist/update-db#r
+eadme
+
+Γò¡ΓöÇΓöÇ ≡ƒî╝[35m daisyUI 3.9.4 [0mhttps://daisyui.com
+Γöé
+Γö£ΓöÇΓöÇ [2m1[0m theme is enabled. How to add more themes:
+Γöé   https://daisyui.com/docs/themes
+Γöé
+Γò░ΓöÇΓöÇ [32mΓ¡É∩╕Å Star daisyUI project on GitHub[0m: https://github.com/saadeghi/daisyui
+
+<w> [webpack.cache.PackFile
+CacheStrategy] Skipped not 
+serializable cache item 'Co
+mpilation/modules|C:\Users\
+JinoPrinx\coop\node_modules
+\next\dist\build\webpack\lo
+aders\css-loader\src\index.
+js??ruleSet[1].rules[14].on
+eOf[12].use[2]!C:\Users\Jin
+oPrinx\coop\node_modules\ne
+xt\dist\build\webpack\loade
+rs\postcss-loader\src\index
+.js??ruleSet[1].rules[14].o
+neOf[12].use[3]!C:\Users\Ji
+noPrinx\coop\app\globals.cs
+s': No serializer 
+registered for 
+PostCSSSyntaxError
+<w> while serializing webpa
+ck/lib/cache/PackFileCacheS
+trategy.PackContentItems 
+-> 
+webpack/lib/NormalModule 
+-> webpack/lib/ModuleBuildE
+rror -> PostCSSSyntaxError
+Failed to compile.
+
+./app/globals.css:1:1
+Syntax error: C:\Users\Jino
+Prinx\coop\app\globals.css 
+The 
+`selection:bg-primary/30` 
+class does not exist. If 
+`selection:bg-primary/30` 
+is a custom class, make 
+sure it is defined within 
+a `@layer` directive.
+
+[1m[31m>[39m[22m[90m 
+1 | 
+[39m[36m@tailwind[39m 
+base[33m;[39m
+ [90m   | 
+[39m[1m[31m^[39m[22m
+ [90m 2 | 
+[39m[36m@tailwind[39m 
+components[33m;[39m
+ [90m 3 | 
+[39m[36m@tailwind[39m 
+utilities[33m;[39m
+
+./app/globals.css
+Syntax error: C:\Users\Jino
+Prinx\coop\app\globals.css 
+The 
+`selection:bg-primary/30` 
+class does not exist. If 
+`selection:bg-primary/30` 
+is a custom class, make 
+sure it is defined within 
+a `@layer` directive. (1:1)
+
+[1m[31m>[39m[22m[90m 
+1 | 
+[39m[36m@tailwind[39m 
+base[33m;[39m
+ [90m   | 
+[39m[1m[31m^[39m[22m
+ [90m 2 | 
+[39m[36m@tailwind[39m 
+components[33m;[39m
+ [90m 3 | 
+[39m[36m@tailwind[39m 
+utilities[33m;[39m
+
+    at 
+tryRunOrWebpackError (C:\Us
+ers\JinoPrinx\coop\node_mod
+ules\next\dist\compiled\web
+pack\bundle5.js:28:312989)
+    at 
+__webpack_require_module__ 
+(C:\Users\JinoPrinx\coop\no
+de_modules\next\dist\compil
+ed\webpack\bundle5.js:28:13
+1165)
+    at __nested_webpack_req
+uire_153728__ (C:\Users\Jin
+oPrinx\coop\node_modules\ne
+xt\dist\compiled\webpack\bu
+ndle5.js:28:130607)
+    at C:\Users\JinoPrinx\c
+oop\node_modules\next\dist\
+compiled\webpack\bundle5.js
+:28:131454
+    at symbolIterator (C:\U
+sers\JinoPrinx\coop\node_mo
+dules\next\dist\compiled\ne
+o-async\async.js:1:14444)
+    at done (C:\Users\JinoP
+rinx\coop\node_modules\next
+\dist\compiled\neo-async\as
+ync.js:1:14824)
+    at Hook.eval [as 
+callAsync] (eval at create 
+(C:\Users\JinoPrinx\coop\no
+de_modules\next\dist\compil
+ed\webpack\bundle5.js:13:28
+858), <anonymous>:15:1)
+    at 
+Hook.CALL_ASYNC_DELEGATE 
+[as _callAsync] (C:\Users\J
+inoPrinx\coop\node_modules\
+next\dist\compiled\webpack\
+bundle5.js:13:26012)
+    at C:\Users\JinoPrinx\c
+oop\node_modules\next\dist\
+compiled\webpack\bundle5.js
+:28:130328
+    at symbolIterator (C:\U
+sers\JinoPrinx\coop\node_mo
+dules\next\dist\compiled\ne
+o-async\async.js:1:14402)
+-- inner error --
+Syntax error: C:\Users\Jino
+Prinx\coop\app\globals.css 
+The 
+`selection:bg-primary/30` 
+class does not exist. If 
+`selection:bg-primary/30` 
+is a custom class, make 
+sure it is defined within 
+a `@layer` directive. (1:1)
+
+[1m[31m>[39m[22m[90m 
+1 | 
+[39m[36m@tailwind[39m 
+base[33m;[39m
+ [90m   | 
+[39m[1m[31m^[39m[22m
+ [90m 2 | 
+[39m[36m@tailwind[39m 
+components[33m;[39m
+ [90m 3 | 
+[39m[36m@tailwind[39m 
+utilities[33m;[39m
+
+    at Object.<anonymous> (
+C:\Users\JinoPrinx\coop\nod
+e_modules\next\dist\build\w
+ebpack\loaders\css-loader\s
+rc\index.js??ruleSet[1].rul
+es[14].oneOf[12].use[2]!C:\
+Users\JinoPrinx\coop\node_m
+odules\next\dist\build\webp
+ack\loaders\postcss-loader\
+src\index.js??ruleSet[1].ru
+les[14].oneOf[12].use[3]!C:
+\Users\JinoPrinx\coop\app\g
+lobals.css:1:7)
+    at C:\Users\JinoPrinx\c
+oop\node_modules\next\dist\
+compiled\webpack\bundle5.js
+:28:922493
+    at Hook.eval [as call] 
+(eval at create (C:\Users\J
+inoPrinx\coop\node_modules\
+next\dist\compiled\webpack\
+bundle5.js:13:28636), 
+<anonymous>:7:1)
+    at Hook.CALL_DELEGATE 
+[as _call] (C:\Users\JinoPr
+inx\coop\node_modules\next\
+dist\compiled\webpack\bundl
+e5.js:13:25906)
+    at C:\Users\JinoPrinx\c
+oop\node_modules\next\dist\
+compiled\webpack\bundle5.js
+:28:131198
+    at 
+tryRunOrWebpackError (C:\Us
+ers\JinoPrinx\coop\node_mod
+ules\next\dist\compiled\web
+pack\bundle5.js:28:312943)
+    at 
+__webpack_require_module__ 
+(C:\Users\JinoPrinx\coop\no
+de_modules\next\dist\compil
+ed\webpack\bundle5.js:28:13
+1165)
+    at __nested_webpack_req
+uire_153728__ (C:\Users\Jin
+oPrinx\coop\node_modules\ne
+xt\dist\compiled\webpack\bu
+ndle5.js:28:130607)
+    at C:\Users\JinoPrinx\c
+oop\node_modules\next\dist\
+compiled\webpack\bundle5.js
+:28:131454
+    at symbolIterator (C:\U
+sers\JinoPrinx\coop\node_mo
+dules\next\dist\compiled\ne
+o-async\async.js:1:14444)
+
+Generated code for C:\Users
+\JinoPrinx\coop\node_module
+s\next\dist\build\webpack\l
+oaders\css-loader\src\index
+.js??ruleSet[1].rules[14].o
+neOf[12].use[2]!C:\Users\Ji
+noPrinx\coop\node_modules\n
+ext\dist\build\webpack\load
+ers\postcss-loader\src\inde
+x.js??ruleSet[1].rules[14].
+oneOf[12].use[3]!C:\Users\J
+inoPrinx\coop\app\globals.c
+ss
+
+Import trace for requested 
+module:
+./app/globals.css
+
+
+> Build failed because of 
+webpack errors

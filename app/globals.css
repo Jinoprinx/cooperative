@@ -4,16 +4,27 @@
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-rgb: 10, 10, 11;
+  --background-rgb: 5, 5, 5;
   --primary-color: #3b82f6;
   --primary-dark-color: #1d4ed8;
   --primary-light-color: #60a5fa;
+  --secondary-color: #10b981;
+  --accent-color: #f59e0b;
+  --surface-color: #111111;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.03);
 }
 
 @layer base {
   body {
-    @apply bg-background text-white selection:bg-primary selection:text-primary-light;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    @apply bg-[#050505] text-white antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+    font-display: swap;
+  }
+
+  ::selection {
+    background-color: var(--primary-color);
+    color: white;
   }
 
   h1,
@@ -22,38 +33,73 @@
   h4,
   h5,
   h6 {
-    @apply font-display tracking-tight;
+    @apply font-display tracking-tight text-white;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-surface/40 backdrop-blur-xl border border-white/5;
+    background-color: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
   }
 
   .glass-navbar {
-    @apply bg-background/60 backdrop-blur-md border-b border-white/5;
+    @apply bg-black/40 backdrop-blur-xl border-b border-white/[0.05];
   }
 
   .hero-gradient {
-    @apply bg-mesh-gradient animate-pulse;
+    background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+    @apply animate-pulse;
     animation-duration: 8s;
   }
 
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-dark rounded-full px-6 py-2.5 font-medium transition-all duration-300 hover:shadow-lg hover:shadow-primary active:scale-95;
+    @apply relative overflow-hidden bg-primary text-white rounded-full px-8 py-3 font-semibold transition-all duration-500 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2;
+
+    &:hover {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    }
   }
 
   .btn-secondary {
-    @apply bg-white/5 text-white hover:bg-white/10 border border-white/10 rounded-full px-6 py-2.5 font-medium transition-all duration-300 active:scale-95;
+    @apply bg-white/[0.05] text-white hover:bg-white/[0.08] border border-white/[0.1] rounded-full px-8 py-3 font-semibold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2;
   }
 
   .card-premium {
-    @apply glass-card rounded-2xl p-8 transition-all duration-500 hover:border-white/10 hover:bg-surface/60;
+    @apply rounded-[2.5rem] p-10 transition-all duration-700;
+    background-color: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/60;
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+
+  .noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.03;
+    z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 }
 
@@ -69,6 +115,14 @@
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-15px);
   }
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotate-y-12 {
+  transform: rotateY(12deg);
 }

@@ -62,7 +62,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background text-white selection:bg-primary">
+    <div className="flex min-h-screen bg-background selection:bg-primary">
       {/* Mobile sidebar */}
       <AnimatePresence>
         {sidebarOpen && (

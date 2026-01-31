@@ -19,37 +19,47 @@ const Navbar = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 z-50 w-full transition-all duration-500 ${isScrolled ? 'py-4' : 'py-6'
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className={`fixed top-0 left-0 z-50 w-full transition-all duration-500 ${isScrolled ? 'py-3' : 'py-6'
         }`}
     >
-      <div className="container mx-auto px-4">
-        <div className={`flex items-center justify-between px-6 py-3 transition-all duration-500 rounded-full ${isScrolled ? 'glass-navbar shadow-2xl shadow-black/20' : 'bg-transparent'
+      <div className="container mx-auto px-4 max-w-7xl">
+        <div className={`flex items-center justify-between px-8 py-4 transition-all duration-700 rounded-[2rem] ${isScrolled ? 'glass-navbar shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]' : 'bg-transparent border border-transparent'
           }`}>
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transform rotate-12">
-              <span className="text-white font-bold -rotate-12 italic text-xl">C</span>
-            </div>
-            <span className="text-2xl font-display font-bold text-white tracking-tight">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <motion.div
+              whileHover={{ rotate: 12, scale: 1.1 }}
+              className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20"
+            >
+              <span className="text-white font-black italic text-2xl tracking-tighter">C</span>
+            </motion.div>
+            <span className="text-2xl font-display font-black text-white tracking-tight group-hover:text-primary transition-colors">
               Coop
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Features</Link>
-            <Link href="#how-it-works" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Process</Link>
-            <Link href="#about" className="text-sm font-medium text-white/70 hover:text-white transition-colors">About</Link>
+          <div className="hidden lg:flex items-center space-x-10">
+            {['Features', 'Process', 'About'].map((item) => (
+              <Link
+                key={item}
+                href={`#${item.toLowerCase().replace(' ', '-')}`}
+                className="text-sm font-semibold text-white/60 hover:text-white transition-all hover:tracking-wider"
+              >
+                {item}
+              </Link>
+            ))}
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <Link
               href="/auth/login"
-              className="px-5 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+              className="px-6 py-2.5 text-sm font-bold text-white/70 hover:text-white transition-colors"
             >
               Log in
             </Link>
             <Link
               href="/auth/register"
-              className="btn-primary text-sm shadow-lg shadow-primary"
+              className="btn-primary text-sm !px-7 !py-2.5 shadow-xl shadow-primary/20"
             >
               Join now
             </Link>
