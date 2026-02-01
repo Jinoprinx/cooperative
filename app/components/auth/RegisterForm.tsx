@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaCircleNotch } from 'react-icons/fa';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTenant } from '@/app/context/TenantContext';
 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -16,6 +17,8 @@ const registerSchema = z.object({
   phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(8, 'Confirm password is required'),
+  coopName: z.string().min(3, 'Cooperative name must be at least 3 characters').optional(),
+  subdomain: z.string().min(3, 'Subdomain must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Subdomain can only contain lowercase letters, numbers, and hyphens').optional(),
   superAdminKey: z.string().optional(),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -26,6 +29,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
   const router = useRouter();
+  const { tenant } = useTenant();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -48,7 +52,10 @@ export default function RegisterForm() {
         email: data.email,
         password: data.password,
         phoneNumber: data.phoneNumber,
+        coopName: data.coopName,
+        subdomain: data.subdomain,
         superAdminKey: data.superAdminKey,
+        tenantId: tenant?.id || tenant?._id, // Handle both id and _id
       });
 
       const token = response.data.token;
@@ -164,6 +171,50 @@ export default function RegisterForm() {
         </div>
       </div>
 
+      {!tenant && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="space-y-5 pt-4 border-t border-white/5 mt-4"
+        >
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] px-1">Cooperative Details</label>
+            <p className="text-[10px] text-white/30 px-1 mb-2">You are registering as an administrator of a new society.</p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Cooperative Name</label>
+            <div className="relative group">
+              <input
+                type="text"
+                className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.coopName ? 'border-red-500/50' : ''}`}
+                placeholder="e.g. Coop Alpha"
+                {...register('coopName')}
+              />
+            </div>
+            {errors.coopName && <p className="text-[10px] text-red-400 font-medium px-1">{errors.coopName.message}</p>}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Desired Subdomain</label>
+            <div className="relative group">
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  className={`flex-1 bg-white/5 border border-white/10 rounded-l-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.subdomain ? 'border-red-500/50' : ''}`}
+                  placeholder="coopa"
+                  {...register('subdomain')}
+                />
+                <div className="bg-white/10 border border-l-0 border-white/10 rounded-r-xl py-2.5 px-4 text-white/40 text-xs font-mono">
+                  .localhost:3000
+                </div>
+              </div>
+            </div>
+            {errors.subdomain && <p className="text-[10px] text-red-400 font-medium px-1">{errors.subdomain.message}</p>}
+          </div>
+        </motion.div>
+      )}
+
       <div className="space-y-1.5">
         <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Super Admin Key (Optional)</label>
         <div className="relative group">
@@ -185,7 +236,7 @@ export default function RegisterForm() {
         className="btn-primary w-full py-3.5 relative overflow-hidden group disabled:opacity-70 mt-4"
       >
         <span className={loading ? 'opacity-0' : 'opacity-100 flex items-center justify-center font-bold tracking-tight text-sm'}>
-          Create Member Profile
+          {tenant ? 'Create Member Profile' : 'Register Cooperative'}
         </span>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center">

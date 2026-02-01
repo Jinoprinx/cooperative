@@ -3,19 +3,21 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  FaHome, 
-  FaUsers, 
-  FaMoneyBillWave, 
-  FaChartLine, 
-  FaSignOutAlt, 
-  FaUserCircle, 
+import {
+  FaHome,
+  FaUsers,
+  FaMoneyBillWave,
+  FaChartLine,
+  FaSignOutAlt,
+  FaUserCircle,
   FaBars,
   FaFileAlt,
   FaHandshake
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
+import { useTenant } from '@/app/context/TenantContext';
 import { getImageUrl } from '@/app/utils/imageUtils';
+import { FaCog } from 'react-icons/fa';
 
 export default function AdminLayout({
   children,
@@ -24,6 +26,7 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const { user, loading, logout } = useAuth();
+  const { tenant } = useTenant();
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
@@ -48,21 +51,27 @@ export default function AdminLayout({
     { name: 'Pending Payments', href: '/admin/payments/pending', icon: FaFileAlt },
     { name: 'Loans', href: '/admin/loans', icon: FaHandshake },
     { name: 'Reports', href: '/admin/reports', icon: FaChartLine },
+    { name: 'Settings', href: '/admin/settings', icon: FaCog },
     { name: 'Account', href: '/admin/account', icon: FaUserCircle },
   ];
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Mobile sidebar */}
-      <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" 
-          style={{ display: sidebarOpen ? 'block' : 'none' }}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" 
-             onClick={toggleSidebar} aria-hidden="true"></div>
-        
+      <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true"
+        style={{ display: sidebarOpen ? 'block' : 'none' }}>
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          onClick={toggleSidebar} aria-hidden="true"></div>
+
         <div className="fixed inset-y-0 left-0 flex w-full max-w-xs flex-col bg-primary pt-5 pb-4">
           <div className="px-4">
             <div className="flex items-center justify-between">
-              <div className="text-xl font-bold text-white">Admin Portal</div>
+              <div className="flex items-center">
+                {tenant?.branding?.logoUrl ? (
+                  <img src={tenant.branding.logoUrl} alt="Logo" className="h-8 w-auto mr-2" />
+                ) : null}
+                <div className="text-xl font-bold text-white truncate">{tenant?.name || 'Admin Portal'}</div>
+              </div>
               <button
                 type="button"
                 className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
@@ -93,16 +102,14 @@ export default function AdminLayout({
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center rounded-md px-2 py-2 text-base font-medium ${
-                    pathname.startsWith(item.href)
+                  className={`group flex items-center rounded-md px-2 py-2 text-base font-medium ${pathname.startsWith(item.href)
                       ? 'bg-primary-dark text-white'
                       : 'text-white hover:bg-primary-light'
-                  }`}
+                    }`}
                 >
                   <item.icon
-                    className={`mr-4 h-6 w-6 flex-shrink-0 ${
-                      pathname.startsWith(item.href) ? 'text-white' : 'text-white'
-                    }`}
+                    className={`mr-4 h-6 w-6 flex-shrink-0 ${pathname.startsWith(item.href) ? 'text-white' : 'text-white'
+                      }`}
                     aria-hidden="true"
                   />
                   {item.name}
@@ -127,24 +134,25 @@ export default function AdminLayout({
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex min-h-0 flex-1 flex-col bg-primary">
           <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-            <div className="flex items-center justify-center px-4">
-              <div className="text-xl font-bold text-white">Admin Portal</div>
+            <div className="flex flex-col items-center px-4 mb-6">
+              {tenant?.branding?.logoUrl ? (
+                <img src={tenant.branding.logoUrl} alt="Logo" className="h-12 w-auto mb-2" />
+              ) : null}
+              <div className="text-xl font-bold text-white text-center line-clamp-2">{tenant?.name || 'Admin Portal'}</div>
             </div>
             <nav className="mt-5 flex-1 space-y-1 px-2">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center rounded-md px-2 py-2 text-sm font-medium ${
-                    pathname.startsWith(item.href)
+                  className={`group flex items-center rounded-md px-2 py-2 text-sm font-medium ${pathname.startsWith(item.href)
                       ? 'bg-primary-dark text-white'
                       : 'text-white hover:bg-primary-light'
-                  }`}
+                    }`}
                 >
                   <item.icon
-                    className={`mr-3 h-6 w-6 flex-shrink-0 ${
-                      pathname.startsWith(item.href) ? 'text-white' : 'text-white'
-                    }`}
+                    className={`mr-3 h-6 w-6 flex-shrink-0 ${pathname.startsWith(item.href) ? 'text-white' : 'text-white'
+                      }`}
                     aria-hidden="true"
                   />
                   {item.name}
@@ -178,7 +186,7 @@ export default function AdminLayout({
           </button>
           <div className="flex flex-1 justify-between px-4">
             <div className="flex flex-1 items-center">
-              <h1 className="text-lg font-semibold text-primary">Admin Dashboard</h1>
+              <h1 className="text-lg font-semibold text-primary">{tenant?.name || 'Admin Dashboard'}</h1>
             </div>
             <div className="ml-4 flex items-center md:ml-6">
               <div className="relative">

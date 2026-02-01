@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  FaUsers, 
-  FaMoneyBillWave, 
-  FaChartLine, 
+import {
+  FaUsers,
+  FaMoneyBillWave,
+  FaChartLine,
   FaHandshake,
   FaArrowUp,
   FaArrowDown,
@@ -266,7 +266,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-      
+
       {/* Stats Grid */}
       <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Members */}
@@ -429,7 +429,7 @@ export default function AdminDashboard() {
                     <FaHandshake className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{loan.user.firstName} {loan.user.lastName}</p>
+                    <p className="font-medium text-gray-900 truncate">{loan.user?.firstName || 'Unknown'} {loan.user?.lastName || ''}</p>
                     <p className="text-xs text-gray-500 truncate">{loan.purpose}</p>
                   </div>
                 </div>
@@ -473,7 +473,7 @@ export default function AdminDashboard() {
                   <FaMoneyBillWave className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{payment.user.firstName} {payment.user.lastName}</p>
+                  <p className="font-medium text-gray-900 truncate">{payment.user?.firstName || 'Unknown'} {payment.user?.lastName || ''}</p>
                   <p className="text-xs text-gray-500 truncate">{payment.description}</p>
                 </div>
               </div>

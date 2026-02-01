@@ -4,8 +4,18 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { useAuth } from '@/app/context/AuthContext';
+import { useTenant } from '@/app/context/TenantContext';
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user, logout } = useAuth();
+  const { tenant } = useTenant();
+
+  // Dynamic branding logic
+  const logoChar = tenant?.name ? tenant.name.charAt(0).toUpperCase() : 'C';
+  const coopName = tenant?.name || 'Coop';
+  const logoUrl = tenant?.branding?.logoUrl;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,12 +39,16 @@ const Navbar = () => {
           <Link href="/" className="flex items-center space-x-3 group">
             <motion.div
               whileHover={{ rotate: 12, scale: 1.1 }}
-              className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20"
+              className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden"
             >
-              <span className="text-white font-black italic text-2xl tracking-tighter">C</span>
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-white font-black italic text-2xl tracking-tighter">{logoChar}</span>
+              )}
             </motion.div>
             <span className="text-2xl font-display font-black text-white tracking-tight group-hover:text-primary transition-colors">
-              Coop
+              {coopName}
             </span>
           </Link>
 
@@ -51,18 +65,36 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-6">
-            <Link
-              href="/auth/login"
-              className="px-6 py-2.5 text-sm font-bold text-white/70 hover:text-white transition-colors"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/auth/register"
-              className="btn-primary text-sm !px-7 !py-2.5 shadow-xl shadow-primary/20"
-            >
-              Join now
-            </Link>
+            {user ? (
+              <>
+                <button
+                  onClick={logout}
+                  className="px-6 py-2.5 text-sm font-bold text-white/70 hover:text-white transition-colors"
+                >
+                  Log out
+                </button>
+                <div
+                  className="btn-primary text-sm !px-7 !py-2.5 shadow-xl shadow-primary/20 pointer-events-none"
+                >
+                  Welcome, {user.firstName}
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="px-6 py-2.5 text-sm font-bold text-white/70 hover:text-white transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="btn-primary text-sm !px-7 !py-2.5 shadow-xl shadow-primary/20"
+                >
+                  Join now
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

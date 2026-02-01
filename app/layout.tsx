@@ -39,7 +39,31 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headersList = headers();
+  const subdomain = (await headersList).get('x-tenant-subdomain');
   const tenant = await getTenantData();
+
+  // If we are on a subdomain but no tenant was found, show a 404/Error page
+  if (subdomain && !tenant) {
+    return (
+      <html lang="en" className="dark">
+        <body className="bg-[#050505] text-white flex items-center justify-center min-h-screen">
+          <div className="text-center p-8 glass-card rounded-3xl border border-white/10 max-w-md">
+            <div className="w-16 h-16 bg-red-500/20 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl font-bold">!</span>
+            </div>
+            <h1 className="text-2xl font-bold mb-4">Cooperative Not Found</h1>
+            <p className="text-white/50 mb-8">
+              The society <span className="text-white font-mono font-bold">"{subdomain}"</span> does not exist or has been deactivated.
+            </p>
+            <a href="http://localhost:3000" className="btn-primary inline-flex">
+              Return to Landing Page
+            </a>
+          </div>
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${outfit.variable} dark`}>

@@ -96,7 +96,7 @@ export default function Home() {
                     transition={{ delay: 0.5, duration: 1 }}
                     className="text-gradient inline-block"
                   >
-                    Collective
+                    Collective Banking
                   </motion.span>
                 </h1>
 
@@ -119,7 +119,7 @@ export default function Home() {
                     href="/auth/register"
                     className="btn-primary group"
                   >
-                    Start your journey
+                    Register your Society
                     <FaArrowRight className="text-sm transition-transform duration-500 group-hover:translate-x-2" />
                   </Link>
                   <Link

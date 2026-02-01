@@ -17,8 +17,8 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (credential: string, password: string) => Promise<void>;
-  register: (firstName: string, lastName: string, email: string, password: string, phoneNumber: string) => Promise<void>;
+  login: (credential: string, password: string, tenantId?: string) => Promise<void>;
+  register: (firstName: string, lastName: string, email: string, password: string, phoneNumber: string, tenantId?: string) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
   isAuthenticated: boolean;
@@ -38,30 +38,63 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
-    if (storedToken && storedUser) {
+
+    // Check for token and user in URL (for cross-subdomain redirection)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get('token');
+    const urlUser = urlParams.get('user');
+
+    if (urlToken && urlUser) {
+      const decodedUser = JSON.parse(decodeURIComponent(urlUser));
+      setToken(urlToken);
+      setUser(decodedUser);
+      localStorage.setItem('token', urlToken);
+      localStorage.setItem('user', JSON.stringify(decodedUser));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${urlToken}`;
+
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`; // Set default header for axios
+      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
     }
     setLoading(false);
   }, []);
 
-  const login = async (credential: string, password: string) => {
+  const login = async (credential: string, password: string, tenantId?: string) => {
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         credential,
         password,
+        tenantId,
       });
       const { token, user } = response.data;
+
+      // Subdomain redirection logic
+      const currentHost = window.location.hostname; // e.g., 'localhost' or 'coopa.localhost'
+      const mainDomain = 'localhost'; // In production, this would be 'yourdomain.com'
+      const targetSubdomain = user.subdomain; // e.g., 'coopa' or null (for super-admin)
+
+      if (targetSubdomain && !currentHost.startsWith(`${targetSubdomain}.`)) {
+        // Redirect to subdomain with token and user data
+        const protocol = window.location.protocol;
+        const port = window.location.port ? `:${window.location.port}` : '';
+        const encodedUser = encodeURIComponent(JSON.stringify(user));
+        const redirectUrl = `${protocol}//${targetSubdomain}.${mainDomain}${port}/admin/dashboard?token=${token}&user=${encodedUser}`;
+
+        window.location.href = redirectUrl;
+        return; // Stop execution here as we are redirecting
+      }
+
       setToken(token);
       setUser(user);
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set default header for axios
-      console.log('User is admin:', user.isAdmin);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
       const redirectPath = user.role === 'admin' ? '/admin/dashboard' : '/dashboard';
-      console.log('Redirecting to:', redirectPath);
-      router.push(redirectPath); // Redirect based on role
+      router.push(redirectPath);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Login failed');
@@ -71,7 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (firstName: string, lastName: string, email: string, password: string, phoneNumber: string) => {
+  const register = async (firstName: string, lastName: string, email: string, password: string, phoneNumber: string, tenantId?: string) => {
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         firstName,
@@ -79,6 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
         phoneNumber,
+        tenantId,
       });
       const { token, user } = response.data;
       setToken(token);
@@ -102,7 +136,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization']; // Remove default header
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   const updateUser = (updatedUser: User) => {

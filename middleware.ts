@@ -17,16 +17,22 @@ export async function middleware(request: NextRequest) {
     }
 
     // Extract subdomain (e.g., "coopa.localhost:3000" -> "coopa")
-    // For production, this would be coopa.yourdomain.com
-    const parts = hostname.split('.');
+    const hostnameWithoutPort = hostname.split(':')[0];
+    const parts = hostnameWithoutPort.split('.');
     let subdomain = '';
 
-    if (parts.length > 2) {
+    // Handle localhost subdomains (e.g., coopa.localhost)
+    if (hostnameWithoutPort.endsWith('localhost')) {
+        if (parts.length > 1) {
+            subdomain = parts[0];
+        }
+    } else if (parts.length > 2) {
+        // Handle production domains (e.g., coopa.yourdomain.com)
         subdomain = parts[0];
     }
 
-    // If no subdomain, check if it's the main domain or localhost
-    if (!subdomain || subdomain === 'www' || subdomain === 'localhost:3000') {
+    // If no subdomain, or it's just 'www', proceed to main site
+    if (!subdomain || subdomain === 'www') {
         return NextResponse.next();
     }
 

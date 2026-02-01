@@ -7,6 +7,7 @@ import { z } from 'zod';
 import Link from 'next/link';
 import { FaLock, FaUser, FaCircleNotch } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
+import { useTenant } from '@/app/context/TenantContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const loginSchema = z.object({
@@ -28,10 +29,12 @@ export default function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
+  const { tenant } = useTenant();
+
   const onSubmit = async (data: LoginFormData) => {
     setError('');
     try {
-      await login(data.credential, data.password);
+      await login(data.credential, data.password, tenant?.id || tenant?._id);
     } catch (err: any) {
       setError(err.message || 'Failed to login. Please try again.');
     }
