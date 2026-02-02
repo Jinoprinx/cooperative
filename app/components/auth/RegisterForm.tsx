@@ -46,7 +46,7 @@ export default function RegisterForm() {
     setError('');
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register${tenant ? '/member' : ''}`, {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
@@ -55,12 +55,10 @@ export default function RegisterForm() {
         coopName: data.coopName,
         subdomain: data.subdomain,
         superAdminKey: data.superAdminKey,
-        tenantId: tenant?.id || tenant?._id, // Handle both id and _id
+        tenantId: tenant?.id || tenant?._id,
       });
 
-      const token = response.data.token;
-      localStorage.setItem('token', token);
-      router.push('/auth/login');
+      router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to register. Please try again.');
     } finally {

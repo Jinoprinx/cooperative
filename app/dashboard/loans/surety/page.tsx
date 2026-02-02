@@ -37,17 +37,28 @@ export default function SuretyPage() {
 
   const handleResponse = async (loanId: string, status: 'approved' | 'rejected') => {
     try {
+      let rejectionReason = '';
+
+      if (status === 'rejected') {
+        rejectionReason = prompt('Please provide a reason for rejecting this surety request:') || '';
+        if (!rejectionReason.trim()) {
+          alert('Rejection reason is required');
+          return;
+        }
+      }
+
       const token = localStorage.getItem('token');
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/loans/${loanId}/surety-response`,
-        { status },
+        { status, rejectionReason: rejectionReason || undefined },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       alert(`Request ${status} successfully!`);
       setRequests(requests.filter(req => req._id !== loanId));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error responding to surety request:', error);
-      alert('Failed to respond to the request. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Failed to respond to the request. Please try again.';
+      alert(errorMessage);
     }
   };
 
