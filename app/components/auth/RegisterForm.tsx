@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,6 +32,11 @@ export default function RegisterForm() {
   const { tenant } = useTenant();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [baseDomain, setBaseDomain] = useState('');
+
+  useEffect(() => {
+    setBaseDomain(window.location.host);
+  }, []);
 
   const {
     register,
@@ -204,7 +209,7 @@ export default function RegisterForm() {
                   {...register('subdomain')}
                 />
                 <div className="bg-surface-lighter dark:bg-white/10 border border-l-0 border-border dark:border-white/10 rounded-r-xl py-2.5 px-4 text-muted-foreground dark:text-white/40 text-xs font-mono">
-                  .localhost:3000
+                  .{baseDomain}
                 </div>
               </div>
             </div>
