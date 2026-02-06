@@ -73,7 +73,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Subdomain redirection logic
       const currentHost = window.location.hostname; // e.g., 'localhost' or 'coopa.localhost'
-      const mainDomain = 'localhost'; // In production, this would be 'yourdomain.com'
+
+      let mainDomain = 'localhost';
+      const parts = currentHost.split('.');
+
+      if (currentHost.endsWith('localhost')) {
+        mainDomain = 'localhost';
+      } else if (currentHost.endsWith('.vercel.app')) {
+        // Vercel apps are always project.vercel.app, so we want the last 3 parts
+        // e.g. cooperative-kappa.vercel.app OR tenant.cooperative-kappa.vercel.app
+        mainDomain = parts.slice(-3).join('.');
+      } else {
+        // Assume standard domain (example.com), take last 2 parts
+        // e.g. example.com OR tenant.example.com
+        mainDomain = parts.slice(-2).join('.');
+      }
       const targetSubdomain = user.subdomain; // e.g., 'coopa' or null (for super-admin)
 
       if (targetSubdomain && !currentHost.startsWith(`${targetSubdomain}.`)) {
