@@ -17,7 +17,7 @@ async function getTenantData() {
 
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tenants/resolve?subdomain=${subdomain}`, {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      cache: 'no-store' // Disable cache for debugging
     });
     if (!response.ok) return null;
     return response.json();
@@ -60,7 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <p className="text-white/50 mb-8">
               The society <span className="text-white font-mono font-bold">"{subdomain}"</span> does not exist or has been deactivated.
             </p>
-            <a href="http://localhost:3000" className="btn-primary inline-flex">
+            <a href="/" className="btn-primary inline-flex">
               Return to Landing Page
             </a>
           </div>
