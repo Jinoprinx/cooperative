@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { useAuth } from '@/app/context/AuthContext';
 import { useTenant } from '@/app/context/TenantContext';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -34,7 +35,7 @@ const Navbar = () => {
         }`}
     >
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className={`flex items-center justify-between px-8 py-4 transition-all duration-700 rounded-[2rem] ${isScrolled ? 'glass-navbar shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]' : 'bg-transparent border border-transparent'
+        <div className={`flex items-center justify-between px-8 py-4 transition-all duration-700 rounded-[2rem] ${isScrolled ? 'glass-navbar shadow-[0_8px_32px_0_var(--shadow-color)]' : 'bg-transparent border border-transparent'
           }`}>
           <Link href="/" className="flex items-center space-x-3 group">
             <motion.div
@@ -47,7 +48,7 @@ const Navbar = () => {
                 <span className="text-white font-black italic text-2xl tracking-tighter">{logoChar}</span>
               )}
             </motion.div>
-            <span className="text-2xl font-display font-black text-white tracking-tight group-hover:text-primary transition-colors">
+            <span className="text-2xl font-display font-black text-white dark:text-white text-gray-900 tracking-tight group-hover:text-primary transition-colors">
               {coopName}
             </span>
           </Link>
@@ -57,7 +58,7 @@ const Navbar = () => {
               <Link
                 key={item}
                 href={`#${item.toLowerCase().replace(' ', '-')}`}
-                className="text-sm font-semibold text-white/60 hover:text-white transition-all hover:tracking-wider"
+                className="text-sm font-semibold text-gray-600 dark:text-white/60 hover:text-gray-900 dark:hover:text-white transition-all hover:tracking-wider"
               >
                 {item}
               </Link>
@@ -65,11 +66,13 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-6">
+            <ThemeToggle />
+
             {user ? (
               <>
                 <button
                   onClick={logout}
-                  className="px-6 py-2.5 text-sm font-bold text-white/70 hover:text-white transition-colors"
+                  className="px-6 py-2.5 text-sm font-bold text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
                   Log out
                 </button>
@@ -83,7 +86,7 @@ const Navbar = () => {
               <>
                 <Link
                   href="/auth/login"
-                  className="px-6 py-2.5 text-sm font-bold text-white/70 hover:text-white transition-colors"
+                  className="px-6 py-2.5 text-sm font-bold text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
                   Log in
                 </Link>

@@ -79,7 +79,7 @@ export default function DashboardLayout({
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col bg-surface border-r border-white/5 pt-5 pb-4"
+              className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col bg-surface border-r border-border pt-5 pb-4"
             >
               <div className="px-6 flex items-center justify-between mb-8">
                 <Link href="/" className="flex items-center space-x-2">
@@ -124,7 +124,7 @@ export default function DashboardLayout({
       </AnimatePresence>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col border-r border-white/5 bg-surface/50">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col border-r border-border bg-surface/50">
         <div className="flex flex-col flex-1 pt-8 pb-4">
           <div className="px-8 mb-12">
             <Link href="/" className="flex items-center space-x-3">
@@ -195,7 +195,7 @@ export default function DashboardLayout({
                   />
                 </div>
               ) : (
-                <div className="w-10 h-10 rounded-xl bg-surface-lighter flex items-center justify-center border border-white/10 group-hover:border-primary transition-all">
+                <div className="w-10 h-10 rounded-xl bg-surface-lighter flex items-center justify-center border border-border group-hover:border-primary transition-all">
                   <FaUserCircle className="h-6 w-6 text-white/20" />
                 </div>
               )}

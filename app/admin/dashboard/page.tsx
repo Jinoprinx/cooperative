@@ -478,7 +478,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <a href={payment.receipt} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm font-medium text-primary hover:text-primary-dark">
+                <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm font-medium text-primary hover:text-primary-dark">
                   View Receipt
                 </a>
                 <p className="text-xs text-gray-500">{formatDate(payment.createdAt)}</p>

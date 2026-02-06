@@ -16,7 +16,7 @@ async function getTenantData() {
   if (!subdomain) return null;
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tenants/resolve?subdomain=${subdomain}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tenants/resolve?subdomain=${subdomain}`, {
       next: { revalidate: 3600 } // Cache for 1 hour
     });
     if (!response.ok) return null;
@@ -38,6 +38,10 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+import { ThemeProvider } from './context/ThemeContext';
+
+// ... imports
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headersList = headers();
   const subdomain = (await headersList).get('x-tenant-subdomain');
@@ -46,7 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // If we are on a subdomain but no tenant was found, show a 404/Error page
   if (subdomain && !tenant) {
     return (
-      <html lang="en" className="dark">
+      <html lang="en" suppressHydrationWarning>
         <body className="bg-[#050505] text-white flex items-center justify-center min-h-screen">
           <div className="text-center p-8 glass-card rounded-3xl border border-white/10 max-w-md">
             <div className="w-16 h-16 bg-red-500/20 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -66,13 +70,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${outfit.variable} dark`}>
-      <body className="font-sans antialiased text-white bg-[#050505] min-h-screen">
-        <TenantProvider initialTenant={tenant || undefined}>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </TenantProvider>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${outfit.variable}`}>
+      <body className="font-sans antialiased min-h-screen transition-colors duration-300">
+        <ThemeProvider>
+          <TenantProvider initialTenant={tenant || undefined}>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </TenantProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

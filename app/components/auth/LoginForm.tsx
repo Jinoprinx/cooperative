@@ -59,18 +59,18 @@ export default function LoginForm() {
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="credential" className="text-xs font-bold text-white/40 uppercase tracking-widest px-1">
+          <label htmlFor="credential" className="text-xs font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">
             Email or Phone
           </label>
           <div className="relative group">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <FaUser className="h-4 w-4 text-white/20 group-focus-within:text-primary transition-colors" />
+              <FaUser className="h-4 w-4 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
             </div>
             <input
               id="credential"
               type="text"
               autoComplete="email"
-              className={`block w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all ${errors.credential ? 'border-red-500/50 ring-2 ring-red-500/20' : ''
+              className={`block w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-foreground dark:text-white placeholder:text-muted-foreground/50 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all ${errors.credential ? 'border-red-500/50 ring-2 ring-red-500/20' : ''
                 }`}
               placeholder="e.g. name@company.com"
               {...register('credential')}
@@ -85,22 +85,22 @@ export default function LoginForm() {
 
         <div className="space-y-2">
           <div className="flex justify-between items-center px-1">
-            <label htmlFor="password" className="text-xs font-bold text-white/40 uppercase tracking-widest">
+            <label htmlFor="password" className="text-xs font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest">
               Password
             </label>
-            <Link href="/auth/forgot-password" title="Forgot Password" className="text-xs font-bold text-white/30 hover:text-white transition-colors">
+            <Link href="/auth/forgot-password" title="Forgot Password" className="text-xs font-bold text-muted-foreground/70 dark:text-white/30 hover:text-foreground dark:hover:text-white transition-colors">
               Forgot?
             </Link>
           </div>
           <div className="relative group">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <FaLock className="h-4 w-4 text-white/20 group-focus-within:text-primary transition-colors" />
+              <FaLock className="h-4 w-4 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
             </div>
             <input
               id="password"
               type="password"
               autoComplete="current-password"
-              className={`block w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all ${errors.password ? 'border-red-500 ring-2 ring-red-500' : ''
+              className={`block w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-foreground dark:text-white placeholder:text-muted-foreground/50 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all ${errors.password ? 'border-red-500 ring-2 ring-red-500' : ''
                 }`}
               placeholder="••••••••"
               {...register('password')}
@@ -119,9 +119,9 @@ export default function LoginForm() {
           id="remember-me"
           name="remember-me"
           type="checkbox"
-          className="h-4 w-4 rounded border-white/10 bg-white/5 text-primary focus:ring-primary/50"
+          className="h-4 w-4 rounded border-border dark:border-white/10 bg-surface-lighter dark:bg-white/5 text-primary focus:ring-primary/50"
         />
-        <label htmlFor="remember-me" className="text-sm text-white/40 font-medium cursor-pointer select-none">
+        <label htmlFor="remember-me" className="text-sm text-foreground/60 dark:text-white/40 font-medium cursor-pointer select-none">
           Keep me signed in
         </label>
       </div>

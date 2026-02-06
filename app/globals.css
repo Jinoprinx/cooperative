@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  /* Default Dark Mode Variables */
   --foreground-rgb: 255, 255, 255;
   --background-rgb: 5, 5, 5;
   --primary-color: #3b82f6;
@@ -10,14 +11,74 @@
   --primary-light-color: #60a5fa;
   --secondary-color: #10b981;
   --accent-color: #f59e0b;
+
   --surface-color: #111111;
+  --surface-hover: #1a1a1a;
+  --border-color: rgba(255, 255, 255, 0.08);
+  /* Default border for dark */
+
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-bg: rgba(255, 255, 255, 0.03);
+  --shadow-color: rgba(0, 0, 0, 0.36);
+
+  --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.1) 0px, transparent 50%);
+}
+
+/* Explicit Dark Theme Overrides (if needed beyond root) */
+:root[data-theme='dark'] {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 5, 5, 5;
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.5);
+
+  --surface-color: #111111;
+  --surface-hover: #1a1a1a;
+  --border-color: rgba(255, 255, 255, 0.08);
+
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --shadow-color: rgba(0, 0, 0, 0.36);
+  --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.1) 0px, transparent 50%);
+}
+
+/* Light Theme (White Luxury) */
+:root[data-theme='light'] {
+  --foreground-rgb: 15, 23, 42;
+  /* Darker Slate - High Contrast */
+  --background-rgb: 255, 255, 255;
+  /* Pure White */
+
+  --text-primary: #0f172a;
+  /* Deep, sharp dark blue/grey */
+  --text-secondary: #334155;
+  /* Readable secondary text */
+  --text-tertiary: #64748b;
+
+  --surface-color: #ffffff;
+  --surface-hover: #f8fafc;
+  /* Very subtle grey */
+
+  --border-color: #e2e8f0;
+  /* Crisp light grey border */
+
+  --glass-border: rgba(0, 0, 0, 0.06);
+  /* Simpler, cleaner glass border */
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  /* More opaque, frosted glass */
+  --shadow-color: rgba(148, 163, 184, 0.15);
+  /* Colored shadow for premium feel */
+
+  /* Adjusted mesh for light mode - subtle and airy */
+  --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.03) 0px, transparent 50%);
 }
 
 @layer base {
   body {
-    @apply bg-[#050505] text-white antialiased;
+    @apply antialiased transition-colors duration-300;
+    background-color: rgb(var(--background-rgb));
+    color: var(--text-primary);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
     font-display: swap;
   }
@@ -33,27 +94,34 @@
   h4,
   h5,
   h6 {
-    @apply font-display tracking-tight text-white;
+    @apply font-display tracking-tight;
+    color: var(--text-primary);
   }
 }
 
 @layer components {
   .glass-card {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--glass-bg);
     backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 var(--shadow-color);
   }
 
   .glass-navbar {
-    @apply bg-black/40 backdrop-blur-xl border-b border-white/[0.05];
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border-color);
   }
 
   .hero-gradient {
     background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
       radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
-    @apply animate-pulse;
-    animation-duration: 8s;
+  }
+
+  /* Light mode hero gradient */
+  [data-theme='light'] .hero-gradient {
+    background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
   }
 
   .btn-primary {
@@ -65,29 +133,50 @@
   }
 
   .btn-secondary {
-    @apply bg-white/[0.05] text-white hover:bg-white/[0.08] border border-white/[0.1] rounded-full px-8 py-3 font-semibold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2;
+    @apply rounded-full px-8 py-3 font-semibold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2;
+    background-color: var(--glass-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+
+    &:hover {
+      background-color: var(--surface-hover);
+    }
   }
 
   .card-premium {
     @apply rounded-[2.5rem] p-10 transition-all duration-700;
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--glass-bg);
     backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 var(--shadow-color);
 
     &:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-      background-color: rgba(255, 255, 255, 0.05);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      border-color: var(--border-color);
+      background-color: var(--surface-hover);
+      box-shadow: 0 20px 50px var(--shadow-color);
     }
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40;
+    @apply bg-clip-text text-transparent;
+  }
+
+  /* Dark mode gradient */
+  .dark .text-gradient {
+    @apply bg-gradient-to-br from-white via-white to-white/40;
+  }
+
+  /* Light mode gradient */
+  [data-theme='light'] .text-gradient {
+    @apply bg-gradient-to-br from-gray-900 via-gray-800 to-gray-600;
   }
 
   .text-glow {
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+
+  [data-theme='light'] .text-glow {
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }
 
   .noise-overlay {

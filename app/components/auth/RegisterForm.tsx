@@ -85,11 +85,11 @@ export default function RegisterForm() {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">First Name</label>
+          <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">First Name</label>
           <div className="relative group">
             <input
               type="text"
-              className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.firstName ? 'border-red-500/50' : ''}`}
+              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.firstName ? 'border-red-500/50' : ''}`}
               placeholder="John"
               {...register('firstName')}
             />
@@ -97,11 +97,11 @@ export default function RegisterForm() {
           {errors.firstName && <p className="text-[10px] text-red-400 font-medium px-1">{errors.firstName.message}</p>}
         </div>
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Last Name</label>
+          <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Last Name</label>
           <div className="relative group">
             <input
               type="text"
-              className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.lastName ? 'border-red-500/50' : ''}`}
+              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.lastName ? 'border-red-500/50' : ''}`}
               placeholder="Doe"
               {...register('lastName')}
             />
@@ -111,14 +111,14 @@ export default function RegisterForm() {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Email Address</label>
+        <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Email Address</label>
         <div className="relative group">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <FaEnvelope className="h-3.5 w-3.5 text-white/20 group-focus-within:text-primary transition-colors" />
+            <FaEnvelope className="h-3.5 w-3.5 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
           </div>
           <input
             type="email"
-            className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.email ? 'border-red-500/50' : ''}`}
+            className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.email ? 'border-red-500/50' : ''}`}
             placeholder="john@example.com"
             {...register('email')}
           />
@@ -127,14 +127,14 @@ export default function RegisterForm() {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Phone Number</label>
+        <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Phone Number</label>
         <div className="relative group">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <FaPhone className="h-3.5 w-3.5 text-white/20 group-focus-within:text-primary transition-colors" />
+            <FaPhone className="h-3.5 w-3.5 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
           </div>
           <input
             type="tel"
-            className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.phoneNumber ? 'border-red-500/50' : ''}`}
+            className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.phoneNumber ? 'border-red-500/50' : ''}`}
             placeholder="+1 (555) 000-0000"
             {...register('phoneNumber')}
           />
@@ -144,11 +144,11 @@ export default function RegisterForm() {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Password</label>
+          <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Password</label>
           <div className="relative group">
             <input
               type="password"
-              className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.password ? 'border-red-500/50' : ''}`}
+              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.password ? 'border-red-500/50' : ''}`}
               placeholder="••••••••"
               {...register('password')}
             />
@@ -156,11 +156,11 @@ export default function RegisterForm() {
           {errors.password && <p className="text-[10px] text-red-400 font-medium px-1">{errors.password.message}</p>}
         </div>
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Confirm</label>
+          <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Confirm</label>
           <div className="relative group">
             <input
               type="password"
-              className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
+              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
               placeholder="••••••••"
               {...register('confirmPassword')}
             />
@@ -173,19 +173,19 @@ export default function RegisterForm() {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="space-y-5 pt-4 border-t border-white/5 mt-4"
+          className="space-y-5 pt-4 border-t border-border dark:border-white/5 mt-4"
         >
           <div className="space-y-1.5">
             <label className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] px-1">Cooperative Details</label>
-            <p className="text-[10px] text-white/30 px-1 mb-2">You are registering as an administrator of a new society.</p>
+            <p className="text-[10px] text-muted-foreground dark:text-white/30 px-1 mb-2">You are registering as an administrator of a new society.</p>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Cooperative Name</label>
+            <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Cooperative Name</label>
             <div className="relative group">
               <input
                 type="text"
-                className={`w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.coopName ? 'border-red-500/50' : ''}`}
+                className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.coopName ? 'border-red-500/50' : ''}`}
                 placeholder="e.g. Coop Alpha"
                 {...register('coopName')}
               />
@@ -194,16 +194,16 @@ export default function RegisterForm() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Desired Subdomain</label>
+            <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Desired Subdomain</label>
             <div className="relative group">
               <div className="flex items-center">
                 <input
                   type="text"
-                  className={`flex-1 bg-white/5 border border-white/10 rounded-l-xl py-2.5 pl-4 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.subdomain ? 'border-red-500/50' : ''}`}
+                  className={`flex-1 bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-l-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.subdomain ? 'border-red-500/50' : ''}`}
                   placeholder="coopa"
                   {...register('subdomain')}
                 />
-                <div className="bg-white/10 border border-l-0 border-white/10 rounded-r-xl py-2.5 px-4 text-white/40 text-xs font-mono">
+                <div className="bg-surface-lighter dark:bg-white/10 border border-l-0 border-border dark:border-white/10 rounded-r-xl py-2.5 px-4 text-muted-foreground dark:text-white/40 text-xs font-mono">
                   .localhost:3000
                 </div>
               </div>
@@ -214,14 +214,14 @@ export default function RegisterForm() {
       )}
 
       <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Super Admin Key (Optional)</label>
+        <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Super Admin Key (Optional)</label>
         <div className="relative group">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <FaLock className="h-3.5 w-3.5 text-white/20 group-focus-within:text-primary transition-colors" />
+            <FaLock className="h-3.5 w-3.5 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
           </div>
           <input
             type="text"
-            className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            className="w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             placeholder="Enter key if applicable"
             {...register('superAdminKey')}
           />

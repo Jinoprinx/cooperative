@@ -47,7 +47,7 @@ export default function SettingsPage() {
         <div className="max-w-4xl mx-auto py-8 px-4">
             <h1 className="text-3xl font-display font-bold mb-8">Cooperative Settings</h1>
 
-            <form onSubmit={handleSubmit} className="space-y-8 bg-surface/40 p-8 rounded-2xl border border-white/5 backdrop-blur-xl">
+            <form onSubmit={handleSubmit} className="space-y-8 bg-surface/50 dark:bg-surface/40 p-8 rounded-2xl border border-border backdrop-blur-xl shadow-xl">
                 <section className="space-y-4">
                     <h2 className="text-xl font-semibold text-primary-light">General Information</h2>
                     <div>
@@ -56,7 +56,7 @@ export default function SettingsPage() {
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none transition-all"
+                            className="w-full bg-surface dark:bg-black/40 border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none transition-all text-foreground"
                         />
                     </div>
                 </section>
@@ -77,7 +77,7 @@ export default function SettingsPage() {
                                     type="text"
                                     value={formData.primaryColor}
                                     onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                                    className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                    className="flex-1 bg-surface dark:bg-black/40 border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                 />
                             </div>
                         </div>
@@ -87,7 +87,7 @@ export default function SettingsPage() {
                                 type="text"
                                 value={formData.logoUrl}
                                 onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
-                                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                className="w-full bg-surface dark:bg-black/40 border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                 placeholder="https://example.com/logo.png"
                             />
                         </div>
@@ -97,12 +97,11 @@ export default function SettingsPage() {
                 <section className="space-y-4">
                     <h2 className="text-xl font-semibold text-primary-light">Loan Configurations</h2>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Max Loan Approval Amount (₦)</label>
                         <input
                             type="number"
                             value={formData.maxApprovalAmount}
                             onChange={(e) => setFormData({ ...formData, maxApprovalAmount: parseInt(e.target.value) })}
-                            className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            className="w-full bg-surface dark:bg-black/40 border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none text-foreground"
                         />
                     </div>
                 </section>

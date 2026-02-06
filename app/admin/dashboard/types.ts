@@ -1,6 +1,6 @@
 import { Member, Loan } from '@/app/types';
 
-export interface RecentMember extends Member {}
+export interface RecentMember extends Member { }
 
 export interface PendingLoan extends Loan {
   user: {
@@ -19,7 +19,7 @@ export interface PendingPayment {
     lastName: string;
     accountNumber: string;
   };
-  receipt: string;
+  receiptUrl: string;
   description: string;
   createdAt: string;
   status: string;

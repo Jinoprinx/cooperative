@@ -31,20 +31,20 @@ export default function AuthLayout({
         transition={{ duration: 0.6 }}
         className="w-full max-w-md z-10"
       >
-        <div className="card-premium bg-surface/60 backdrop-blur-3xl border border-white/10 p-10 rounded-3xl shadow-2xl">
+        <div className="card-premium bg-surface/70 backdrop-blur-3xl border border-glass-border p-10 rounded-3xl shadow-2xl text-foreground">
           <div className="text-center mb-10">
             <Link href="/" className="inline-flex items-center space-x-2 mb-8">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transform rotate-12">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transform rotate-12 shadow-lg shadow-primary/20">
                 <span className="text-white font-bold -rotate-12 italic text-xl">C</span>
               </div>
-              <span className="text-2xl font-display font-bold text-white tracking-tight">
+              <span className="text-2xl font-display font-bold text-foreground tracking-tight">
                 Coop
               </span>
             </Link>
-            <h2 className="text-3xl font-bold tracking-tight text-white mb-3">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
               {title}
             </h2>
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-muted-foreground dark:text-white/50">
               {subtitle}{' '}
               <Link
                 href={linkHref}
@@ -58,7 +58,7 @@ export default function AuthLayout({
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-xs text-white/20 font-medium italic">
+          <p className="text-xs text-muted-foreground dark:text-white/20 font-medium italic">
             &copy; {new Date().getFullYear()} Modern Cooperative. Built for legacy.
           </p>
         </div>
