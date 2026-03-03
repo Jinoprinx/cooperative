@@ -312,7 +312,7 @@ export default function Home() {
                     <span className="text-white font-black italic text-2xl tracking-tighter">C</span>
                   </div>
                   <span className="text-3xl font-display font-black text-foreground dark:text-white tracking-tight">
-                    Coop
+                    Cooperatives.io
                   </span>
                 </Link>
                 <p className="text-muted-foreground dark:text-white/30 max-w-xs font-medium">The definitive operating system for modern cooperatives.</p>
