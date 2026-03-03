@@ -15,9 +15,9 @@ export default function Transactions() {
     const fetchData = async () => {
       try {
         const [transactionsResponse, membersResponse, loansResponse] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/members`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/loans`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transactions`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans`),
         ]);
 
         const combinedTransactions = [
@@ -26,7 +26,7 @@ export default function Transactions() {
         ];
 
         setTransactions(combinedTransactions);
-        setMembers(membersResponse.data);
+        setMembers(membersResponse.data.members || membersResponse.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -57,7 +57,7 @@ export default function Transactions() {
 
   const handleApproveTransaction = async (id: string) => {
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${id}`, { status: 'approved' } as Partial<Transaction>);
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, { status: 'approved' } as Partial<Transaction>);
       setTransactions(transactions.map(t => t._id === id ? { ...t, status: 'approved' } : t));
     } catch (error) {
       console.error('Error approving transaction:', error);
@@ -66,7 +66,7 @@ export default function Transactions() {
 
   const handleRejectTransaction = async (id: string) => {
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${id}`, { status: 'rejected' } as Partial<Transaction>);
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, { status: 'rejected' } as Partial<Transaction>);
       setTransactions(transactions.map(t => t._id === id ? { ...t, status: 'rejected' } : t));
     } catch (error) {
       console.error('Error rejecting transaction:', error);
@@ -131,15 +131,14 @@ export default function Transactions() {
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member ? `${member.firstName} ${member.lastName}` : 'Unknown'}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                          transaction.type === 'deposit'
+                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${transaction.type === 'deposit'
                             ? 'bg-green-100 text-green-800'
                             : transaction.type === 'withdrawal'
-                            ? 'bg-red-100 text-red-800'
-                            : transaction.type === 'loan'
-                            ? 'bg-purple-100 text-purple-800'
-                            : 'bg-blue-100 text-blue-800'
-                        }`}
+                              ? 'bg-red-100 text-red-800'
+                              : transaction.type === 'loan'
+                                ? 'bg-purple-100 text-purple-800'
+                                : 'bg-blue-100 text-blue-800'
+                          }`}
                       >
                         {transaction.type}
                       </span>
@@ -148,13 +147,12 @@ export default function Transactions() {
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{transaction.description || transaction.purpose}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                          transaction.status === 'approved'
+                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${transaction.status === 'approved'
                             ? 'bg-green-100 text-green-800'
                             : transaction.status === 'rejected'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
                       >
                         {transaction.status}
                       </span>

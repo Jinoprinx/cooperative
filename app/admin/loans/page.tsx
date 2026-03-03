@@ -19,11 +19,11 @@ export default function Loans() {
     const fetchData = async () => {
       try {
         const [loansResponse, membersResponse] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/loans`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/members`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`),
         ]);
         setLoans(loansResponse.data);
-        setMembers(membersResponse.data);
+        setMembers(membersResponse.data.members || membersResponse.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching loans or members:', error);
@@ -37,8 +37,8 @@ export default function Loans() {
     const member = members.find(m => m._id === loan.memberId);
     const matchesSearch =
       (member?.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       member?.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       loan.purpose.toLowerCase().includes(searchQuery.toLowerCase()));
+        member?.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        loan.purpose.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter ? loan.status === statusFilter : true;
     const loanDate = new Date(loan.startDate || loan.nextPaymentDate || '');
     const start = startDate ? new Date(startDate) : null;
@@ -66,7 +66,7 @@ export default function Loans() {
         endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0],
         nextPaymentDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
       };
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/loans/${id}`, updatedLoan);
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/loans/${id}`, updatedLoan);
       setLoans(loans.map(l => l._id === id ? { ...l, ...updatedLoan } : l));
     } catch (error) {
       console.error('Error approving loan:', error);
@@ -75,7 +75,7 @@ export default function Loans() {
 
   const handleRejectLoan = async (id: string) => {
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/loans/${id}`, { status: 'rejected' } as Partial<Loan>);
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/loans/${id}`, { status: 'rejected' } as Partial<Loan>);
       setLoans(loans.map(l => l._id === id ? { ...l, status: 'rejected' } : l));
     } catch (error) {
       console.error('Error rejecting loan:', error);
@@ -165,12 +165,11 @@ export default function Loans() {
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.amount)}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                          loan.status === 'approved' ? 'bg-green-100 text-green-800' :
-                          loan.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          loan.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                          'bg-blue-100 text-blue-800'
-                        }`}
+                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${loan.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            loan.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              loan.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                'bg-blue-100 text-blue-800'
+                          }`}
                       >
                         {loan.status}
                       </span>
