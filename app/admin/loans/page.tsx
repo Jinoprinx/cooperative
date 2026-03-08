@@ -34,13 +34,12 @@ export default function Loans() {
   }, []);
 
   const filteredLoans = loans.filter(loan => {
-    const member = members.find(m => m._id === loan.memberId);
+    const memberName = loan.user ? `${loan.user.firstName} ${loan.user.lastName}`.toLowerCase() : '';
     const matchesSearch =
-      (member?.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        member?.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (memberName.includes(searchQuery.toLowerCase()) ||
         loan.purpose.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter ? loan.status === statusFilter : true;
-    const loanDate = new Date(loan.startDate || loan.nextPaymentDate || '');
+    const loanDate = new Date(loan.startDate || loan.nextPaymentDate || loan.createdAt || '');
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
     const matchesDate = (!start || loanDate >= start) && (!end || loanDate <= end);
@@ -151,24 +150,23 @@ export default function Loans() {
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Purpose</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Sureties</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Remaining Balance</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Remaining Loan Balance</th>
                 <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {filteredLoans.map((loan) => {
-                const member = members.find(m => m._id === loan.memberId);
                 const approvedSureties = loan.sureties?.filter(s => s.status === 'approved').length || 0;
                 return (
                   <tr key={loan._id}>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member ? `${member.firstName} ${member.lastName}` : 'Unknown'}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 text-capitalize">{loan.user ? `${loan.user.firstName} ${loan.user.lastName}` : 'Unknown'}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.amount)}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       <span
                         className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${loan.status === 'approved' ? 'bg-green-100 text-green-800' :
-                            loan.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                              loan.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                'bg-blue-100 text-blue-800'
+                          loan.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            loan.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-blue-100 text-blue-800'
                           }`}
                       >
                         {loan.status}
@@ -180,7 +178,7 @@ export default function Loans() {
                         {approvedSureties} / {loan.sureties?.length || 0} approved
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.remainingAmount)}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.remainingAmount || 0)}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                       <button onClick={() => setSelectedLoan(loan)} className="btn btn-info btn-sm mr-2">
                         <FaEye />
@@ -206,7 +204,7 @@ export default function Loans() {
       {selectedLoan && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="text-lg font-bold">Repayment History for {members.find(m => m._id === selectedLoan.memberId)?.firstName} {members.find(m => m._id === selectedLoan.memberId)?.lastName}</h3>
+            <h3 className="text-lg font-bold">Repayment History for {selectedLoan.user ? `${selectedLoan.user.firstName} ${selectedLoan.user.lastName}` : 'Unknown'}</h3>
             <div className="mt-4">
               {selectedLoan.repaymentHistory.length > 0 ? (
                 <table className="min-w-full divide-y divide-gray-200">

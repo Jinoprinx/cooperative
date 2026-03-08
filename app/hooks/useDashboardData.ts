@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Transaction, ActiveLoan, TransactionSummary } from '@/app/types';
@@ -15,7 +15,7 @@ export function useDashboardData() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -54,7 +54,7 @@ export function useDashboardData() {
       setError('Failed to load dashboard data. Please try again.');
       setLoading(false);
     }
-  };
+  }, [router]);
 
   useEffect(() => {
     fetchData();

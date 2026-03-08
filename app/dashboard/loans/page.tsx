@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Loan, Transaction, User } from '@/app/types';
 import { useDashboardData } from '@/app/hooks/useDashboardData';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function Loans() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -13,10 +14,11 @@ export default function Loans() {
   const [loanAmount, setLoanAmount] = useState('');
   const [purpose, setPurpose] = useState('');
   const [durationMonths, setDurationMonths] = useState('');
-  const [sureties, setSureties] = useState<{ phone: string; name: string; found: boolean }[]>([]);
+  const [sureties, setSureties] = useState<{ phone: string; name: string; found: boolean; error?: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { user: currentUser } = useAuth();
   const { refetch: refetchDashboardData } = useDashboardData();
 
   useEffect(() => {
@@ -106,16 +108,30 @@ export default function Loans() {
     newSureties[index].phone = phone;
     newSureties[index].name = '';
     newSureties[index].found = false;
+    newSureties[index].error = undefined;
 
-    if (phone.length === 11) { // Only search when the phone number has 11 digits
+    if (phone.length === 11) {
+      // Check if user entered their own phone number
+      if (currentUser?.phoneNumber === phone) {
+        newSureties[index].error = 'You or any admin cannot be a surety for this loan.';
+        setSureties(newSureties);
+        return;
+      }
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/search?phone=${phone}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (response.data) {
-          newSureties[index].name = response.data.name;
-          newSureties[index].found = true;
+          const foundRole: string = response.data.role;
+          if (foundRole === 'admin' || foundRole === 'super-admin') {
+            newSureties[index].error = 'You or any admin cannot be a surety for this loan.';
+            newSureties[index].name = '';
+            newSureties[index].found = false;
+          } else {
+            newSureties[index].name = response.data.name;
+            newSureties[index].found = true;
+          }
         }
       } catch (error) {
         console.error('Error searching for member:', error);
@@ -171,7 +187,7 @@ export default function Loans() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800">Loans</h1>
+      <h1 className="text-2xl font-bold text-white">Loans</h1>
       {/* Apply for Loan */}
       <div className="rounded-lg bg-white p-6 shadow-md">
         <h2 className="text-lg font-medium text-gray-800">Apply for Loan</h2>
@@ -200,18 +216,28 @@ export default function Loans() {
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Sureties (at least 2)</label>
             {sureties.map((surety, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <input
-                  type="tel"
-                  placeholder="Surety Phone Number"
-                  value={surety.phone}
-                  onChange={(e) => handleSuretyChange(index, e.target.value)}
-                  className="input input-bordered w-full"
-                />
-                <span className={`text-sm ${surety.found ? 'text-green-600' : 'text-red-600'}`}>{surety.name}</span>
-                <button onClick={() => removeSurety(index)} className="btn btn-ghost btn-sm">
-                  <FaTrash className="text-red-500" />
-                </button>
+              <div key={index} className="space-y-1">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="tel"
+                    placeholder="Surety Phone Number"
+                    value={surety.phone}
+                    onChange={(e) => handleSuretyChange(index, e.target.value)}
+                    className={`input input-bordered w-full ${surety.error ? 'border-red-500' : ''}`}
+                  />
+                  {!surety.error && (
+                    <span className={`text-sm whitespace-nowrap ${surety.found ? 'text-green-600' : 'text-red-600'}`}>{surety.name}</span>
+                  )}
+                  <button onClick={() => removeSurety(index)} className="btn btn-ghost btn-sm">
+                    <FaTrash className="text-red-500" />
+                  </button>
+                </div>
+                {surety.error && (
+                  <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium px-3 py-2 rounded-lg">
+                    <FaTimesCircle className="flex-shrink-0" />
+                    {surety.error}
+                  </div>
+                )}
               </div>
             ))}
             {sureties.length < 5 && (
@@ -233,39 +259,67 @@ export default function Loans() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Description</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Purpose</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Remaining Balance</th>
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Loan Balance</th>
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">You Received</th>
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Monthly Payment</th>
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Remaining</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {(loans || []).map((item) => (
                 <tr key={item._id}>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    {formatDate(item.startDate || item.createdAt)}
+                    <div className="flex flex-col">
+                      <span>{formatDate(item.startDate || item.createdAt)}</span>
+                      {item.renewedFrom && (
+                        <span className="inline-flex items-center text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full w-max mt-1">
+                          ↩ Renewed
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    {`Loan Application: ${item.purpose}`}
+                    {item.purpose}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                     <span
-                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                        item.status === 'approved' || item.status === 'active' || item.status === 'completed'
+                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${item.status === 'approved' || item.status === 'active' || item.status === 'completed'
                           ? 'bg-green-100 text-green-800'
-                          : item.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
+                          : item.status === 'renewed'
+                            ? 'bg-purple-100 text-purple-800'
+                            : item.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}
                     >
                       {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
+                  {/* Loan Balance = principal (what the member owes back) */}
+                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-semibold text-gray-800">
                     {formatCurrency(item.amount)}
                   </td>
+                  {/* You Received = disbursed net amount (principal minus upfront interest) */}
+                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-emerald-600">
+                    {item.disbursedAmount != null
+                      ? formatCurrency(item.disbursedAmount)
+                      : item.status === 'pending'
+                        ? '—'
+                        : formatCurrency(item.amount)}
+                  </td>
+                  {/* Monthly repayment instalment */}
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                    {'remainingAmount' in item ? formatCurrency(item.remainingAmount) : 'N/A'}
+                    {item.monthlyPayment != null && item.status !== 'pending'
+                      ? formatCurrency(item.monthlyPayment)
+                      : '—'}
+                  </td>
+                  {/* Remaining balance to pay back */}
+                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
+                    {'remainingAmount' in item && item.status !== 'pending'
+                      ? formatCurrency(item.remainingAmount)
+                      : '—'}
                   </td>
                 </tr>
               ))}

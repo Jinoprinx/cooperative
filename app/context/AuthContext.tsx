@@ -9,7 +9,10 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber?: string;
   role: 'user' | 'admin';
+  isMainAdmin?: boolean;
+  hasPin?: boolean;
   accountNumber: string;
   profileImage?: string;
 }
@@ -23,6 +26,7 @@ interface AuthContextType {
   updateUser: (user: User) => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isMainAdmin: boolean;
   loading: boolean;
 }
 
@@ -160,9 +164,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const isAuthenticated = !!token && !!user;
   const isAdmin = isAuthenticated && user?.role === 'admin';
+  const isMainAdmin = isAdmin && !!user?.isMainAdmin;
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated, isAdmin, loading, updateUser }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated, isAdmin, isMainAdmin, loading, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

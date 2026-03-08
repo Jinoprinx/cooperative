@@ -20,6 +20,7 @@ export type Member = {
   joinDate: string;
   accountBalance: number;
   phoneNumber: string;
+  role?: 'member' | 'admin';
   status: 'pending' | 'active' | 'rejected';
 };
 
@@ -43,6 +44,7 @@ export type Transaction = {
   balanceBefore?: number;
   receiptUrl?: string;
   remainingAmount?: number;
+  rejectionReason?: string;
 };
 
 export type Loan = {
@@ -53,6 +55,7 @@ export type Loan = {
     _id: string;
     firstName: string;
     lastName: string;
+    accountNumber?: string;
   };
   amount: number;
   interestRate: number;
@@ -64,6 +67,7 @@ export type Loan = {
   totalRepayment: number;
   amountPaid: number;
   remainingAmount: number;
+  disbursedAmount?: number;
   nextPaymentDate?: string;
   repaymentHistory: { date: string; amount: number; reference?: string }[];
   sureties?: {
@@ -74,7 +78,8 @@ export type Loan = {
   paymentDueDay: number;
   approvedBy?: string;
   approvalDate?: string;
-  status: 'pending' | 'approved' | 'rejected' | 'active' | 'repaid' | 'completed' | 'defaulted';
+  renewedFrom?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'active' | 'repaid' | 'completed' | 'defaulted' | 'renewed';
 };
 
 export type Stats = {

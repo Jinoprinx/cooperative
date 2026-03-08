@@ -39,6 +39,10 @@ export default function PendingLoansPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedLoanId, setExpandedLoanId] = useState<string | null>(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [rejecting, setRejecting] = useState(false);
 
   const fetchPendingLoans = async () => {
     try {
@@ -59,6 +63,12 @@ export default function PendingLoansPage() {
   }, []);
 
   const handleLoanAction = async (loanId: string, status: 'approved' | 'rejected') => {
+    if (status === 'rejected') {
+      setSelectedLoanId(loanId);
+      setShowRejectModal(true);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -68,6 +78,29 @@ export default function PendingLoansPage() {
       const errorMessage = error.response?.data?.message || `Failed to ${status} loan`;
       const errorDetails = error.response?.data?.details || '';
       alert(`${errorMessage}\n${errorDetails}`);
+    }
+  };
+
+  const confirmReject = async () => {
+    if (!selectedLoanId || !rejectionReason.trim()) return;
+    setRejecting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/loans/${selectedLoanId}/status`,
+        { status: 'rejected', reason: rejectionReason },
+        config
+      );
+      setShowRejectModal(false);
+      setRejectionReason('');
+      setSelectedLoanId(null);
+      fetchPendingLoans();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to reject loan';
+      alert(errorMessage);
+    } finally {
+      setRejecting(false);
     }
   };
 
@@ -260,6 +293,40 @@ export default function PendingLoansPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Rejection Modal */}
+      {showRejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Reason for Loan Rejection</h3>
+            <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-semibold">Please provide a reason:</p>
+            <textarea
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+              rows={4}
+              placeholder="e.g., Inadequate surety history, income mismatch, etc."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              autoFocus
+            />
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowRejectModal(false)}
+                className="flex-1 px-4 py-2 text-gray-700 font-semibold bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={rejecting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmReject}
+                disabled={!rejectionReason.trim() || rejecting}
+                className="flex-1 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {rejecting ? 'Rejecting...' : 'Reject'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

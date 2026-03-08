@@ -1,17 +1,57 @@
 'use client';
 
-import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle } from 'react-icons/fa';
+import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle, FaBell, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
 import { useUser } from '@/app/hooks/useUser';
 import { useDashboardData } from '@/app/hooks/useDashboardData';
 import PayNowButton from '../components/PayNowButton';
-//import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 //const PayNowButton = dynamic(() => import('@/app/components/PayNowButton'), { ssr: false });
+
+interface Notification {
+  _id: string;
+  message: string;
+  isRead: boolean;
+  type: string;
+}
 
 export default function Dashboard() {
   const { user, loading: userLoading, error: userError } = useUser();
   const { transactions, activeLoan, summary, loading: dataLoading, error: dataError, refetch } = useDashboardData();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifLoading, setNotifLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/notifications`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setNotifications(res.data);
+      } catch (err) {
+        console.error('Failed to fetch notifications:', err);
+      } finally {
+        setNotifLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+  const markNotificationAsRead = async (id: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/notifications/${id}/read`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(notifications.map(n => n._id === id ? { ...n, isRead: true } : n));
+    } catch (err) {
+      console.error('Failed to mark notification as read', err);
+    }
+  };
 
   const loading = userLoading || dataLoading;
   const error = userError || dataError;
@@ -52,6 +92,34 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+
+      {/* Notifications Banner */}
+      {notifications.filter(n => !n.isRead).length > 0 && (
+        <div className="space-y-2 mb-6">
+          {notifications.filter(n => !n.isRead).map(notification => (
+            <div key={notification._id} className={`flex items-center justify-between p-4 rounded-lg shadow-sm ${notification.type === 'success' ? 'bg-green-50 border-l-4 border-green-500' :
+                notification.type === 'alert' ? 'bg-yellow-50 border-l-4 border-yellow-500' :
+                  'bg-blue-50 border-l-4 border-blue-500'
+              }`}>
+              <div className="flex items-center">
+                <FaBell className={`mr-3 h-5 w-5 ${notification.type === 'success' ? 'text-green-500' :
+                    notification.type === 'alert' ? 'text-yellow-600' :
+                      'text-blue-500'
+                  }`} />
+                <p className="text-sm font-medium text-gray-800">{notification.message}</p>
+              </div>
+              <button
+                onClick={() => markNotificationAsRead(notification._id)}
+                className="text-gray-400 hover:text-gray-600 focus:outline-none p-1"
+                title="Dismiss"
+              >
+                <FaTimes className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Account Balance Card */}
         <div className="rounded-lg bg-white p-6 shadow-md">
@@ -185,31 +253,29 @@ export default function Dashboard() {
                   <td className="px-6 py-4 text-sm text-gray-500">{transaction.description}</td>
                   <td className="px-6 py-4 text-sm">
                     <span
-                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                        transaction.type === 'deposit'
+                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${transaction.type === 'deposit'
                           ? 'bg-green-100 text-green-800'
                           : transaction.type === 'withdrawal'
-                          ? 'bg-red-100 text-red-800'
-                          : transaction.type === 'loan_repayment'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
+                            ? 'bg-red-100 text-red-800'
+                            : transaction.type === 'loan_repayment'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-800'
+                        }`}
                     >
                       {transaction.type === 'deposit'
                         ? 'Deposit'
                         : transaction.type === 'withdrawal'
-                        ? 'Withdrawal'
-                        : transaction.type === 'loan_repayment'
-                        ? 'Loan Repayment'
-                        : transaction.type}
+                          ? 'Withdrawal'
+                          : transaction.type === 'loan_repayment'
+                            ? 'Loan Repayment'
+                            : transaction.type}
                     </span>
                   </td>
                   <td
-                    className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${
-                      ['deposit', 'loan_disbursement'].includes(transaction.type)
+                    className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${['deposit', 'loan_disbursement'].includes(transaction.type)
                         ? 'text-green-600'
                         : 'text-red-600'
-                    }`}
+                      }`}
                   >
                     {['deposit', 'loan_disbursement'].includes(transaction.type) ? '+' : '-'} {formatCurrency(transaction.amount)}
                   </td>
@@ -223,9 +289,9 @@ export default function Dashboard() {
       {/* Actions Card */}
       <div className="rounded-lg bg-white p-6 shadow-md">
         <h2 className="mb-4 text-lg font-medium text-gray-800">Quick Actions</h2>
-          <div className="flex items-center justify-between mb-3">
-            <PayNowButton/>
-          </div>
+        <div className="flex items-center justify-between mb-3">
+          <PayNowButton />
+        </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <Link
             href="/dashboard/loans"

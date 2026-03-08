@@ -74,6 +74,11 @@ export default function PendingPaymentsPage() {
     }
   };
 
+  const handleViewReceipt = (transactionId: string) => {
+    const token = localStorage.getItem('token');
+    window.open(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${transactionId}/receipt?token=${token}`, '_blank');
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -105,7 +110,9 @@ export default function PendingPaymentsPage() {
                   <p className="text-gray-600 whitespace-no-wrap">{transaction.user.email}</p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <p className="text-gray-900 whitespace-no-wrap">${transaction.amount.toFixed(2)}</p>
+                  <p className="text-gray-900 whitespace-no-wrap">
+                    {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(transaction.amount)}
+                  </p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <p className="text-gray-900 whitespace-no-wrap">{transaction.description}</p>
@@ -114,7 +121,12 @@ export default function PendingPaymentsPage() {
                   <p className="text-gray-900 whitespace-no-wrap">{new Date(transaction.date).toLocaleDateString()}</p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <a href={transaction.receiptUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">View Receipt</a>
+                  <button
+                    onClick={() => handleViewReceipt(transaction._id)}
+                    className="text-blue-500 hover:underline font-medium"
+                  >
+                    View Receipt
+                  </button>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <button onClick={() => handleApprove(transaction._id)} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">Approve</button>

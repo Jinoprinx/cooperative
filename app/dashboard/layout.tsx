@@ -102,11 +102,11 @@ export default function DashboardLayout({
                     key={item.name}
                     href={item.href}
                     className={`group flex items-center rounded-xl px-4 py-3 text-sm font-bold transition-all ${pathname === item.href
-                      ? 'bg-primary text-primary'
+                      ? 'bg-primary text-[#050505]'
                       : 'text-white/40 hover:bg-white/5 hover:text-white'
                       }`}
                   >
-                    <item.icon className={`mr-4 h-5 w-5 ${pathname === item.href ? 'text-primary' : 'text-current'}`} />
+                    <item.icon className={`mr-4 h-5 w-5 ${pathname === item.href ? 'text-[#050505]' : 'text-current'}`} />
                     {item.name}
                   </Link>
                 ))}
@@ -143,11 +143,11 @@ export default function DashboardLayout({
                 key={item.name}
                 href={item.href}
                 className={`group flex items-center rounded-xl px-4 py-3.5 text-sm font-bold transition-all ${pathname === item.href
-                  ? 'bg-primary text-primary shadow-sm'
+                  ? 'bg-primary text-[#050505] shadow-sm'
                   : 'text-white/40 hover:bg-white/5 hover:text-white'
                   }`}
               >
-                <item.icon className={`mr-4 h-5 w-5 transition-transform group-hover:scale-110 ${pathname === item.href ? 'text-primary' : 'text-current'}`} />
+                <item.icon className={`mr-4 h-5 w-5 transition-transform group-hover:scale-110 ${pathname === item.href ? 'text-[#050505]' : 'text-current'}`} />
                 {item.name}
               </Link>
             ))}

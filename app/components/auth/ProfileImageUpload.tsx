@@ -43,8 +43,10 @@ export default function ProfileImageUpload({ setProfileImage }: { setProfileImag
       };
       const prefix = user?.role === 'admin' ? 'admin' : 'auth';
       const response = await axios.post(
-  `${process.env.NEXT_PUBLIC_API_URL}/${prefix}/profile/image`, formData, config);
-      updateUser(response.data.user);
+        `${process.env.NEXT_PUBLIC_API_URL}/${prefix}/profile/image`, formData, config);
+      if (user) {
+        updateUser({ ...user, profileImage: response.data.user.profileImage });
+      }
       setProfileImage(response.data.user.profileImage);
       setSuccess('Profile image uploaded successfully!');
       setFile(null); // Clear the file input
@@ -99,4 +101,5 @@ export default function ProfileImageUpload({ setProfileImage }: { setProfileImag
         </div>
       )}
     </div>
-  )};
+  )
+};

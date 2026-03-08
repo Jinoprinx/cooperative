@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { User } from '@/app/types';
 
-export function useUser() {
+export function useUser(redirectOnUnauth = true) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +15,10 @@ export function useUser() {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          router.push('/auth/login');
+          setLoading(false);
+          if (redirectOnUnauth) {
+            router.push('/auth/login');
+          }
           return;
         }
 
@@ -32,6 +35,9 @@ export function useUser() {
         console.error('Error fetching user data:', error);
         setError('Failed to load user data. Please try again.');
         setLoading(false);
+        if (redirectOnUnauth) {
+          router.push('/auth/login');
+        }
       }
     };
 

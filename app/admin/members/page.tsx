@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaSearch, FaUserPlus, FaTrash } from 'react-icons/fa';
+import { FaSearch, FaUserPlus, FaTrash, FaUserShield, FaUserEdit } from 'react-icons/fa';
+import { useAuth } from '@/app/context/AuthContext';
 import axios from 'axios';
 import { Member } from '@/app/types';
 import Link from 'next/link';
@@ -12,6 +13,7 @@ export default function Members() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMember, setNewMember] = useState({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '', email: '' });
   const [loading, setLoading] = useState(true);
+  const { isMainAdmin } = useAuth();
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -76,6 +78,25 @@ export default function Members() {
     }
   };
 
+  const handleToggleAdmin = async (member: Member) => {
+    if (!isMainAdmin) return;
+    try {
+      const token = localStorage.getItem('token');
+      const newRole = member.role === 'admin' ? 'member' : 'admin';
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/admin/members/${member._id}`,
+        { isAdmin: newRole === 'admin' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setMembers(members.map(m => m._id === member._id ? { ...m, role: newRole } : m));
+      alert(response.data.message);
+    } catch (error: any) {
+      console.error('Error toggling admin role:', error);
+      alert(error.response?.data?.message || 'Failed to update role');
+    }
+  };
+
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(amount);
   };
@@ -122,6 +143,7 @@ export default function Members() {
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Account Number</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Join Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Balance</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Role</th>
                 <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
@@ -136,10 +158,26 @@ export default function Members() {
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member.accountNumber}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(member.joinDate)}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(member.accountBalance)}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                    <button onClick={() => handleDeleteClick(member._id)} className="btn btn-error btn-sm">
-                      <FaTrash />
-                    </button>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${member.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
+                      {member.role || 'member'}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium space-x-2">
+                    {isMainAdmin && (
+                      <>
+                        <button
+                          onClick={() => handleToggleAdmin(member)}
+                          className={`btn btn-sm ${member.role === 'admin' ? 'btn-ghost text-red-600 hover:bg-red-50' : 'btn-ghost text-primary hover:bg-blue-50'}`}
+                          title={member.role === 'admin' ? "Demote from Admin" : "Promote to Admin"}
+                        >
+                          <FaUserShield className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => handleDeleteClick(member._id)} className="btn btn-error btn-sm">
+                          <FaTrash className="h-3 w-3" />
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}

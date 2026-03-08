@@ -7,10 +7,8 @@ export function getImageUrl(imagePath: string | undefined): string | undefined {
 
   // If it's already a full URL, return as is
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    // Replace localhost with production URL if needed
-    if (imagePath.includes('localhost:5000')) {
-      return imagePath.replace('http://localhost:5000', 'https://coopbkend-acfb9cb075e5.herokuapp.com');
-    }
+    // If the frontend is communicating with a different backend in production vs local,
+    // we should respect the NEXT_PUBLIC_API_URL, but for now, just return the exact URL provided by the backend.
     return imagePath;
   }
 

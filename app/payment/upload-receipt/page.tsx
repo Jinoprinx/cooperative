@@ -7,11 +7,11 @@ import { useDashboardData } from '@/app/hooks/useDashboardData'; // Import useDa
 
 export default function UploadReceiptPage() {
   const { user } = useAuth();
-  const { refetch: refetchDashboardData } = useDashboardData(); // Get refetch from useDashboardData
+  const { refetch: refetchDashboardData } = useDashboardData();
   const [file, setFile] = useState<File | null>(null);
-  const [depositAmount, setDepositAmount] = useState('');
-  const [loanReturnAmount, setLoanReturnAmount] = useState('');
-  const [description, setDescription] = useState(''); // New state for description
+  const [amount, setAmount] = useState('');
+  const [purpose, setPurpose] = useState<'deposit' | 'loan_repayment'>('deposit');
+  const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -24,8 +24,8 @@ export default function UploadReceiptPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || (!depositAmount && !loanReturnAmount)) {
-      setError('Please provide a receipt and at least one amount.');
+    if (!file || !amount) {
+      setError('Please provide a receipt and an amount.');
       return;
     }
 
@@ -35,14 +35,8 @@ export default function UploadReceiptPage() {
 
     const formData = new FormData();
     formData.append('receipt', file);
-
-    if (depositAmount) {
-      formData.append('depositAmount', depositAmount);
-    }
-
-    if (loanReturnAmount) {
-      formData.append('loanReturnAmount', loanReturnAmount);
-    }
+    formData.append('amount', amount);
+    formData.append('purpose', purpose);
 
     if (description) {
       formData.append('description', description);
@@ -58,10 +52,9 @@ export default function UploadReceiptPage() {
       });
       setSuccess('Receipt uploaded successfully. It is pending review.');
       setFile(null);
-      setDepositAmount('');
-      setLoanReturnAmount('');
-      setDescription(''); // Clear description after successful upload
-      refetchDashboardData(); // Refetch dashboard data after successful upload
+      setAmount('');
+      setDescription('');
+      refetchDashboardData();
     } catch (err) {
       setError('Failed to upload receipt. Please try again.');
     } finally {
@@ -70,54 +63,67 @@ export default function UploadReceiptPage() {
   };
 
   return (
-    <main className="p-6 max-w-lg mx-auto bg-white rounded-lg shadow-md mt-8">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">Upload Payment Receipt</h1>
+    <main className="p-6 max-w-lg mx-auto bg-surface border border-border rounded-xl shadow-2xl mt-8">
+      <h1 className="text-2xl font-bold mb-6 text-white text-center">Upload Payment Receipt</h1>
 
-      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">{error}</div>}
-      {success && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">{success}</div>}
+      {error && <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg relative mb-4" role="alert">{error}</div>}
+      {success && <div className="bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 px-4 py-3 rounded-lg relative mb-4" role="alert">{success}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="receipt" className="block text-gray-700 text-sm font-bold mb-2">Payment Receipt:</label>
+          <label htmlFor="receipt" className="block text-white/70 text-sm font-bold mb-2">Payment Receipt:</label>
           <input
             type="file"
             id="receipt"
             onChange={handleFileChange}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             required
           />
         </div>
+
         <div>
-          <label htmlFor="depositAmount" className="block text-gray-700 text-sm font-bold mb-2">Deposit Amount:</label>
+          <label htmlFor="purpose" className="block text-white/70 text-sm font-bold mb-2">Purpose of Payment:</label>
+          <select
+            id="purpose"
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value as 'deposit' | 'loan_repayment')}
+            className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
+          >
+            <option value="deposit">Deposit (Savings)</option>
+            <option value="loan_repayment">Loan Refund</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="amount" className="block text-white/70 text-sm font-bold mb-2">Amount (must match receipt):</label>
           <input
             type="number"
-            id="depositAmount"
-            value={depositAmount}
-            onChange={(e) => setDepositAmount(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="0.00"
+            className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            required
           />
         </div>
+
         <div>
-          <label htmlFor="loanReturnAmount" className="block text-gray-700 text-sm font-bold mb-2">Loan Return Amount:</label>
-          <input
-            type="number"
-            id="loanReturnAmount"
-            value={loanReturnAmount}
-            onChange={(e) => setLoanReturnAmount(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div>
-          <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description (Optional):</label>
+          <label htmlFor="description" className="block text-white/70 text-sm font-bold mb-2">Description (Optional):</label>
           <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Additional details..."
+            className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
             rows={3}
           />
         </div>
-        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out w-full" disabled={loading}>
+
+        <button
+          type="submit"
+          className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition duration-300 ease-in-out w-full disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+          disabled={loading}
+        >
           {loading ? 'Submitting...' : 'Send for Approval'}
         </button>
       </form>

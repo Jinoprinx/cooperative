@@ -7,9 +7,8 @@ export interface PendingLoan extends Loan {
     _id: string;
     firstName: string;
     lastName: string;
-    accountNumber: string;
+    accountNumber?: string;
   };
-  createdAt: string;
 }
 
 export interface PendingPayment {
@@ -17,7 +16,7 @@ export interface PendingPayment {
   user: {
     firstName: string;
     lastName: string;
-    accountNumber: string;
+    accountNumber?: string;
   };
   receiptUrl: string;
   description: string;

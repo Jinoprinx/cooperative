@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FaUsers, FaMoneyBillWave, FaChartLine, FaHandshake, FaArrowRight } from 'react-icons/fa';
 import Navbar from '@/app/components/Navbar'
+import { useUser } from '@/app/hooks/useUser';
 
 const features = [
   {
@@ -51,6 +52,8 @@ const steps = [
 ];
 
 export default function Home() {
+  const { user } = useUser(false);
+
   return (
     <div className="relative min-h-screen bg-background overflow-x-hidden selection:bg-primary">
       <div className="noise-overlay" />
@@ -115,19 +118,39 @@ export default function Home() {
                   transition={{ delay: 1, duration: 0.8 }}
                   className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-8 sm:space-y-0"
                 >
-                  <Link
-                    href="/auth/register"
-                    className="btn-primary group"
-                  >
-                    Register your Society
-                    <FaArrowRight className="text-sm transition-transform duration-500 group-hover:translate-x-2" />
-                  </Link>
-                  <Link
-                    href="/auth/login"
-                    className="btn-secondary"
-                  >
-                    Member Login
-                  </Link>
+                  {user ? (
+                    <>
+                      <Link
+                        href="/dashboard"
+                        className="btn-primary group"
+                      >
+                        Visit Your Dashboard
+                        <FaArrowRight className="text-sm transition-transform duration-500 group-hover:translate-x-2" />
+                      </Link>
+                      <Link
+                        href="/dashboard"
+                        className="btn-secondary"
+                      >
+                        Make Payment
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/auth/register"
+                        className="btn-primary group"
+                      >
+                        Register your Society
+                        <FaArrowRight className="text-sm transition-transform duration-500 group-hover:translate-x-2" />
+                      </Link>
+                      <Link
+                        href="/auth/login"
+                        className="btn-secondary"
+                      >
+                        Member Login
+                      </Link>
+                    </>
+                  )}
                 </motion.div>
               </motion.div>
             </div>

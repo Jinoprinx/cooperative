@@ -112,7 +112,7 @@ export default function Account() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800">Account</h1>
+      <h1 className="text-2xl font-bold text-white">Account</h1>
       <div className="mb-4">
         <PayNowButton />
       </div>
@@ -134,9 +134,8 @@ export default function Account() {
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(activity.date)}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{activity.description}</td>
                   <td
-                    className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${
-                      ['deposit', 'loan_disbursement'].includes(activity.type) ? 'text-green-600' : 'text-red-600'
-                    }`}
+                    className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${['deposit', 'loan_disbursement'].includes(activity.type) ? 'text-green-600' : 'text-red-600'
+                      }`}
                   >
                     {['deposit', 'loan_disbursement'].includes(activity.type) ? '+' : '-'} {formatCurrency(activity.amount)}
                   </td>
