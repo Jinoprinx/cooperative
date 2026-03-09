@@ -9,26 +9,26 @@ import { useUser } from '@/app/hooks/useUser';
 const features = [
   {
     icon: FaUsers,
-    title: "Member Management",
-    description: "Connect and empower your community with streamlined member profiles and enrollment.",
+    title: "Digital Identity",
+    description: "Onboard members instantly with secure, paperless profiles and automated KYC verification.",
     color: "bg-blue-500/20 text-blue-400"
   },
   {
     icon: FaMoneyBillWave,
-    title: "Financial Tracking",
-    description: "Real-time visibility into your deposits, withdrawals, and wealth growth.",
+    title: "Automated Ledger",
+    description: "Eliminate manual bookkeeping with real-time digital receipts and instant transaction tracking.",
     color: "bg-emerald-500/20 text-emerald-400"
   },
   {
     icon: FaHandshake,
-    title: "Smart Loans",
-    description: "Access capital when it matters most with our automated loan processing system.",
+    title: "Paperless Lending",
+    description: "Accelerate approvals with a fully automated, document-free loan application and disbursement pipeline.",
     color: "bg-amber-500/20 text-amber-400"
   },
   {
     icon: FaChartLine,
-    title: "Wealth Analytics",
-    description: "Make data-driven decisions with comprehensive financial reporting and insights.",
+    title: "Instant Audits",
+    description: "Generate comprehensive financial reports and compliance audits with a single click—anytime, anywhere.",
     color: "bg-indigo-500/20 text-indigo-400"
   }
 ];
@@ -36,18 +36,18 @@ const features = [
 const steps = [
   {
     id: "01",
-    title: "Digital Onboarding",
-    description: "Join our legacy in minutes with a secure, paperless registration process."
+    title: "Instant Digital Setup",
+    description: "Transition your manual records into our secure cloud-based ecosystem without lifting a pen."
   },
   {
     id: "02",
-    title: "Flexible Funding",
-    description: "Automate your savings or make one-time contributions with ease."
+    title: "Automated Operations",
+    description: "Set up recurring contributions and automated notifications for all member activities."
   },
   {
     id: "03",
-    title: "Prosper Together",
-    description: "Access loans, track benefits, and grow your collective impact."
+    title: "Transparent Growth",
+    description: "Monitor your cooperative's performance through real-time dashboards with zero manual reporting required."
   }
 ];
 
@@ -81,7 +81,7 @@ export default function Home() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  Transcend Legacy Banking
+                  Eliminate Paperwork. Elevate Efficiency.
                 </motion.div>
 
                 <h1 className="mb-8 text-7xl font-black md:text-[9rem] text-foreground dark:text-white tracking-tighter leading-[0.85] perspective-1000">
@@ -109,7 +109,7 @@ export default function Home() {
                   transition={{ delay: 0.8, duration: 1 }}
                   className="mb-14 text-xl md:text-2xl text-muted-foreground dark:text-white/50 font-medium leading-relaxed max-w-2xl mx-auto px-4"
                 >
-                  Experience a modern cooperative ecosystem engineered for exponential growth, radical transparency, and shared prosperity.
+                  The ultimate paperless management system for modern cooperatives. Streamline your operations, digitize every record, and automate financial workflows with surgical precision.
                 </motion.p>
 
                 <motion.div
@@ -140,7 +140,7 @@ export default function Home() {
                         href="/auth/register"
                         className="btn-primary group"
                       >
-                        Register your Society
+                        Digitize your Cooperative
                         <FaArrowRight className="text-sm transition-transform duration-500 group-hover:translate-x-2" />
                       </Link>
                       <Link
@@ -182,13 +182,13 @@ export default function Home() {
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
               <div className="max-w-2xl">
-                <span className="text-primary font-black tracking-[0.3em] uppercase text-xs mb-4 block">Utility & Scale</span>
+                <span className="text-primary font-black tracking-[0.3em] uppercase text-xs mb-4 block">Paperless Core</span>
                 <h2 className="text-5xl md:text-7xl font-black text-foreground dark:text-white tracking-tighter leading-none">
-                  Designed for <span className="text-muted-foreground dark:text-white/30">Hypergrowth.</span>
+                  Built for <span className="text-muted-foreground dark:text-white/30">Total Automation.</span>
                 </h2>
               </div>
               <p className="text-muted-foreground dark:text-white/40 font-medium max-w-xs text-lg border-l border-border dark:border-white/10 pl-6">
-                Modular architecture built to empower communities across any distance.
+                Modernize your cooperative with a suite of tools designed to eliminate manual entry and reduce administrative overhead.
               </p>
             </div>
 
@@ -224,9 +224,9 @@ export default function Home() {
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col lg:flex-row items-center gap-24">
               <div className="lg:w-1/2">
-                <span className="text-secondary font-black tracking-[0.3em] uppercase text-xs mb-4 block">Protocol</span>
+                <span className="text-secondary font-black tracking-[0.3em] uppercase text-xs mb-4 block">Workflow</span>
                 <h2 className="text-5xl md:text-7xl font-black text-foreground dark:text-white mb-10 tracking-tighter leading-[0.9]">
-                  How We Move <span className="text-gradient">Together</span>
+                  Go Paperless <span className="text-gradient">in Minutes</span>
                 </h2>
 
                 <div className="space-y-10">
@@ -264,7 +264,7 @@ export default function Home() {
                     <div className="flex justify-between items-center mb-12">
                       <div className="space-y-2">
                         <div className="h-1.5 w-20 bg-primary/30 rounded-full"></div>
-                        <div className="text-xs font-black text-muted-foreground dark:text-white/40 uppercase tracking-widest">Global Vault</div>
+                        <div className="text-xs font-black text-muted-foreground dark:text-white/40 uppercase tracking-widest">Digital Treasury</div>
                       </div>
                       <div className="w-12 h-12 rounded-2xl bg-surface-lighter dark:bg-white/[0.03] flex items-center justify-center border border-border dark:border-white/[0.08]">
                         <FaChartLine className="text-primary text-xl" />
@@ -286,7 +286,7 @@ export default function Home() {
                     <div className="space-y-6 mb-12">
                       <div className="bg-surface-lighter dark:bg-white/[0.02] rounded-2xl p-6 border border-border dark:border-white/[0.05]">
                         <div className="flex justify-between items-center mb-4">
-                          <span className="text-[10px] font-black text-muted-foreground dark:text-white/30 uppercase tracking-widest">Smart Loan Allocation</span>
+                          <span className="text-[10px] font-black text-muted-foreground dark:text-white/30 uppercase tracking-widest">Automated Disbursements</span>
                           <span className="text-[10px] font-black text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/10">Authorized</span>
                         </div>
                         <div className="h-3 w-full bg-surface-hover dark:bg-white/[0.03] rounded-full overflow-hidden">
@@ -306,7 +306,7 @@ export default function Home() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-surface-lighter dark:bg-white/[0.02] rounded-2xl p-5 border border-border dark:border-white/[0.05]">
-                        <div className="text-[9px] text-muted-foreground dark:text-white/30 uppercase font-black mb-1 tracking-widest">Network Node</div>
+                        <div className="text-[9px] text-muted-foreground dark:text-white/30 uppercase font-black mb-1 tracking-widest">System Uptime</div>
                         <div className="text-xl font-bold text-foreground dark:text-white">420.2 km</div>
                       </div>
                       <div className="bg-surface-lighter dark:bg-white/[0.02] rounded-2xl p-5 border border-border dark:border-white/[0.05]">
@@ -338,7 +338,7 @@ export default function Home() {
                     Cooperatives.io
                   </span>
                 </Link>
-                <p className="text-muted-foreground dark:text-white/30 max-w-xs font-medium">The definitive operating system for modern cooperatives.</p>
+                <p className="text-muted-foreground dark:text-white/30 max-w-xs font-medium">The definitive paperless management system for modern cooperatives.</p>
               </div>
 
               <div className="flex flex-col items-end gap-6 text-right">
@@ -347,7 +347,7 @@ export default function Home() {
                   <Link href="#" className="text-muted-foreground dark:text-white/30 hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase">Terms of Use</Link>
                 </div>
                 <p className="text-muted-foreground dark:text-white/20 text-xs font-black tracking-widest uppercase italic">
-                  &copy; {new Date().getFullYear()} Cooperative System Intelligence. Built for legacy.
+                  &copy; {new Date().getFullYear()} Paperless Cooperative Systems. Built for legacy.
                 </p>
               </div>
             </div>
