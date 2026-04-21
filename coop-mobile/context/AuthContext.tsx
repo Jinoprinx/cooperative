@@ -75,10 +75,14 @@ function useProtectedRoute(authState: AuthState, isAuthenticated: boolean) {
       }
       // If no tenant, send to tenant-select (unless already there or on landing)
       else if (!tenant && !isLandingPage && segments[0] !== 'tenant-select') {
-        router.replace('/tenant-select');
+        // However, allow them to access new society registration directly
+        const isRegisterPage = segments[0] === '(auth)' && segments[1] === 'register';
+        if (!isRegisterPage) {
+          router.replace('/tenant-select');
+        }
       }
     }
-  }, [isAuthenticated, authState.user?.role, !!tenant, segments[0], authState.isLoading, isTenantLoading]);
+  }, [isAuthenticated, authState.user?.role, !!tenant, segments[0], segments[1], authState.isLoading, isTenantLoading]);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

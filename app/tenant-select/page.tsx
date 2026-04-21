@@ -92,25 +92,58 @@ export default function TenantSelectPage() {
                         Enter the unique name or subdomain of your society to access your portal.
                     </p>
 
-                    <form onSubmit={handleSearch} className="relative mb-12">
-                        <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                            <FaSearch className="text-muted-foreground/50" />
+                    <form onSubmit={handleSearch}>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                                <FaSearch className="text-muted-foreground/50" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="e.g. Ogba Citizens"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                className="w-full bg-surface dark:bg-white/[0.03] border border-border dark:border-white/[0.08] rounded-2xl py-5 pl-14 pr-32 text-foreground dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-xl"
+                            />
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="absolute right-2 top-2 bottom-2 px-6 bg-primary text-white font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                            >
+                                {loading ? 'Searching...' : 'Search'}
+                            </button>
                         </div>
-                        <input
-                            type="text"
-                            placeholder="e.g. Ogba Citizens"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            className="w-full bg-surface dark:bg-white/[0.03] border border-border dark:border-white/[0.08] rounded-2xl py-5 pl-14 pr-32 text-foreground dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-xl"
-                        />
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="absolute right-2 top-2 bottom-2 px-6 bg-primary text-white font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
-                        >
-                            {loading ? 'Searching...' : 'Search'}
-                        </button>
                     </form>
+                    
+                    <div className="flex items-center justify-center gap-4 my-8 opacity-60">
+                        <div className="h-px bg-border flex-1"></div>
+                        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">OR</span>
+                        <div className="h-px bg-border flex-1"></div>
+                    </div>
+
+                    <button 
+                        onClick={(e) => {
+                            e.preventDefault();
+                            const hostname = window.location.hostname;
+                            const port = window.location.port ? `:${window.location.port}` : '';
+                            const protocol = window.location.protocol;
+                            
+                            let mainDomain = hostname;
+                            const parts = hostname.split('.');
+                            
+                            if (hostname.endsWith('localhost')) {
+                                mainDomain = 'localhost';
+                            } else if (hostname.endsWith('.vercel.app')) {
+                                mainDomain = parts.slice(-3).join('.');
+                            } else if (parts.length > 2 && parts[0] !== 'www') {
+                                mainDomain = parts.slice(1).join('.');
+                            }
+
+                            window.location.href = `${protocol}//${mainDomain}${port}/auth/register`;
+                        }}
+                        className="block w-full py-4 mb-8 bg-surface dark:bg-white/[0.03] border border-primary/20 text-primary font-bold rounded-xl hover:bg-primary/10 transition-colors text-center"
+                    >
+                        Register a New Cooperative
+                    </button>
 
                     <div className="space-y-4">
                         {results.length > 0 ? (

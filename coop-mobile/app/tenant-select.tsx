@@ -15,7 +15,7 @@ export default function TenantSelect() {
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const { tenant, isLoading: isTenantLoading, setActiveTenant, searchTenants } = useTenant();
+  const { tenant, isLoading: isTenantLoading, setActiveTenant, searchTenants, clearTenant } = useTenant();
   const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
 
@@ -82,7 +82,7 @@ export default function TenantSelect() {
             Find your{"\n"}Cooperative
           </Text>
           <Text className="text-white/50 text-lg font-medium leading-relaxed">
-            Enter your cooperative's unique name or ID to get started.
+            Enter the unique name or subdomain of your society to access your portal.
           </Text>
         </View>
 
@@ -99,8 +99,23 @@ export default function TenantSelect() {
           title="Search" 
           onPress={handleSearch} 
           isLoading={isSearching}
-          className="mb-8"
         />
+
+        <View className="flex-row items-center justify-center my-6 opacity-60">
+          <View className="h-[1px] bg-border flex-1" />
+          <Text className="text-xs font-bold uppercase tracking-widest text-white/50 mx-4">OR</Text>
+          <View className="h-[1px] bg-border flex-1" />
+        </View>
+
+        <TouchableOpacity
+          onPress={async () => {
+              await clearTenant();
+              router.push('/(auth)/register');
+          }}
+          className="w-full py-4 bg-surface border border-primary/20 rounded-2xl items-center justify-center mb-8"
+        >
+          <Text className="text-primary font-bold text-lg">Register a New Cooperative</Text>
+        </TouchableOpacity>
 
         {results.length > 0 && (
           <View className="space-y-4">
