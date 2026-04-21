@@ -32,6 +32,7 @@ interface TenantContextType {
     loading: boolean;
     error: string | null;
     refreshTenant: () => Promise<void>;
+    searchTenants: (query: string) => Promise<Tenant[]>;
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
@@ -63,6 +64,15 @@ export function TenantProvider({ children, initialTenant }: { children: React.Re
         }
     };
 
+    const searchTenants = async (query: string): Promise<Tenant[]> => {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tenants/resolve?subdomain=${query.toLowerCase()}`);
+            return response.data ? [response.data] : [];
+        } catch {
+            return [];
+        }
+    };
+
     useEffect(() => {
         if (!initialTenant) {
             refreshTenant().finally(() => setLoading(false));
@@ -70,7 +80,7 @@ export function TenantProvider({ children, initialTenant }: { children: React.Re
     }, [initialTenant]);
 
     return (
-        <TenantContext.Provider value={{ tenant, loading, error, refreshTenant }}>
+        <TenantContext.Provider value={{ tenant, loading, error, refreshTenant, searchTenants }}>
             {children}
             {tenant?.branding?.primaryColor && (
                 <style jsx global>{`

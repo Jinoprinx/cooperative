@@ -38,8 +38,14 @@ export async function middleware(request: NextRequest) {
         subdomain = parts[0];
     }
 
-    // If no subdomain, or it's just 'www', proceed to main site
+    // If no subdomain, or it's just 'www', this is the main/parent site
     if (!subdomain || subdomain === 'www') {
+        // On the main domain, redirect /auth/login and /auth/register to /tenant-select
+        // so users must pick a cooperative before accessing auth pages
+        const pathname = url.pathname;
+        if (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')) {
+            return NextResponse.redirect(new URL('/tenant-select', request.url));
+        }
         return NextResponse.next();
     }
 

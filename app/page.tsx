@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { FaUsers, FaMoneyBillWave, FaChartLine, FaHandshake, FaArrowRight } from 'react-icons/fa';
 import Navbar from '@/app/components/Navbar'
 import { useUser } from '@/app/hooks/useUser';
+import { useTenant } from '@/app/context/TenantContext';
 
 const features = [
   {
@@ -53,7 +54,97 @@ const steps = [
 
 export default function Home() {
   const { user } = useUser(false);
+  const { tenant } = useTenant();
 
+  const handleVisitMainSite = () => {
+    const hostname = window.location.hostname;
+    const port = window.location.port ? `:${window.location.port}` : '';
+    const protocol = window.location.protocol;
+    
+    const parts = hostname.split('.');
+    let parentHostname = '';
+
+    if (hostname === 'localhost' || (parts.length > 1 && parts[parts.length - 1] === 'localhost')) {
+      parentHostname = 'localhost';
+    } else {
+      // e.g. test.cooperatives.io -> cooperatives.io
+      if (parts.length > 2) {
+        parentHostname = parts.slice(1).join('.');
+      } else {
+        parentHostname = hostname;
+      }
+    }
+
+    window.location.href = `${protocol}//${parentHostname}${port}`;
+  };
+
+  // 1. Tenant Landing Page View
+  if (tenant) {
+    return (
+      <div className="min-h-screen bg-background relative overflow-hidden">
+        <div className="noise-overlay" />
+        <Navbar />
+
+        <main className="relative z-10 pt-40 pb-20">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="max-w-4xl mx-auto text-center"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 text-[10px] font-black tracking-widest text-primary uppercase bg-primary/10 rounded-full border border-primary/20">
+                Official Portal
+              </div>
+              
+              <h1 className="text-6xl md:text-8xl font-black text-foreground dark:text-white tracking-tighter leading-none mb-8">
+                {tenant.name}
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-muted-foreground dark:text-white/40 font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
+                Welcome to your cooperative's digital home. Manage your contributions, applications, and accounts with ease in our secure environment.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20">
+                {user ? (
+                   <Link href="/dashboard" className="btn-primary w-full sm:w-auto">
+                     Go to Dashboard <FaArrowRight className="ml-2" />
+                   </Link>
+                ) : (
+                  <>
+                    <Link href="/auth/login" className="btn-primary w-full sm:w-auto">
+                      Access My Account <FaArrowRight className="ml-2" />
+                    </Link>
+                    <Link href="/auth/register" className="btn-secondary w-full sm:w-auto">
+                      Become a Member
+                    </Link>
+                  </>
+                )}
+              </div>
+
+              <div className="pt-20 border-t border-border dark:border-white/5">
+                <button 
+                  onClick={handleVisitMainSite}
+                  className="text-xs font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.3em] flex items-center gap-3 mx-auto"
+                >
+                  <div className="w-8 h-px bg-current opacity-20" />
+                  Visit Cooperatives.io Main Site
+                  <div className="w-8 h-px bg-current opacity-20" />
+                </button>
+              </div>
+            </motion.div>
+          </div>
+          
+          {/* Background Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-5xl pointer-events-none -z-10 opacity-30">
+            <div className="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary rounded-full blur-[120px]" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // 2. Parent Landing Page View (Existing Content)
   return (
     <div className="relative min-h-screen bg-background overflow-x-hidden selection:bg-primary">
       <div className="noise-overlay" />
@@ -144,7 +235,7 @@ export default function Home() {
                         <FaArrowRight className="text-sm transition-transform duration-500 group-hover:translate-x-2" />
                       </Link>
                       <Link
-                        href="/auth/login"
+                        href="/tenant-select"
                         className="btn-secondary"
                       >
                         Member Login
@@ -273,7 +364,7 @@ export default function Home() {
 
                     <div className="mb-12">
                       <div className="text-6xl font-black text-foreground dark:text-white mb-4 tracking-tighter">
-                        $124,592<span className="text-muted-foreground dark:text-white/20">.00</span>
+                        ₦124,592<span className="text-muted-foreground dark:text-white/20">.00</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center text-xs font-black text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/10">
@@ -298,8 +389,8 @@ export default function Home() {
                           ></motion.div>
                         </div>
                         <div className="flex justify-between mt-3">
-                          <span className="text-[10px] text-muted-foreground dark:text-white/40 font-bold">$7,800 Released</span>
-                          <span className="text-[10px] text-muted-foreground dark:text-white/40 font-bold">$10k Ceiling</span>
+                          <span className="text-[10px] text-muted-foreground dark:text-white/40 font-bold">₦7,800 Released</span>
+                          <span className="text-[10px] text-muted-foreground dark:text-white/40 font-bold">₦10k Ceiling</span>
                         </div>
                       </div>
                     </div>

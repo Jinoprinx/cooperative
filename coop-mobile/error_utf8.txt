@@ -1,0 +1,74 @@
+﻿Starting project at C:\Users\JinoPrinx\coop\coop-mobile
+Metro is running in CI mode, reloads are disabled. Remove CI=true to enable watch mode.
+node.exe : TypeError: 
+Cannot read properties of 
+undefined (reading 
+'length')
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (T  
+  ypeError: Cann...adin   
+ g 'length'):String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+TypeError: Cannot read 
+properties of undefined 
+(reading 'length')
+    at RootPathUtils.absol
+uteToNormal (C:\Users\Jino
+Prinx\coop\coop-mobile\nod
+e_modules\metro-file-map\s
+rc\lib\RootPathUtils.js:71
+:64)
+    at C:\Users\JinoPrinx\
+coop\coop-mobile\node_modu
+les\metro-file-map\src\lib
+\rootRelativeCacheKeys.js:
+42:25
+    at Array.map 
+(<anonymous>)
+    at C:\Users\JinoPrinx\
+coop\coop-mobile\node_modu
+les\metro-file-map\src\lib
+\rootRelativeCacheKeys.js:
+40:39
+    at Array.map 
+(<anonymous>)
+    at 
+rootRelativeCacheKeys (C:\
+Users\JinoPrinx\coop\coop-
+mobile\node_modules\metro-
+file-map\src\lib\rootRelat
+iveCacheKeys.js:37:6)
+    at 
+Function.getCacheFilePath 
+(C:\Users\JinoPrinx\coop\c
+oop-mobile\node_modules\me
+tro-file-map\src\cache\Dis
+kCacheManager.js:49:36)
+    at new 
+DiskCacheManager (C:\Users
+\JinoPrinx\coop\coop-mobil
+e\node_modules\metro-file-
+map\src\cache\DiskCacheMan
+ager.js:34:40)
+    at _metroFileMap.defau
+lt.create.cacheManagerFact
+ory (C:\Users\JinoPrinx\co
+op\coop-mobile\node_module
+s\metro\src\node-haste\Dep
+endencyGraph\createFileMap
+.js:79:9)
+    at new FileMap (C:\Use
+rs\JinoPrinx\coop\coop-mob
+ile\node_modules\metro-fil
+e-map\src\index.js:179:37)

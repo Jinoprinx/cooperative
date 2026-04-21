@@ -14,7 +14,8 @@ const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
+  countryCode: z.string().min(1, 'Required'),
+  phoneNumber: z.string().min(7, 'Invalid number'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(8, 'Confirm password is required'),
   coopName: z.string().min(3, 'Cooperative name must be at least 3 characters').optional(),
@@ -44,6 +45,9 @@ export default function RegisterForm() {
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      countryCode: '+234',
+    }
   });
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -56,7 +60,7 @@ export default function RegisterForm() {
         lastName: data.lastName,
         email: data.email,
         password: data.password,
-        phoneNumber: data.phoneNumber,
+        phoneNumber: `${data.countryCode}${data.phoneNumber}`,
         coopName: data.coopName,
         subdomain: data.subdomain,
         superAdminKey: data.superAdminKey,
@@ -133,18 +137,40 @@ export default function RegisterForm() {
 
       <div className="space-y-1.5">
         <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Phone Number</label>
-        <div className="relative group">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <FaPhone className="h-3.5 w-3.5 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
+        <div className="flex gap-3">
+          <div className="w-32 relative group">
+            <select
+              className="w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-10 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none cursor-pointer"
+              {...register('countryCode')}
+            >
+              <option value="+234">🇳🇬 +234</option>
+              <option value="+1">🇺🇸 +1</option>
+              <option value="+44">🇬🇧 +44</option>
+              <option value="+233">🇬🇭 +233</option>
+              <option value="+254">🇰🇪 +254</option>
+              <option value="+27">🇿🇦 +27</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <FaCircleNotch className="h-2 w-2 text-muted-foreground/30 rotate-45" />
+            </div>
           </div>
-          <input
-            type="tel"
-            className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.phoneNumber ? 'border-red-500/50' : ''}`}
-            placeholder="+1 (555) 000-0000"
-            {...register('phoneNumber')}
-          />
+          <div className="flex-1 relative group">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+              <FaPhone className="h-3.5 w-3.5 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
+            </div>
+            <input
+              type="tel"
+              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.phoneNumber ? 'border-red-500/50' : ''}`}
+              placeholder="803 123 4567"
+              {...register('phoneNumber')}
+            />
+          </div>
         </div>
-        {errors.phoneNumber && <p className="text-[10px] text-red-400 font-medium px-1">{errors.phoneNumber.message}</p>}
+        {(errors.phoneNumber || errors.countryCode) && (
+          <p className="text-[10px] text-red-400 font-medium px-1">
+            {errors.phoneNumber?.message || errors.countryCode?.message}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">

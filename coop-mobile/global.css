@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 5 5 5;
+    --foreground: 255 255 255;
+    --primary: 59 130 246;
+    --secondary: 16 185 129;
+    --surface: 17 17 17;
+    --border: 255 255 255 / 0.08;
+  }
+}

@@ -35,7 +35,7 @@ const Navbar = () => {
         }`}
     >
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className={`flex items-center justify-between px-8 py-4 transition-all duration-700 rounded-[2rem] ${isScrolled ? 'glass-navbar shadow-[0_8px_32px_0_var(--shadow-color)]' : 'bg-transparent border border-transparent'
+        <div className={`flex items-center justify-between px-4 md:px-8 py-4 transition-all duration-700 rounded-[2rem] ${isScrolled ? 'glass-navbar shadow-[0_8px_32px_0_var(--shadow-color)]' : 'bg-transparent border border-transparent'
           }`}>
           <Link href="/" className="flex items-center space-x-3 group">
             <motion.div
@@ -65,7 +65,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-2 md:space-x-6">
             <ThemeToggle />
 
             {user ? (
@@ -85,16 +85,16 @@ const Navbar = () => {
             ) : (
               <>
                 <Link
-                  href="/auth/login"
-                  className="px-6 py-2.5 text-sm font-bold text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  href={tenant ? "/auth/login" : "/tenant-select"}
+                  className="px-3 md:px-6 py-2.5 text-sm font-bold text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
                   Log in
                 </Link>
                 <Link
-                  href="/auth/register"
-                  className="btn-primary text-sm !px-7 !py-2.5 shadow-xl shadow-primary/20"
+                  href={tenant ? "/auth/register" : "/tenant-select"}
+                  className="btn-primary text-sm !px-4 md:!px-7 !py-2.5 shadow-xl shadow-primary/20"
                 >
-                  Join now
+                  {tenant ? "Join now" : "Get Started"}
                 </Link>
               </>
             )}
