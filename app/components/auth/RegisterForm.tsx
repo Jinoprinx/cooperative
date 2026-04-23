@@ -76,200 +76,171 @@ export default function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <AnimatePresence>
         {error && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="rounded-xl bg-red-500 border border-red-500 p-4"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="rounded-2xl bg-red-500/10 border border-red-500/20 p-4"
           >
-            <div className="flex">
-              <div className="text-sm text-red-400 font-medium">{error}</div>
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              <div className="text-[10px] font-black uppercase tracking-widest text-red-500">{error}</div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">First Name</label>
-          <div className="relative group">
-            <input
-              type="text"
-              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.firstName ? 'border-red-500/50' : ''}`}
-              placeholder="John"
-              {...register('firstName')}
-            />
-          </div>
-          {errors.firstName && <p className="text-[10px] text-red-400 font-medium px-1">{errors.firstName.message}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Last Name</label>
-          <div className="relative group">
-            <input
-              type="text"
-              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.lastName ? 'border-red-500/50' : ''}`}
-              placeholder="Doe"
-              {...register('lastName')}
-            />
-          </div>
-          {errors.lastName && <p className="text-[10px] text-red-400 font-medium px-1">{errors.lastName.message}</p>}
-        </div>
-      </div>
-
-      <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Email Address</label>
-        <div className="relative group">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <FaEnvelope className="h-3.5 w-3.5 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
-          </div>
+        <div className="space-y-2 relative group/field">
+          <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Given Name</span>
           <input
-            type="email"
-            className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.email ? 'border-red-500/50' : ''}`}
-            placeholder="john@example.com"
-            {...register('email')}
+            type="text"
+            className={`w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${errors.firstName ? 'border-red-500/50' : ''}`}
+            placeholder="John"
+            {...register('firstName')}
           />
+          {errors.firstName && <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">{errors.firstName.message}</p>}
         </div>
-        {errors.email && <p className="text-[10px] text-red-400 font-medium px-1">{errors.email.message}</p>}
+        <div className="space-y-2 relative group/field">
+          <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Surname</span>
+          <input
+            type="text"
+            className={`w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${errors.lastName ? 'border-red-500/50' : ''}`}
+            placeholder="Doe"
+            {...register('lastName')}
+          />
+          {errors.lastName && <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">{errors.lastName.message}</p>}
+        </div>
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Phone Number</label>
+      <div className="space-y-2 relative group/field">
+        <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Email Address</span>
+        <input
+          type="email"
+          className={`w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${errors.email ? 'border-red-500/50' : ''}`}
+          placeholder="john@example.com"
+          {...register('email')}
+        />
+        {errors.email && <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">{errors.email.message}</p>}
+      </div>
+
+      <div className="space-y-2 relative group/field">
+        <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Communication Vector</span>
         <div className="flex gap-3">
-          <div className="w-32 relative group">
+          <div className="w-28 relative group/select">
             <select
-              className="w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-10 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none cursor-pointer"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold appearance-none cursor-pointer"
               {...register('countryCode')}
             >
-              <option value="+234">🇳🇬 +234</option>
-              <option value="+1">🇺🇸 +1</option>
-              <option value="+44">🇬🇧 +44</option>
-              <option value="+233">🇬🇭 +233</option>
-              <option value="+254">🇰🇪 +254</option>
-              <option value="+27">🇿🇦 +27</option>
+              <option value="+234" className="bg-slate-900">🇳🇬 +234</option>
+              <option value="+1" className="bg-slate-900">🇺🇸 +1</option>
+              <option value="+44" className="bg-slate-900">🇬🇧 +44</option>
+              <option value="+233" className="bg-slate-900">🇬🇭 +233</option>
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <FaCircleNotch className="h-2 w-2 text-muted-foreground/30 rotate-45" />
-            </div>
           </div>
-          <div className="flex-1 relative group">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <FaPhone className="h-3.5 w-3.5 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
-            </div>
+          <div className="flex-1 relative">
             <input
               type="tel"
-              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.phoneNumber ? 'border-red-500/50' : ''}`}
-              placeholder="803 123 4567"
+              className={`w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${errors.phoneNumber ? 'border-red-500/50' : ''}`}
+              placeholder="0803 123 4567"
               {...register('phoneNumber')}
             />
           </div>
         </div>
         {(errors.phoneNumber || errors.countryCode) && (
-          <p className="text-[10px] text-red-400 font-medium px-1">
+          <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">
             {errors.phoneNumber?.message || errors.countryCode?.message}
           </p>
         )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Password</label>
-          <div className="relative group">
-            <input
-              type="password"
-              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.password ? 'border-red-500/50' : ''}`}
-              placeholder="••••••••"
-              {...register('password')}
-            />
-          </div>
-          {errors.password && <p className="text-[10px] text-red-400 font-medium px-1">{errors.password.message}</p>}
+        <div className="space-y-2 relative group/field">
+          <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Security Key</span>
+          <input
+            type="password"
+            className={`w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 tracking-[0.3em] ${errors.password ? 'border-red-500/50' : ''}`}
+            placeholder="********"
+            {...register('password')}
+          />
+          {errors.password && <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">{errors.password.message}</p>}
         </div>
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Confirm</label>
-          <div className="relative group">
-            <input
-              type="password"
-              className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
-              placeholder="••••••••"
-              {...register('confirmPassword')}
-            />
-          </div>
-          {errors.confirmPassword && <p className="text-[10px] text-red-400 font-medium px-1">{errors.confirmPassword.message}</p>}
+        <div className="space-y-2 relative group/field">
+          <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Verify Security</span>
+          <input
+            type="password"
+            className={`w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 tracking-[0.3em] ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
+            placeholder="********"
+            {...register('confirmPassword')}
+          />
+          {errors.confirmPassword && <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">{errors.confirmPassword.message}</p>}
         </div>
       </div>
 
       {!tenant && (
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="space-y-5 pt-4 border-t border-border dark:border-white/5 mt-4"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="space-y-6 pt-8 border-t border-white/5 mt-6"
         >
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] px-1">Cooperative Details</label>
-            <p className="text-[10px] text-muted-foreground dark:text-white/30 px-1 mb-2">You are registering as an administrator of a new society.</p>
+          <div className="space-y-1 px-2">
+            <label className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Protocol Definition</label>
+            <p className="text-[10px] text-white/20 font-medium">Initializing new society management vector.</p>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Cooperative Name</label>
-            <div className="relative group">
+          <div className="space-y-2 relative group/field">
+            <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Registry Designation</span>
+            <input
+              type="text"
+              className={`w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${errors.coopName ? 'border-red-500/50' : ''}`}
+              placeholder="e.g. Nexus Alpha"
+              {...register('coopName')}
+            />
+            {errors.coopName && <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">{errors.coopName.message}</p>}
+          </div>
+
+          <div className="space-y-2 relative group/field">
+            <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Desired Subdomain</span>
+            <div className="flex items-center">
               <input
                 type="text"
-                className={`w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.coopName ? 'border-red-500/50' : ''}`}
-                placeholder="e.g. Coop Alpha"
-                {...register('coopName')}
+                className={`flex-1 bg-white/5 border border-white/10 rounded-l-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${errors.subdomain ? 'border-red-500/50' : ''}`}
+                placeholder="nexus-a"
+                {...register('subdomain')}
               />
-            </div>
-            {errors.coopName && <p className="text-[10px] text-red-400 font-medium px-1">{errors.coopName.message}</p>}
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Desired Subdomain</label>
-            <div className="relative group">
-              <div className="flex items-center">
-                <input
-                  type="text"
-                  className={`flex-1 bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-l-xl py-2.5 pl-4 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${errors.subdomain ? 'border-red-500/50' : ''}`}
-                  placeholder="coopa"
-                  {...register('subdomain')}
-                />
-                <div className="bg-surface-lighter dark:bg-white/10 border border-l-0 border-border dark:border-white/10 rounded-r-xl py-2.5 px-4 text-muted-foreground dark:text-white/40 text-xs font-mono">
-                  .{baseDomain}
-                </div>
+              <div className="bg-white/10 border border-l-0 border-white/10 rounded-r-2xl p-6 pt-10 text-white/30 text-[10px] font-black uppercase tracking-widest">
+                .{baseDomain}
               </div>
             </div>
-            {errors.subdomain && <p className="text-[10px] text-red-400 font-medium px-1">{errors.subdomain.message}</p>}
+            {errors.subdomain && <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">{errors.subdomain.message}</p>}
           </div>
         </motion.div>
       )}
 
-      <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">Super Admin Key (Optional)</label>
-        <div className="relative group">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <FaLock className="h-3.5 w-3.5 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
-          </div>
-          <input
-            type="text"
-            className="w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-foreground dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-            placeholder="Enter key if applicable"
-            {...register('superAdminKey')}
-          />
-        </div>
+      <div className="space-y-2 relative group/field">
+        <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Elevated Authorization (Optional)</span>
+        <input
+          type="text"
+          className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10"
+          placeholder="Access key"
+          {...register('superAdminKey')}
+        />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="btn-primary w-full py-3.5 relative overflow-hidden group disabled:opacity-70 mt-4"
+        className="w-full btn-primary py-5 rounded-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 mt-6 disabled:opacity-50"
       >
-        <span className={loading ? 'opacity-0' : 'opacity-100 flex items-center justify-center font-bold tracking-tight text-sm'}>
-          {tenant ? 'Create Member Profile' : 'Register Cooperative'}
+        <span className={loading ? 'opacity-0' : 'opacity-100'}>
+          {tenant ? 'Activate Membership' : 'Initialize Cooperative'}
         </span>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <FaCircleNotch className="animate-spin text-lg" />
+             <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           </div>
         )}
       </button>

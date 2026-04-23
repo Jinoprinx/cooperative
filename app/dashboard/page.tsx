@@ -91,30 +91,53 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10 pb-20">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Personal Ledger</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
+            Member <span className="text-white/40">Hub</span>
+          </h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end">
+            <span className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Status</span>
+            <span className="text-emerald-400 text-xs font-bold flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Active Member
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Notifications Banner */}
       {notifications.filter(n => !n.isRead).length > 0 && (
-        <div className="space-y-2 mb-6">
+        <div className="space-y-4">
           {notifications.filter(n => !n.isRead).map(notification => (
-            <div key={notification._id} className={`flex items-center justify-between p-4 rounded-lg shadow-sm ${notification.type === 'success' ? 'bg-green-50 border-l-4 border-green-500' :
-                notification.type === 'alert' ? 'bg-yellow-50 border-l-4 border-yellow-500' :
-                  'bg-blue-50 border-l-4 border-blue-500'
-              }`}>
-              <div className="flex items-center">
-                <FaBell className={`mr-3 h-5 w-5 ${notification.type === 'success' ? 'text-green-500' :
-                    notification.type === 'alert' ? 'text-yellow-600' :
-                      'text-blue-500'
-                  }`} />
-                <p className="text-sm font-medium text-gray-800">{notification.message}</p>
+            <div key={notification._id} className="relative group overflow-hidden">
+               <div className={`absolute inset-0 opacity-10 blur-xl group-hover:opacity-20 transition-opacity ${
+                 notification.type === 'success' ? 'bg-emerald-500' : notification.type === 'alert' ? 'bg-amber-500' : 'bg-primary'
+               }`} />
+               <div className={`relative flex items-center justify-between p-6 glass-card rounded-[2rem] border-l-4 ${
+                 notification.type === 'success' ? 'border-emerald-500' : notification.type === 'alert' ? 'border-amber-500' : 'border-primary'
+               }`}>
+                <div className="flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    notification.type === 'success' ? 'bg-emerald-500/20 text-emerald-500' : 
+                    notification.type === 'alert' ? 'bg-amber-500/20 text-amber-500' : 
+                    'bg-primary/20 text-primary'
+                  }`}>
+                    <FaBell className="h-5 w-5" />
+                  </div>
+                  <p className="text-sm font-bold text-white/90">{notification.message}</p>
+                </div>
+                <button
+                  onClick={() => markNotificationAsRead(notification._id)}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all"
+                >
+                  <FaTimes className="h-4 w-4" />
+                </button>
               </div>
-              <button
-                onClick={() => markNotificationAsRead(notification._id)}
-                className="text-gray-400 hover:text-gray-600 focus:outline-none p-1"
-                title="Dismiss"
-              >
-                <FaTimes className="h-4 w-4" />
-              </button>
             </div>
           ))}
         </div>
@@ -122,205 +145,204 @@ export default function Dashboard() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Account Balance Card */}
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-800">Account Balance</h2>
-            <div className="rounded-full bg-primary p-2 text-white">
+        <div className="card-premium group relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Savings Balance</p>
+              <h3 className="text-3xl font-black text-white tracking-tighter shadow-glow-sm">{formatCurrency(user?.accountBalance || 0)}</h3>
+            </div>
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
               <FaMoneyBillWave className="h-6 w-6" />
             </div>
           </div>
-          <p className="mt-4 text-3xl font-bold text-primary">{formatCurrency(user?.accountBalance || 0)}</p>
-          <p className="mt-2 text-sm text-gray-500">Account Number: {user?.accountNumber}</p>
+          <div className="flex flex-col">
+            <span className="text-white/20 text-[10px] font-black uppercase tracking-widest mb-1">Account Identifier</span>
+            <p className="text-sm font-mono font-bold text-white/60 tracking-wider">{user?.accountNumber}</p>
+          </div>
         </div>
 
-        {/* Loan Summary Card (if there's an active loan) */}
-        {activeLoan && (
-          <div className="rounded-lg bg-white p-6 shadow-md">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium text-gray-800">Active Loan</h2>
-              <div className="rounded-full bg-secondary p-2 text-white">
+        {/* Loan Summary Card */}
+        {activeLoan ? (
+          <div className="card-premium group relative overflow-hidden border-red-500/20">
+            <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-red-500/10 rounded-full blur-3xl group-hover:bg-red-500/20 transition-all duration-700" />
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Outstanding Loan</p>
+                <h3 className="text-3xl font-black text-red-500 tracking-tighter">{formatCurrency(activeLoan.remainingAmount)}</h3>
+              </div>
+              <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform duration-500">
                 <FaHandHoldingUsd className="h-6 w-6" />
               </div>
             </div>
-            <p className="mt-4 text-3xl font-bold text-red-600">{formatCurrency(activeLoan.remainingAmount)}</p>
-            <p className="mt-2 text-sm text-gray-500">Outstanding Balance</p>
-            <div className="mt-4 flex justify-between">
-              <span className="text-sm text-gray-500">Next Payment: {activeLoan.nextPaymentDate ? formatDate(activeLoan.nextPaymentDate) : 'N/A'}</span>
-              <span className="text-sm font-medium">{formatCurrency(activeLoan.monthlyPayment)}</span>
+            <div className="space-y-4">
+              <div className="flex justify-between items-end">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">Next Payment Due</span>
+                  <span className="text-sm font-bold text-white/80">{activeLoan.nextPaymentDate ? formatDate(activeLoan.nextPaymentDate) : 'N/A'}</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">Amount Due</span>
+                  <p className="text-sm font-black text-white">{formatCurrency(activeLoan.monthlyPayment)}</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-1000"
+                    style={{ width: `${(activeLoan.amountPaid / activeLoan.totalRepayment) * 100}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-white/20">
+                  <span>Paid: {formatCurrency(activeLoan.amountPaid)}</span>
+                  <span>Total: {formatCurrency(activeLoan.totalRepayment)}</span>
+                </div>
+              </div>
+              <Link href="/dashboard/loans" className="block text-center text-[10px] font-black text-red-500 hover:text-red-400 uppercase tracking-widest pt-2">View Loan Progression</Link>
             </div>
-            <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
-              <div
-                className="h-2 rounded-full bg-secondary"
-                style={{ width: `${(activeLoan.amountPaid / activeLoan.totalRepayment) * 100}%` }}
-              ></div>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/dashboard/loans"
-                className="text-sm font-medium text-red-600 hover:text-red-800"
-              >
-                View Details
-              </Link>
-            </div>
+          </div>
+        ) : (
+          <div className="card-premium group relative overflow-hidden border-emerald-500/20 flex flex-col justify-center items-center text-center">
+             <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 mb-4">
+                <FaHandHoldingUsd className="h-8 w-8" />
+             </div>
+             <p className="text-white font-bold text-sm mb-1">No Active Loans</p>
+             <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Apply for funding today</p>
+             <Link href="/dashboard/loans" className="mt-6 btn-primary bg-emerald-600 hover:bg-emerald-500 px-8 text-xs py-2 shadow-none">Get Started</Link>
           </div>
         )}
 
-        {/* Transaction Summary Card */}
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-800">Recent Activity</h2>
-            <div className="rounded-full bg-blue-500 p-2 text-white">
-              <FaHistory className="h-6 w-6" />
+        {/* Activity Summary Card */}
+        <div className="card-premium group relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all duration-700" />
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-[10px] font-black text-white/40 uppercase tracking-widest">Quick Snapshot</h2>
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500">
+              <FaHistory className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <FaArrowUp className="mr-2 h-4 w-4 text-secondary" />
-                <span className="text-sm text-gray-600">Recent Deposit</span>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/10">
+                  <FaArrowUp className="h-3 w-3" />
+                </div>
+                <span className="text-xs font-bold text-white/60">Last Deposit</span>
               </div>
-              <span className="text-sm font-medium text-secondary">
-                {formatCurrency(summary.lastDepositAmount || 0)}
-              </span>
+              <span className="text-sm font-black text-emerald-400">{formatCurrency(summary.lastDepositAmount || 0)}</span>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <FaArrowDown className="mr-2 h-4 w-4 text-red-500" />
-                <span className="text-sm text-gray-600">Loan Balance</span>
+            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/10">
+                  <FaArrowDown className="h-3 w-3" />
+                </div>
+                <span className="text-xs font-bold text-white/60">Debt Exposure</span>
               </div>
-              <span className="text-sm font-medium text-red-500">
-                {activeLoan ? formatCurrency(activeLoan.remainingAmount) : formatCurrency(0)}
-              </span>
+              <span className="text-sm font-black text-red-400">{activeLoan ? formatCurrency(activeLoan.remainingAmount) : formatCurrency(0)}</span>
             </div>
+            <Link href="/dashboard/transactions" className="block text-center text-[10px] font-black text-primary hover:text-white uppercase tracking-widest transition-colors">See Complete History</Link>
           </div>
-          <div className="mt-4">
-            <Link
-              href="/dashboard/transactions"
-              className="text-sm font-medium text-blue-500 hover:text-blue-700"
-            >
-              View All Transactions
-            </Link>
-          </div>
-        </div>
-      </div>
-      {/* Recent Transactions */}
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <div className="flex items-center justify-between pb-4">
-          <h2 className="text-lg font-medium text-gray-800">Recent Transactions</h2>
-          <Link
-            href="/dashboard/transactions"
-            className="text-sm font-medium text-primary hover:text-primary-dark"
-          >
-            View All
-          </Link>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Date
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Description
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Type
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Amount
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {transactions.slice(0, 5).map((transaction) => (
-                <tr key={transaction._id}>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    {formatDate(transaction.date)}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{transaction.description}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <span
-                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${transaction.type === 'deposit'
-                          ? 'bg-green-100 text-green-800'
-                          : transaction.type === 'withdrawal'
-                            ? 'bg-red-100 text-red-800'
-                            : transaction.type === 'loan_repayment'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-gray-100 text-gray-800'
-                        }`}
-                    >
-                      {transaction.type === 'deposit'
-                        ? 'Deposit'
-                        : transaction.type === 'withdrawal'
-                          ? 'Withdrawal'
-                          : transaction.type === 'loan_repayment'
-                            ? 'Loan Repayment'
-                            : transaction.type}
-                    </span>
-                  </td>
-                  <td
-                    className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${['deposit', 'loan_disbursement'].includes(transaction.type)
-                        ? 'text-green-600'
-                        : 'text-red-600'
-                      }`}
-                  >
-                    {['deposit', 'loan_disbursement'].includes(transaction.type) ? '+' : '-'} {formatCurrency(transaction.amount)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
 
-      {/* Actions Card */}
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <h2 className="mb-4 text-lg font-medium text-gray-800">Quick Actions</h2>
-        <div className="flex items-center justify-between mb-3">
-          <PayNowButton />
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Recent Transactions Feed */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="card-premium p-0 overflow-hidden">
+            <div className="p-8 border-b border-white/5 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-white tracking-tight">Financial Feed</h2>
+                <p className="text-white/40 text-xs font-medium uppercase tracking-widest mt-1">Transaction Stream</p>
+              </div>
+              <Link href="/dashboard/transactions" className="btn-secondary px-6 py-2 text-xs">Full History</Link>
+            </div>
+            <div className="divide-y divide-white/5">
+              {transactions.slice(0, 5).map((transaction) => {
+                const isCredit = ['deposit', 'loan_disbursement'].includes(transaction.type);
+                return (
+                  <div key={transaction._id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${
+                        isCredit 
+                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 group-hover:bg-emerald-500/20 shadow-lg shadow-emerald-500/5' 
+                          : 'bg-red-500/10 border-red-500/20 text-red-500 group-hover:bg-red-500/20 shadow-lg shadow-red-500/5'
+                      }`}>
+                        {transaction.type === 'deposit' ? <FaArrowUp className="h-5 w-5" /> : 
+                         transaction.type === 'loan_repayment' ? <FaHandHoldingUsd className="h-5 w-5" /> :
+                         <FaArrowDown className="h-5 w-5" />}
+                      </div>
+                      <div>
+                        <p className="font-bold text-white group-hover:text-primary transition-colors">{transaction.description}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full border uppercase tracking-widest ${
+                            transaction.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                            transaction.type === 'withdrawal' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                            'bg-blue-500/10 border-blue-500/20 text-blue-500'
+                          }`}>
+                            {transaction.type.replace('_', ' ')}
+                          </span>
+                          <span className="text-[10px] text-white/30 font-bold">{formatDate(transaction.date)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-lg font-black tracking-tighter ${isCredit ? 'text-emerald-400 shadow-glow-sm' : 'text-white/80'}`}>
+                        {isCredit ? '+' : '-'} {formatCurrency(transaction.amount)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              {transactions.length === 0 && (
+                <div className="p-12 text-center text-white/20 italic text-sm font-medium">No recorded movements found.</div>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <Link
-            href="/dashboard/loans"
-            className="flex flex-col items-center rounded-lg bg-blue-50 p-4 text-center hover:bg-blue-100"
-          >
-            <FaHandHoldingUsd className="mb-2 h-8 w-8 text-blue-500" />
-            <span className="text-sm font-medium text-blue-700">Apply for Loan</span>
-          </Link>
-          <Link
-            href="/dashboard/account"
-            className="flex flex-col items-center rounded-lg bg-green-50 p-4 text-center hover:bg-green-100"
-          >
-            <FaMoneyBillWave className="mb-2 h-8 w-8 text-green-500" />
-            <span className="text-sm font-medium text-green-700">Setup Auto Payment</span>
-          </Link>
-          <Link
-            href="/dashboard/account"
-            className="flex flex-col items-center rounded-lg bg-purple-50 p-4 text-center hover:bg-purple-100"
-          >
-            <FaUserCircle className="mb-2 h-8 w-8 text-purple-500" />
-            <span className="text-sm font-medium text-purple-700">Account Settings</span>
-          </Link>
-          <Link
-            href="/dashboard/transactions"
-            className="flex flex-col items-center rounded-lg bg-yellow-50 p-4 text-center hover:bg-yellow-100"
-          >
-            <FaHistory className="mb-2 h-8 w-8 text-yellow-500" />
-            <span className="text-sm font-medium text-yellow-700">Transaction History</span>
-          </Link>
+
+        {/* Quick Actions Sidebar */}
+        <div className="space-y-8">
+          <div className="card-premium bg-gradient-to-br from-primary/20 to-transparent border-primary/20 p-8">
+            <h2 className="text-xl font-black text-white tracking-tighter mb-6">Payment Core</h2>
+            <div className="p-1 bg-white/5 rounded-[2.5rem] border border-white/10 mb-8">
+               <PayNowButton />
+            </div>
+            <div className="space-y-4">
+               <Link href="/dashboard/loans" className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/5 hover:border-primary/30 group transition-all duration-300">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                    <FaHandHoldingUsd className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-white leading-none mb-1">Apply for Loan</p>
+                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Growth Capital</p>
+                  </div>
+               </Link>
+               <Link href="/dashboard/account" className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/5 hover:border-emerald-500/30 group transition-all duration-300">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                    <FaArrowUp className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-white leading-none mb-1">Auto-Payment</p>
+                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Set & Forget</p>
+                  </div>
+               </Link>
+               <Link href="/dashboard/account" className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/5 hover:border-purple-500/30 group transition-all duration-300">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                    <FaUserCircle className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-white leading-none mb-1">Account Secure</p>
+                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Verify Details</p>
+                  </div>
+               </Link>
+            </div>
+          </div>
+
+          <div className="glass-card p-8 rounded-[2.5rem] border border-white/5 text-center">
+            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">Support Hub</p>
+            <p className="text-sm font-medium text-white/60 mb-6">Need assistance with your financial records?</p>
+            <Link href="mailto:support@coop.com" className="btn-secondary w-full py-3 text-xs tracking-widest font-black rounded-2xl block">Contact Desk</Link>
+          </div>
         </div>
       </div>
     </div>

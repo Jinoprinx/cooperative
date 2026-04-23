@@ -186,145 +186,184 @@ export default function Loans() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">Loans</h1>
-      {/* Apply for Loan */}
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <h2 className="text-lg font-medium text-gray-800">Apply for Loan</h2>
-        <div className="mt-4 space-y-4">
-          <input
-            type="number"
-            placeholder="Loan Amount (NGN)"
-            value={loanAmount}
-            onChange={(e) => setLoanAmount(e.target.value)}
-            className="input input-bordered w-full"
-          />
-          <input
-            type="number"
-            placeholder="Loan Duration (Months)"
-            value={durationMonths}
-            onChange={(e) => setDurationMonths(e.target.value)}
-            className="input input-bordered w-full"
-          />
-          <textarea
-            placeholder="Purpose of Loan"
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value)}
-            className="textarea textarea-bordered w-full"
-          />
-          {/* Sureties */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Sureties (at least 2)</label>
-            {sureties.map((surety, index) => (
-              <div key={index} className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="tel"
-                    placeholder="Surety Phone Number"
-                    value={surety.phone}
-                    onChange={(e) => handleSuretyChange(index, e.target.value)}
-                    className={`input input-bordered w-full ${surety.error ? 'border-red-500' : ''}`}
-                  />
-                  {!surety.error && (
-                    <span className={`text-sm whitespace-nowrap ${surety.found ? 'text-green-600' : 'text-red-600'}`}>{surety.name}</span>
-                  )}
-                  <button onClick={() => removeSurety(index)} className="btn btn-ghost btn-sm">
-                    <FaTrash className="text-red-500" />
-                  </button>
-                </div>
-                {surety.error && (
-                  <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium px-3 py-2 rounded-lg">
-                    <FaTimesCircle className="flex-shrink-0" />
-                    {surety.error}
-                  </div>
-                )}
-              </div>
-            ))}
-            {sureties.length < 5 && (
-              <button onClick={addSurety} className="btn btn-outline btn-sm">
-                <FaPlus className="mr-2" /> Add Surety
-              </button>
-            )}
-          </div>
-          <button onClick={handleApplyLoan} className="btn btn-primary">
-            <FaHandHoldingUsd className="mr-2" /> Apply
-          </button>
+    <div className="space-y-10 pb-20 text-white">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Capital Management</span>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter">
+            Personal <span className="text-white/40">Portfolio</span>
+          </h1>
         </div>
       </div>
-      {/* Loan History */}
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <h2 className="text-lg font-medium text-gray-800">Loan History</h2>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Purpose</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Loan Balance</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">You Received</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Monthly Payment</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Remaining</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {(loans || []).map((item) => (
-                <tr key={item._id}>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    <div className="flex flex-col">
-                      <span>{formatDate(item.startDate || item.createdAt)}</span>
-                      {item.renewedFrom && (
-                        <span className="inline-flex items-center text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full w-max mt-1">
-                          ↩ Renewed
-                        </span>
+
+      <div className="grid gap-10 lg:grid-cols-5 items-start">
+        {/* Application Form */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="card-premium relative overflow-hidden group">
+            <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-all duration-700" />
+            <h2 className="text-xl font-black tracking-tighter mb-8 flex items-center gap-3">
+               <FaHandHoldingUsd className="text-primary" />
+               Request Capital
+            </h2>
+            <div className="space-y-4">
+              <div className="relative group/field">
+                 <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Principle Amount (NGN)</span>
+                 <input
+                  type="number"
+                  placeholder="0.00"
+                  value={loanAmount}
+                  onChange={(e) => setLoanAmount(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-8 text-white outline-none focus:border-primary transition-all font-black text-lg"
+                />
+              </div>
+              <div className="relative group/field">
+                 <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Repayment Tenure (Months)</span>
+                 <input
+                  type="number"
+                  placeholder="Duration"
+                  value={durationMonths}
+                  onChange={(e) => setDurationMonths(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-8 text-white outline-none focus:border-primary transition-all font-bold"
+                />
+              </div>
+              <div className="relative group/field">
+                 <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Allocation Purpose</span>
+                 <textarea
+                  placeholder="Describe your requirement..."
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-8 text-white outline-none focus:border-primary transition-all font-medium h-32 resize-none"
+                />
+              </div>
+
+              {/* Sureties Management */}
+              <div className="pt-6 space-y-4">
+                <div className="flex justify-between items-center px-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Guarantors (Min. 2)</label>
+                  {sureties.length < 5 && (
+                    <button onClick={addSurety} className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">
+                      <FaPlus className="h-3 w-3" /> Add Surety
+                    </button>
+                  )}
+                </div>
+                
+                <div className="space-y-3">
+                  {sureties.map((surety, index) => (
+                    <div key={index} className="relative group/surety">
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex-1">
+                          <input
+                            type="tel"
+                            placeholder="Mobile Number"
+                            value={surety.phone}
+                            onChange={(e) => handleSuretyChange(index, e.target.value)}
+                            className={`w-full bg-white/3 border ${surety.error ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-3 px-4 text-xs text-white outline-none focus:border-primary transition-all font-bold group-hover/surety:bg-white/5`}
+                          />
+                          {surety.found && (
+                             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                               <div className="w-1 h-1 bg-emerald-500 rounded-full" />
+                               <span className="text-[8px] font-black text-emerald-400 uppercase tracking-tighter">Verified</span>
+                             </div>
+                          )}
+                        </div>
+                        <button onClick={() => removeSurety(index)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                          <FaTrash className="h-4 w-4" />
+                        </button>
+                      </div>
+                      
+                      {surety.name && (
+                         <p className={`mt-2 text-[10px] font-black uppercase tracking-widest px-2 ${surety.found ? 'text-emerald-400' : 'text-red-400'}`}>{surety.name}</p>
+                      )}
+                      {surety.error && (
+                         <p className="mt-2 text-[10px] text-red-500 px-2 font-bold italic">! {surety.error}</p>
                       )}
                     </div>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    {item.purpose}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    <span
-                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${item.status === 'approved' || item.status === 'active' || item.status === 'completed'
-                          ? 'bg-green-100 text-green-800'
-                          : item.status === 'renewed'
-                            ? 'bg-purple-100 text-purple-800'
-                            : item.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
-                        }`}
-                    >
-                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                    </span>
-                  </td>
-                  {/* Loan Balance = principal (what the member owes back) */}
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-semibold text-gray-800">
-                    {formatCurrency(item.amount)}
-                  </td>
-                  {/* You Received = disbursed net amount (principal minus upfront interest) */}
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-emerald-600">
-                    {item.disbursedAmount != null
-                      ? formatCurrency(item.disbursedAmount)
-                      : item.status === 'pending'
-                        ? '—'
-                        : formatCurrency(item.amount)}
-                  </td>
-                  {/* Monthly repayment instalment */}
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                    {item.monthlyPayment != null && item.status !== 'pending'
-                      ? formatCurrency(item.monthlyPayment)
-                      : '—'}
-                  </td>
-                  {/* Remaining balance to pay back */}
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                    {'remainingAmount' in item && item.status !== 'pending'
-                      ? formatCurrency(item.remainingAmount)
-                      : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  ))}
+                  {sureties.length === 0 && (
+                    <p className="text-center py-10 text-white/10 text-[10px] font-black uppercase tracking-[0.3em] border border-dashed border-white/10 rounded-2xl">Requirement: 2 Sureties</p>
+                  )}
+                </div>
+              </div>
+
+              <button 
+                onClick={handleApplyLoan} 
+                className="w-full btn-primary py-5 rounded-2xl flex items-center justify-center gap-4 text-xs font-black tracking-[0.4em] uppercase transition-all duration-500 hover:tracking-[0.6em] shadow-[0_0_30px_rgba(59,130,246,0.1)] group"
+              >
+                Assemble Credit Request
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Loan History / Records */}
+        <div className="lg:col-span-3 space-y-6">
+          <div className="card-premium p-0 overflow-hidden">
+            <div className="p-8 border-b border-white/5 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-black tracking-tighter">Ledger Archive</h2>
+                <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mt-1">Repayment Progression</p>
+              </div>
+            </div>
+            <div className="overflow-x-auto min-h-[400px]">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-white/5 bg-white/2">
+                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest">Protocol Date</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest">Classification</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest">Integrity</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Value (NGN)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Outstanding</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {(loans || []).map((item) => (
+                    <tr key={item._id} className="group hover:bg-white/3 transition-colors">
+                      <td className="px-8 py-6">
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-white/80">{formatDate(item.startDate || item.createdAt)}</span>
+                          {item.renewedFrom && (
+                            <span className="text-[9px] font-black text-primary uppercase tracking-tighter mt-1">↩ Renewed Cycle</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <p className="text-xs font-medium text-white/70 max-w-[150px] truncate">{item.purpose}</p>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                          ['approved', 'active', 'completed'].includes(item.status) ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                          item.status === 'renewed' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' :
+                          item.status === 'pending' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' :
+                          'bg-red-500/10 border-red-500/20 text-red-500'
+                        }`}>
+                           <div className={`w-1 h-1 rounded-full ${
+                             ['approved', 'active', 'completed'].includes(item.status) ? 'bg-emerald-500' :
+                             item.status === 'pending' ? 'bg-amber-500 animate-pulse' : 'bg-current'
+                           }`} />
+                           {item.status}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6 text-right font-black text-white shadow-glow-sm">
+                         {formatCurrency(item.amount)}
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                         <span className={`text-sm font-black ${item.remainingAmount > 0 ? 'text-red-400' : 'text-emerald-400 opacity-20'}`}>
+                           {item.status !== 'pending' ? formatCurrency(item.remainingAmount || 0) : '—'}
+                         </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {(loans || []).length === 0 && (
+                     <tr>
+                       <td colSpan={5} className="py-20 text-center bg-white/2">
+                          <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em] italic">No active or historical credit records</p>
+                       </td>
+                     </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

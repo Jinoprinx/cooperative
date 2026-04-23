@@ -125,218 +125,220 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Cooperative Settings</h1>
-                <p className="mt-2 text-gray-600">Customize your cooperative's branding and operational rules.</p>
+        <div className="space-y-10 pb-20 text-white max-w-6xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                <div>
+                    <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Core Configuration</span>
+                    <h1 className="text-4xl sm:text-5xl font-black tracking-tighter">
+                        Cooperative <span className="text-white/40">Nexus</span>
+                    </h1>
+                </div>
             </div>
 
             {message.text && (
-                <div className={`mb-6 p-4 rounded-md flex items-center ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                    }`}>
-                    {message.type === 'success' ? <FaCheckCircle className="mr-3" /> : <FaExclamationCircle className="mr-3" />}
-                    {message.text}
+                <div className={`p-6 rounded-[2rem] flex items-center border animate-float ${
+                    message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                }`}>
+                    {message.type === 'success' ? <FaCheckCircle className="mr-3 h-5 w-5" /> : <FaExclamationCircle className="mr-3 h-5 w-5" />}
+                    <span className="text-xs font-black uppercase tracking-widest">{message.text}</span>
                 </div>
             )}
 
-            <div className="space-y-8">
-                <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid gap-10 lg:grid-cols-2">
+                <form onSubmit={handleSubmit} className="lg:col-span-1 space-y-10">
                     {/* General Info */}
-                    <section className="bg-white shadow rounded-lg p-6">
-                        <div className="flex items-center mb-6 border-b pb-4">
-                            <FaCog className="text-primary text-xl mr-3" />
-                            <h2 className="text-xl font-semibold text-gray-800">General Information</h2>
+                    <div className="card-premium relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
+                        <div className="flex items-center gap-3 mb-8">
+                             <FaCog className="text-primary h-5 w-5" />
+                             <h2 className="text-xl font-black tracking-tighter uppercase">General Params</h2>
                         </div>
-                        <div className="grid grid-cols-1 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Cooperative Name</label>
+                        <div className="space-y-8">
+                            <div className="relative group/field">
+                                <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Registry Designation</span>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-8 text-white outline-none focus:border-primary transition-all font-bold"
                                     required
                                 />
                             </div>
-                            <div className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    id="registrationOpen"
-                                    checked={formData.settings.registrationOpen}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        settings: { ...formData.settings, registrationOpen: e.target.checked }
-                                    })}
-                                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                                />
-                                <label htmlFor="registrationOpen" className="ml-2 block text-sm text-gray-900">
-                                    Member Registration Open
+                            <div className="flex items-center gap-4 bg-white/3 p-6 rounded-2xl border border-white/5 group hover:bg-white/5 transition-all">
+                                <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out bg-white/10 rounded-full cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        id="registrationOpen"
+                                        checked={formData.settings.registrationOpen}
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            settings: { ...formData.settings, registrationOpen: e.target.checked }
+                                        })}
+                                        className="absolute w-6 h-6 rounded-full appearance-none cursor-pointer checked:bg-primary border-none left-0 checked:left-6 transition-all duration-300"
+                                    />
+                                </div>
+                                <label htmlFor="registrationOpen" className="text-xs font-black uppercase tracking-widest text-white/60 cursor-pointer group-hover:text-white transition-colors">
+                                    Member Intake Protocol Open
                                 </label>
                             </div>
                         </div>
-                    </section>
+                    </div>
 
                     {/* Branding */}
-                    <section className="bg-white shadow rounded-lg p-6">
-                        <div className="flex items-center mb-6 border-b pb-4">
-                            <FaPalette className="text-primary text-xl mr-3" />
-                            <h2 className="text-xl font-semibold text-gray-800">Branding</h2>
+                    <div className="card-premium relative overflow-hidden">
+                        <div className="flex items-center gap-3 mb-8">
+                             <FaPalette className="text-primary h-5 w-5" />
+                             <h2 className="text-xl font-black tracking-tighter uppercase">Visual Identity</h2>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Primary Color</label>
-                                <div className="mt-1 flex items-center space-x-2">
+                        <div className="grid gap-6 sm:grid-cols-2">
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Dominant Hue</label>
+                                <div className="flex items-center gap-3 bg-white/3 p-2 rounded-2xl border border-white/5 hover:bg-white/5 transition-all">
                                     <input
                                         type="color"
                                         name="primaryColor"
                                         value={formData.branding.primaryColor}
                                         onChange={handleBrandingChange}
-                                        className="h-10 w-20 p-1 border rounded"
+                                        className="h-12 w-12 rounded-xl cursor-pointer bg-transparent border-none overflow-hidden"
                                     />
                                     <input
                                         type="text"
                                         name="primaryColor"
                                         value={formData.branding.primaryColor}
                                         onChange={handleBrandingChange}
-                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2"
+                                        className="flex-1 bg-transparent text-xs font-mono font-bold text-white outline-none uppercase"
                                     />
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Accent Color</label>
-                                <div className="mt-1 flex items-center space-x-2">
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Accent Calibration</label>
+                                <div className="flex items-center gap-3 bg-white/3 p-2 rounded-2xl border border-white/5 hover:bg-white/5 transition-all">
                                     <input
                                         type="color"
                                         name="accentColor"
                                         value={formData.branding.accentColor}
                                         onChange={handleBrandingChange}
-                                        className="h-10 w-20 p-1 border rounded"
+                                        className="h-12 w-12 rounded-xl cursor-pointer bg-transparent border-none overflow-hidden"
                                     />
                                     <input
                                         type="text"
                                         name="accentColor"
                                         value={formData.branding.accentColor}
                                         onChange={handleBrandingChange}
-                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2"
+                                        className="flex-1 bg-transparent text-xs font-mono font-bold text-white outline-none uppercase"
                                     />
                                 </div>
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700">Logo URL</label>
+                            <div className="sm:col-span-2 space-y-4 mt-4">
+                                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Symbol Asset URL</label>
                                 <input
                                     type="url"
                                     name="logoUrl"
                                     value={formData.branding.logoUrl}
                                     onChange={handleBrandingChange}
-                                    placeholder="https://example.com/logo.png"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2"
+                                    className="w-full bg-white/3 border border-white/5 rounded-2xl p-6 text-white text-xs outline-none focus:border-primary transition-all font-mono"
+                                    placeholder="https://assets.nexus.io/logo.svg"
                                 />
                             </div>
                         </div>
-                    </section>
+                    </div>
 
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full btn-primary py-6 rounded-3xl text-sm font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500"
+                    >
+                        {loading ? (
+                            <div className="w-5 h-5 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : <FaSave className="h-5 w-5" />}
+                        Flash Update Settings
+                    </button>
+                </form>
+
+                <div className="lg:col-span-1 space-y-10">
                     {/* Loan Rules */}
-                    <section className="bg-white shadow rounded-lg p-6">
-                        <div className="flex items-center mb-6 border-b pb-4">
-                            <FaHandHolding className="text-primary text-xl mr-3" />
-                            <h2 className="text-xl font-semibold text-gray-800">Loan Policies</h2>
+                    <div className="card-premium relative overflow-hidden bg-primary/5 border-primary/20">
+                        <div className="flex items-center gap-3 mb-8">
+                             <FaHandHolding className="text-primary h-5 w-5" />
+                             <h2 className="text-xl font-black tracking-tighter uppercase text-primary">Credit Algorithms</h2>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Max Loan Amount</label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span className="text-gray-500 sm:text-sm">₦</span>
-                                    </div>
-                                    <input
-                                        type="number"
-                                        name="maxApprovalAmount"
-                                        value={formData.settings.loanRules.maxApprovalAmount}
-                                        onChange={handleLoanRulesChange}
-                                        className="block w-full pl-7 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2"
-                                    />
-                                </div>
+                        <div className="space-y-8">
+                            <div className="relative group/field">
+                                <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-white transition-colors">Max Exposure (NGN)</span>
+                                <input
+                                    type="number"
+                                    name="maxApprovalAmount"
+                                    value={formData.settings.loanRules.maxApprovalAmount}
+                                    onChange={handleLoanRulesChange}
+                                    className="w-full bg-primary/10 border border-primary/20 rounded-2xl p-6 pt-8 text-white outline-none focus:border-white transition-all font-black text-2xl tracking-tighter"
+                                />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Interest Rate (%)</label>
+                            <div className="relative group/field">
+                                <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-white transition-colors">Yield Rate (%)</span>
                                 <input
                                     type="number"
                                     name="interestRate"
                                     step="0.1"
                                     value={formData.settings.loanRules.interestRate}
                                     onChange={handleLoanRulesChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2"
+                                    className="w-full bg-primary/10 border border-primary/20 rounded-2xl p-6 pt-8 text-white outline-none focus:border-white transition-all font-black text-2xl tracking-tighter"
                                 />
                             </div>
                         </div>
-                    </section>
-
-                    <div className="flex justify-end pt-4">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
-                        >
-                            {loading ? (
-                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            ) : <FaSave className="mr-2" />}
-                            Save Changes
-                        </button>
                     </div>
-                </form>
 
-                {/* Security - PIN Management (Main Admin Only) */}
-                {isMainAdmin && (
-                    <section className="bg-white shadow rounded-lg p-6">
-                        <div className="flex items-center mb-6 border-b pb-4">
-                            <FaLock className="text-primary text-xl mr-3" />
-                            <h2 className="text-xl font-semibold text-gray-800">Account Balance PIN</h2>
-                        </div>
+                    {/* Security - PIN Management (Main Admin Only) */}
+                    {isMainAdmin && (
+                        <div className="card-premium relative overflow-hidden border-red-500/20 bg-red-500/3">
+                            <div className="flex items-center gap-3 mb-8 border-b border-red-500/10 pb-6">
+                                <FaLock className="text-red-500 h-5 w-5" />
+                                <h2 className="text-xl font-black tracking-tighter uppercase text-red-500">Encrypted Logic</h2>
+                            </div>
 
-                        {pinMessage.text && (
-                            <div className={`mb-4 p-3 rounded text-sm ${pinMessage.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                                {pinMessage.text}
-                            </div>
-                        )}
+                            {pinMessage.text && (
+                                <div className={`mb-8 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
+                                    pinMessage.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                                }`}>
+                                    {pinMessage.text}
+                                </div>
+                            )}
 
-                        <form onSubmit={handlePinSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">New 4-Digit PIN</label>
-                                <input
-                                    type="password"
-                                    maxLength={4}
-                                    value={pinData.pin}
-                                    onChange={(e) => setPinData({ ...pinData, pin: e.target.value.replace(/\D/g, '') })}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2"
-                                    placeholder="Enter 4 digits"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Confirm PIN</label>
-                                <input
-                                    type="password"
-                                    maxLength={4}
-                                    value={pinData.confirmPin}
-                                    onChange={(e) => setPinData({ ...pinData, confirmPin: e.target.value.replace(/\D/g, '') })}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2"
-                                    placeholder="Confirm 4 digits"
-                                />
-                            </div>
-                            <div className="md:col-span-2 flex justify-end">
+                            <form onSubmit={handlePinSubmit} className="space-y-6">
+                                <div className="grid gap-6 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-red-500/40 uppercase tracking-widest ml-4">Vector PIN</label>
+                                        <input
+                                            type="password"
+                                            maxLength={4}
+                                            value={pinData.pin}
+                                            onChange={(e) => setPinData({ ...pinData, pin: e.target.value.replace(/\D/g, '') })}
+                                            className="w-full bg-red-500/5 border border-red-500/10 rounded-2xl p-6 text-white text-center text-2xl tracking-[0.5em] outline-none focus:border-red-500 transition-all font-mono"
+                                            placeholder="****"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-red-500/40 uppercase tracking-widest ml-4">Verification</label>
+                                        <input
+                                            type="password"
+                                            maxLength={4}
+                                            value={pinData.confirmPin}
+                                            onChange={(e) => setPinData({ ...pinData, confirmPin: e.target.value.replace(/\D/g, '') })}
+                                            className="w-full bg-red-500/5 border border-red-500/10 rounded-2xl p-6 text-white text-center text-2xl tracking-[0.5em] outline-none focus:border-red-500 transition-all font-mono"
+                                            placeholder="****"
+                                        />
+                                    </div>
+                                </div>
                                 <button
                                     type="submit"
                                     disabled={pinLoading || pinData.pin.length !== 4}
-                                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary disabled:opacity-50"
+                                    className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_30px_rgba(220,38,38,0.1)]"
                                 >
-                                    {pinLoading ? 'Updating...' : 'Update PIN'}
+                                    {pinLoading ? 'Protocols Updating...' : 'Refresh Access Vector'}
                                 </button>
-                            </div>
-                        </form>
-                    </section>
-                )}
+                            </form>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

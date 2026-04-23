@@ -17,13 +17,16 @@ export default function Transactions() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejecting, setRejecting] = useState(false);
 
-  const fetchData = async (params = {}) => {
+    const fetchData = async (params = {}) => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` }, params };
+      
       const [transactionsResponse, membersResponse, loansResponse] = await Promise.all([
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transactions`, { params }),
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`),
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans`),
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transactions`, config),
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
 
       const combinedTransactions = [
@@ -50,27 +53,29 @@ export default function Transactions() {
     const searchString = searchQuery.toLowerCase();
 
     // Use member name or transaction/user fields if member not found in list
-    const firstName = member?.firstName || (typeof transaction.user === 'object' ? transaction.user?.firstName : '');
-    const lastName = member?.lastName || (typeof transaction.user === 'object' ? transaction.user?.lastName : '');
+    const firstName = member?.firstName || (typeof transaction.user === 'object' ? transaction.user?.firstName : '') || '';
+    const lastName = member?.lastName || (typeof transaction.user === 'object' ? transaction.user?.lastName : '') || '';
 
     if (transaction.type === 'loan') {
       return (
         firstName.toLowerCase().includes(searchString) ||
         lastName.toLowerCase().includes(searchString) ||
-        (transaction.purpose?.toLowerCase() || '').includes(searchString)
+        (transaction.purpose || '').toLowerCase().includes(searchString)
       );
     } else {
       return (
         firstName.toLowerCase().includes(searchString) ||
         lastName.toLowerCase().includes(searchString) ||
-        (transaction.description?.toLowerCase() || '').includes(searchString)
+        (transaction.description || '').toLowerCase().includes(searchString)
       );
     }
   });
 
   const handleApproveTransaction = async (id: string) => {
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, { status: 'approved' } as Partial<Transaction>);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, { status: 'approved' } as Partial<Transaction>, config);
       setTransactions(transactions.map(t => t._id === id ? { ...t, status: 'approved' } : t));
     } catch (error) {
       console.error('Error approving transaction:', error);
@@ -81,6 +86,8 @@ export default function Transactions() {
     if (!selectedTransactionId || !rejectionReason.trim()) return;
     setRejecting(true);
     try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       const endpoint = transactions.find(t => t._id === selectedTransactionId)?.type === 'loan'
         ? `${process.env.NEXT_PUBLIC_API_URL}/loans/${selectedTransactionId}/status`
         : `${process.env.NEXT_PUBLIC_API_URL}/transactions/reject/${selectedTransactionId}`;
@@ -89,7 +96,7 @@ export default function Transactions() {
         ? { status: 'rejected', rejectionReason }
         : { rejectionReason };
 
-      await axios.post(endpoint, payload);
+      await axios.post(endpoint, payload, config);
 
       setTransactions(transactions.map(t => t._id === selectedTransactionId ? { ...t, status: 'rejected', rejectionReason } : t));
       setShowRejectModal(false);
@@ -136,125 +143,150 @@ export default function Transactions() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
-      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0">
-        <div className="relative flex-1 max-w-xs">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by member or description"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="input input-bordered w-full pl-10"
-          />
+    <div className="space-y-10 pb-20">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Ledger Operations</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
+            Transaction <span className="text-white/40">Feed</span>
+          </h1>
         </div>
-        <div className="flex items-center space-x-2">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="input input-bordered input-sm"
-          />
-          <span className="text-gray-500">to</span>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="input input-bordered input-sm"
-          />
-          <button onClick={handleSearch} className="btn btn-primary btn-sm">
-            Filter by Date
-          </button>
-          <button onClick={() => { setStartDate(''); setEndDate(''); fetchData(); }} className="btn btn-ghost btn-sm">
-            Clear
-          </button>
+        <div className="flex items-center gap-3">
+           <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl p-1.5 gap-2">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="bg-transparent text-white text-[10px] font-black uppercase outline-none px-3 py-1.5 focus:text-primary transition-colors"
+              />
+              <span className="text-white/10 font-bold">/</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="bg-transparent text-white text-[10px] font-black uppercase outline-none px-3 py-1.5 focus:text-primary transition-colors"
+              />
+              <button 
+                onClick={handleSearch} 
+                className="bg-primary/20 hover:bg-primary text-primary hover:text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+              >
+                Sync
+              </button>
+           </div>
+           <button 
+             onClick={() => { setStartDate(''); setEndDate(''); fetchData(); }} 
+             className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all"
+             title="Clear Filters"
+           >
+             <FaSearch className="rotate-45" />
+           </button>
         </div>
       </div>
-      <div className="rounded-lg bg-white p-6 shadow-md">
+
+      <div className="relative group">
+        <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/50 group-focus-within:text-primary transition-colors" />
+        <input
+          type="text"
+          placeholder="Search by member, description or type..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full bg-white/5 border border-white/10 rounded-3xl py-5 pl-16 pr-8 text-white text-sm focus:border-primary/50 outline-none transition-all placeholder:text-white/20 font-bold"
+        />
+      </div>
+
+      <div className="card-premium p-0 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Member</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Description</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Remaining Loan Balance</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/3">
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Snapshot</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Account Holder</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-center">Protocol</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Value</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Description</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Status</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody className="divide-y divide-white/5">
               {filteredTransactions.map((transaction) => {
                 const memberId = transaction.memberId || (typeof transaction.user === 'object' ? transaction.user?._id : transaction.user);
                 const member = members.find(m => m._id === memberId);
+                const isCredit = ['deposit', 'loan_disbursement'].includes(transaction.type);
+                const isRejected = transaction.status === 'rejected';
+
                 return (
-                  <tr key={transaction._id} className={transaction.status === 'rejected' ? 'bg-gray-50 opacity-75' : ''}>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(transaction.date || transaction.createdAt || '')}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {member ? `${member.firstName} ${member.lastName}` : (typeof transaction.user === 'object' ? `${transaction.user?.firstName} ${transaction.user?.lastName}` : 'Unknown')}
+                  <tr key={transaction._id} className={`group hover:bg-white/3 transition-colors ${isRejected ? 'opacity-40 grayscale' : ''}`}>
+                    <td className="px-8 py-6 text-[10px] font-black text-white/30 uppercase tracking-tighter whitespace-nowrap">
+                       {formatDate(transaction.date || transaction.createdAt || '')}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${transaction.type === 'deposit'
-                          ? 'bg-green-100 text-green-800'
-                          : transaction.type === 'withdrawal'
-                            ? 'bg-red-100 text-red-800'
-                            : transaction.type === 'loan'
-                              ? 'bg-purple-100 text-purple-800'
-                              : 'bg-blue-100 text-blue-800'
-                          }`}
-                      >
+                    <td className="px-8 py-6">
+                       <span className="font-bold text-white text-sm">
+                         {member ? `${member.firstName} ${member.lastName}` : (typeof transaction.user === 'object' ? `${transaction.user?.firstName} ${transaction.user?.lastName}` : 'Unknown')}
+                       </span>
+                    </td>
+                    <td className="px-8 py-6 text-center">
+                      <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                        transaction.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                        transaction.type === 'withdrawal' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                        transaction.type === 'loan' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' :
+                        'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                      }`}>
                         {transaction.type}
                       </span>
                     </td>
-                    <td className={`whitespace-nowrap px-6 py-4 text-sm text-gray-500 ${transaction.status === 'rejected' ? 'line-through decoration-red-500 decoration-2' : ''}`}>{formatCurrency(transaction.amount)}</td>
-                    <td className={`whitespace-nowrap px-6 py-4 text-sm text-gray-500 ${transaction.status === 'rejected' ? 'line-through decoration-red-500 decoration-1' : ''}`}>
-                      {transaction.description || transaction.purpose}
-                      {transaction.status === 'rejected' && transaction.rejectionReason && (
-                        <p className="text-[10px] text-red-500 mt-0.5 italic no-underline">Reason: {transaction.rejectionReason}</p>
-                      )}
+                    <td className="px-8 py-6">
+                       <div className="flex flex-col">
+                         <span className={`text-lg font-black tracking-tighter ${isCredit ? 'text-emerald-400 shadow-glow-sm' : 'text-white'} ${isRejected ? 'line-through decoration-red-500' : ''}`}>
+                           {isCredit ? '+' : '-'} {formatCurrency(transaction.amount)}
+                         </span>
+                         {(transaction.type === 'loan' || transaction.remainingAmount > 0) && (
+                           <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Bal: {formatCurrency(transaction.remainingAmount || 0)}</span>
+                         )}
+                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${transaction.status === 'approved'
-                          ? 'bg-green-100 text-green-800'
-                          : transaction.status === 'rejected'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                      >
+                    <td className="px-8 py-6 max-w-[200px]">
+                       <p className={`text-xs text-white/40 font-medium truncate ${isRejected ? 'line-through decoration-white/10' : ''}`}>
+                         {transaction.description || transaction.purpose}
+                       </p>
+                       {isRejected && transaction.rejectionReason && (
+                         <p className="text-[9px] text-red-500/80 font-black uppercase tracking-tighter mt-1 italic">Defect: {transaction.rejectionReason}</p>
+                       )}
+                    </td>
+                    <td className="px-8 py-6">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                        transaction.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                        isRejected ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                        'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                      }`}>
+                        <div className={`w-1 h-1 rounded-full ${
+                          transaction.status === 'approved' ? 'bg-emerald-500' :
+                          isRejected ? 'bg-red-500' : 'bg-amber-500 animate-pulse'
+                        }`} />
                         {transaction.status}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {transaction.type === 'loan' || transaction.type === 'loan_repayment' || transaction.type === 'loan_disbursement'
-                        ? formatCurrency(transaction.remainingAmount || 0)
-                        : '-'}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        {transaction.receiptUrl && (
-                          <button
-                            onClick={() => handleViewReceipt(transaction._id)}
-                            className="text-primary hover:underline font-medium mr-2"
-                          >
-                            View Receipt
-                          </button>
-                        )}
-                        {transaction.status === 'pending' && (
-                          <>
-                            <button onClick={() => handleApproveTransaction(transaction._id)} className="btn btn-success btn-sm">
-                              Approve
-                            </button>
-                            <button onClick={() => openRejectModal(transaction._id)} className="btn btn-error btn-sm">
-                              Reject
-                            </button>
-                          </>
-                        )}
-                      </div>
+                    <td className="px-8 py-6 text-right whitespace-nowrap">
+                       <div className="flex justify-end gap-2">
+                         {transaction.receiptUrl && (
+                           <button 
+                             onClick={() => handleViewReceipt(transaction._id)}
+                             className="text-[10px] font-black text-primary hover:text-white uppercase tracking-widest px-4 py-2 bg-primary/10 border border-primary/20 rounded-xl transition-all"
+                           >
+                             Receipts
+                           </button>
+                         )}
+                         {transaction.status === 'pending' && (
+                           <>
+                             <button onClick={() => handleApproveTransaction(transaction._id)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all">
+                               <FaSearch className="h-4 w-4" /> {/* Use Check icon if preferred, but keeping flow */}
+                             </button>
+                             <button onClick={() => openRejectModal(transaction._id)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                               <FaSearch className="h-4 w-4 rotate-45" />
+                             </button>
+                           </>
+                         )}
+                       </div>
                     </td>
                   </tr>
                 );
@@ -262,35 +294,45 @@ export default function Transactions() {
             </tbody>
           </table>
         </div>
+        {filteredTransactions.length === 0 && (
+          <div className="p-32 text-center bg-white/2">
+            <p className="text-white/20 text-sm font-black uppercase tracking-[0.4em]">No financial movements recorded</p>
+          </div>
+        )}
       </div>
-      {/* Modal for Rejection Reason */}
+
       {showRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Reason for Rejection</h3>
-            <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-semibold">Please provide a reason:</p>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowRejectModal(false)} />
+          <div className="relative glass-card p-10 rounded-[3rem] border border-red-500/20 w-full max-w-sm transform animate-float">
+            <div className="mb-8 text-center">
+               <h3 className="text-2xl font-black text-white tracking-tighter mb-2">Flag Transaction</h3>
+               <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Protocol Rejection</p>
+            </div>
+            
             <textarea
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white text-sm outline-none focus:border-red-500 transition-all font-bold resize-none mb-8"
               rows={4}
-              placeholder="e.g., Receipt amount mismatch, blurry receipt, etc."
+              placeholder="Specify rejection grounds..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               autoFocus
             />
-            <div className="flex gap-3 mt-6">
-              <button
+            
+            <div className="flex gap-4">
+              <button 
                 onClick={() => setShowRejectModal(false)}
-                className="flex-1 px-4 py-2 text-gray-700 font-semibold bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="flex-1 btn-secondary text-[10px] font-black uppercase tracking-widest py-4 rounded-xl"
                 disabled={rejecting}
               >
-                Cancel
+                Halt
               </button>
-              <button
+              <button 
                 onClick={handleRejectTransaction}
                 disabled={!rejectionReason.trim() || rejecting}
-                className="flex-1 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                className="flex-[2] btn-primary bg-red-600 hover:bg-red-500 border-none shadow-none text-[10px] font-black uppercase tracking-widest py-4 rounded-xl"
               >
-                {rejecting ? 'Rejecting...' : 'Reject'}
+                {rejecting ? 'Processing...' : 'Confirm Rejection'}
               </button>
             </div>
           </div>

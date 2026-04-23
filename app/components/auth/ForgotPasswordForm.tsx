@@ -5,8 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import axios from 'axios';
-import { FaEnvelope, FaCircleNotch, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaEnvelope, FaCircleNotch, FaCheckCircle, FaExclamationCircle, FaArrowLeft } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 const schema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -47,72 +48,82 @@ export default function ForgotPasswordForm() {
         animate={{ opacity: 1, scale: 1 }}
         className="text-center py-10"
       >
-        <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
-          <FaCheckCircle className="text-emerald-500 text-4xl" />
+        <div className="w-24 h-24 bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 border border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.1)]">
+          <FaCheckCircle className="text-emerald-500 text-5xl" />
         </div>
-        <h3 className="text-xl font-bold text-foreground mb-2">Check your email</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          We've sent a password reset link to your email address. 
-          Please follow the instructions in the email.
+        <h3 className="text-3xl font-black text-white tracking-tighter mb-4">Transmission Successful</h3>
+        <p className="text-white/40 text-sm font-medium leading-relaxed max-w-xs mx-auto mb-10">
+          We've dispatched a secure recovery vector to your communication endpoint.
         </p>
+        <Link href="/auth/login" className="btn-secondary inline-flex items-center gap-3 px-8 text-xs font-black uppercase tracking-widest">
+           <FaArrowLeft className="text-[10px]" /> Return to Base
+        </Link>
       </motion.div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <AnimatePresence>
         {error && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 flex items-center space-x-3"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="rounded-2xl bg-red-500/10 border border-red-500/20 p-4"
           >
-            <FaExclamationCircle className="text-red-500 shrink-0" />
-            <div className="text-xs text-red-500 font-bold">{error}</div>
+            <div className="flex items-center gap-3">
+               <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+               <div className="text-[10px] font-black uppercase tracking-widest text-red-500">{error}</div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="space-y-2">
-        <label htmlFor="email" className="text-xs font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">
-          Email Address
-        </label>
-        <div className="relative group">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <FaEnvelope className="h-4 w-4 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
-          </div>
+      <div className="space-y-2 relative group/field">
+        <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Recovery Identity</span>
+        <div className="relative">
           <input
             id="email"
             type="email"
             autoComplete="email"
             required
-            className={`block w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-foreground dark:text-white placeholder:text-muted-foreground/50 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all ${
-              errors.email ? 'border-red-500/50 ring-2 ring-red-500/20' : ''
+            className={`w-full bg-white/5 border border-white/10 rounded-[2rem] p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${
+              errors.email ? 'border-red-500/50' : ''
             }`}
             placeholder="name@example.com"
             {...register('email')}
           />
         </div>
         {errors.email && (
-          <p className="mt-1 text-xs text-red-400 font-medium px-1">
+          <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">
             {errors.email.message}
           </p>
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-70 group overflow-hidden"
-      >
-        {isSubmitting ? (
-          <FaCircleNotch className="animate-spin text-lg" />
-        ) : (
-          <span>Send Reset Link</span>
-        )}
-      </button>
+      <div className="space-y-6">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full btn-primary py-5 rounded-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 disabled:opacity-50"
+        >
+          <span className={isSubmitting ? 'opacity-0' : 'opacity-100'}>Dispatch Reset Vector</span>
+          {isSubmitting && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            </div>
+          )}
+        </button>
+
+        <Link 
+          href="/auth/login" 
+          className="flex items-center justify-center gap-3 text-[10px] font-black text-white/20 uppercase tracking-[0.4em] hover:text-white transition-colors py-2"
+        >
+          <FaArrowLeft className="text-[8px]" /> Remember Protocols?
+        </Link>
+      </div>
     </form>
   );
 }
+

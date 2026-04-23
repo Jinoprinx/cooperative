@@ -62,7 +62,10 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-background selection:bg-primary">
+    <div className="flex min-h-screen bg-[#050505] selection:bg-primary selection:text-white">
+      <div className="fixed inset-0 z-0 bg-[var(--mesh-gradient)] opacity-30 pointer-events-none" />
+      <div className="noise-overlay" />
+
       {/* Mobile sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -71,7 +74,7 @@ export default function DashboardLayout({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] lg:hidden"
               onClick={toggleSidebar}
             />
             <motion.div
@@ -79,40 +82,48 @@ export default function DashboardLayout({
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col bg-surface border-r border-border pt-5 pb-4"
+              className="fixed inset-y-0 left-0 z-[110] flex w-full max-w-xs flex-col glass-card border-r border-white/5 pt-5 pb-4"
             >
-              <div className="px-6 flex items-center justify-between mb-8">
-                <Link href="/" className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transform rotate-12">
-                    <span className="text-white font-bold -rotate-12 italic text-xl">C</span>
+              <div className="px-6 flex items-center justify-between mb-10">
+                <Link href="/" className="flex items-center gap-3">
+                  <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
+                    <span className="text-white font-black italic text-xl">C</span>
                   </div>
-                  <span className="text-xl font-display font-bold text-white tracking-tight">Coop</span>
+                  <span className="text-xl font-black text-white tracking-tighter uppercase">Coop</span>
                 </Link>
                 <button
                   type="button"
-                  className="p-2 text-white/40 hover:text-white transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-colors"
                   onClick={toggleSidebar}
                 >
                   <FaTimes className="h-5 w-5" />
                 </button>
               </div>
-              <div className="flex-1 px-4 space-y-1">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`group flex items-center rounded-xl px-4 py-3 text-sm font-bold transition-all ${pathname === item.href
-                      ? 'bg-primary text-[#050505]'
-                      : 'text-white/40 hover:bg-white/5 hover:text-white'
+              <div className="flex-1 px-4 space-y-2 overflow-y-auto">
+                <div className="px-4 mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Main Menu</div>
+                {navigation.map((item) => {
+                   const isActive = pathname === item.href;
+                   return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`group flex items-center rounded-2xl px-5 py-4 text-sm font-bold transition-all duration-300 ${
+                        isActive
+                          ? 'bg-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]'
+                          : 'text-white/40 hover:bg-white/5 hover:text-white'
                       }`}
-                  >
-                    <item.icon className={`mr-4 h-5 w-5 ${pathname === item.href ? 'text-[#050505]' : 'text-current'}`} />
-                    {item.name}
-                  </Link>
-                ))}
+                    >
+                      <item.icon className={`mr-4 h-5 w-5 transition-transform ${isActive ? 'text-white' : 'text-current group-hover:scale-110'}`} />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="px-4 pt-6 border-t border-white/5">
                 <button
                   onClick={handleSignOut}
-                  className="group flex items-center rounded-xl px-4 py-3 text-sm font-bold text-white/40 hover:bg-red-500/10 hover:text-red-400 w-full transition-all"
+                  className="group flex items-center rounded-2xl px-5 py-4 text-sm font-bold text-white/40 hover:bg-red-500/10 hover:text-red-400 w-full transition-all"
                 >
                   <FaSignOutAlt className="mr-4 h-5 w-5" />
                   Sign out
@@ -124,90 +135,104 @@ export default function DashboardLayout({
       </AnimatePresence>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col border-r border-border bg-surface/50">
-        <div className="flex flex-col flex-1 pt-8 pb-4">
-          <div className="px-8 mb-12">
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transform rotate-12 shadow-lg shadow-primary">
-                <span className="text-white font-bold -rotate-12 italic text-2xl">C</span>
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col z-20">
+        <div className="flex flex-col flex-1 glass-card border-r border-white/5 m-4 rounded-[2.5rem] p-6 pt-10">
+          <div className="px-4 mb-14">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20 group hover:scale-105 transition-transform duration-500">
+                <span className="text-white font-black italic text-2xl">C</span>
+                <div className="absolute inset-0 bg-primary/40 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <span className="text-2xl font-display font-bold text-white tracking-tight">
-                Coop
-              </span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-black text-white tracking-tighter uppercase leading-none">Coop</span>
+                <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] leading-none mt-1">Platform</span>
+              </div>
             </Link>
           </div>
-          <nav className="flex-1 px-4 space-y-1.5">
-            <div className="px-4 mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Navigation</div>
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`group flex items-center rounded-xl px-4 py-3.5 text-sm font-bold transition-all ${pathname === item.href
-                  ? 'bg-primary text-[#050505] shadow-sm'
-                  : 'text-white/40 hover:bg-white/5 hover:text-white'
+          
+          <nav className="flex-1 space-y-2">
+            <div className="px-5 mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Navigator</div>
+            {navigation.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`group flex items-center rounded-2xl px-6 py-4 text-sm font-bold transition-all duration-500 hover:scale-[1.02] active:scale-95 ${
+                    isActive
+                      ? 'bg-primary text-white shadow-[0_0_30px_rgba(59,130,246,0.3)]'
+                      : 'text-white/40 hover:bg-white/5 hover:text-white'
                   }`}
-              >
-                <item.icon className={`mr-4 h-5 w-5 transition-transform group-hover:scale-110 ${pathname === item.href ? 'text-[#050505]' : 'text-current'}`} />
-                {item.name}
-              </Link>
-            ))}
-            <div className="pt-8 px-4 mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Session</div>
+                >
+                  <item.icon className={`mr-4 h-5 w-5 transition-transform duration-300 ${isActive ? 'text-white' : 'text-current group-hover:scale-110'}`} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="pt-8 border-t border-white/5">
             <button
               onClick={handleSignOut}
-              className="group flex items-center rounded-xl px-4 py-3.5 text-sm font-bold text-white/40 hover:bg-red-500/10 hover:text-red-400 w-full transition-all"
+              className="group flex items-center rounded-2xl px-6 py-4 text-sm font-bold text-white/40 hover:bg-red-500/10 hover:text-red-400 w-full transition-all duration-300"
             >
-              <FaSignOutAlt className="mr-4 h-5 w-5" />
-              Log Out
+              <FaSignOutAlt className="mr-4 h-5 w-5 transition-colors" />
+              Logout Session
             </button>
-          </nav>
+          </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col lg:pl-72">
-        <header className="sticky top-0 z-30 flex h-20 flex-shrink-0 glass-navbar px-4 lg:px-8 items-center justify-between">
+      <div className="flex flex-1 flex-col lg:pl-80 transition-all duration-300">
+        <header className="sticky top-0 z-30 flex h-20 flex-shrink-0 backdrop-blur-xl bg-black/20 border-b border-white/5 px-4 lg:px-10 items-center justify-between">
           <button
             type="button"
-            className="p-2 text-white/40 lg:hidden"
+            className="p-3 bg-white/5 rounded-2xl border border-white/10 text-white/50 lg:hidden"
             onClick={toggleSidebar}
           >
             <FaBars className="h-6 w-6" />
           </button>
 
-          <div className="flex-1 flex items-center lg:px-0">
-            <h2 className="text-lg font-bold text-white/80 hidden sm:block">
-              {navigation.find(n => n.href === pathname)?.name || 'Dashboard'}
+          <div className="flex flex-col ml-4 lg:ml-0">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/80 leading-none mb-1">
+              Member Workspace
+            </span>
+            <h2 className="text-xl font-black text-white tracking-tighter leading-none">
+              {navigation.find(n => n.href === pathname)?.name || 'Account'}
             </h2>
           </div>
 
-          <div className="flex items-center space-x-6">
-            <div className="flex flex-col items-end">
-              <span className="text-sm font-bold text-white tracking-tight">{user?.firstName} {user?.lastName}</span>
-              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-1.5 py-0.5 rounded">Member</span>
+          <div className="flex items-center gap-6">
+            <div className="hidden sm:flex flex-col items-end">
+              <span className="text-sm font-black text-white tracking-tight leading-none mb-1">{user?.firstName} {user?.lastName}</span>
+              <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.3em] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Verified Member</span>
             </div>
-            <div className="relative group cursor-pointer">
-              {user?.profileImage ? (
-                <div className="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-white/5 group-hover:ring-primary transition-all">
+            
+            <Link href="/dashboard/account" className="relative group">
+              <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative h-12 w-12 rounded-2xl bg-white/5 border border-white/10 p-0.5 overflow-hidden transition-transform duration-500 group-hover:scale-105">
+                {user?.profileImage ? (
                   <img
                     src={getImageUrl(user.profileImage)}
                     alt="Profile"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-xl"
                   />
-                </div>
-              ) : (
-                <div className="w-10 h-10 rounded-xl bg-surface-lighter flex items-center justify-center border border-border group-hover:border-primary transition-all">
-                  <FaUserCircle className="h-6 w-6 text-white/20" />
-                </div>
-              )}
-            </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                    <FaUserCircle className="h-8 w-8 text-primary" />
+                  </div>
+                )}
+              </div>
+            </Link>
           </div>
         </header>
 
-        <main className="flex-1 p-6 lg:p-10">
+        <main className="flex-1 p-6 lg:p-10 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="mx-auto max-w-6xl"
           >
             {children}

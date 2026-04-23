@@ -15,12 +15,14 @@ export default function Loans() {
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem('token');
+        const config = { headers: { Authorization: `Bearer ${token}` } };
         const [loansResponse, membersResponse] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans`, config),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`, config),
         ]);
         setLoans(loansResponse.data);
         setMembers(membersResponse.data.members || membersResponse.data);
@@ -34,10 +36,10 @@ export default function Loans() {
   }, []);
 
   const filteredLoans = loans.filter(loan => {
-    const memberName = loan.user ? `${loan.user.firstName} ${loan.user.lastName}`.toLowerCase() : '';
+    const memberName = loan.user ? `${loan.user.firstName || ''} ${loan.user.lastName || ''}`.toLowerCase() : '';
     const matchesSearch =
       (memberName.includes(searchQuery.toLowerCase()) ||
-        loan.purpose.toLowerCase().includes(searchQuery.toLowerCase()));
+        (loan.purpose || '').toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter ? loan.status === statusFilter : true;
     const loanDate = new Date(loan.startDate || loan.nextPaymentDate || loan.createdAt || '');
     const start = startDate ? new Date(startDate) : null;
@@ -56,6 +58,8 @@ export default function Loans() {
 
   const handleApproveLoan = async (id: string) => {
     try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       const loan = loans.find(l => l._id === id);
       if (!loan) return;
       const updatedLoan: Partial<Loan> = {
@@ -65,7 +69,7 @@ export default function Loans() {
         endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0],
         nextPaymentDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
       };
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/loans/${id}`, updatedLoan);
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/loans/${id}`, updatedLoan, config);
       setLoans(loans.map(l => l._id === id ? { ...l, ...updatedLoan } : l));
     } catch (error) {
       console.error('Error approving loan:', error);
@@ -74,7 +78,9 @@ export default function Loans() {
 
   const handleRejectLoan = async (id: string) => {
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/loans/${id}`, { status: 'rejected' } as Partial<Loan>);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/loans/${id}`, { status: 'rejected' } as Partial<Loan>, config);
       setLoans(loans.map(l => l._id === id ? { ...l, status: 'rejected' } : l));
     } catch (error) {
       console.error('Error rejecting loan:', error);
@@ -101,98 +107,141 @@ export default function Loans() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Loans</h1>
-      <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-        <div className="relative">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by member or purpose"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="input input-bordered w-full max-w-xs pl-10"
-          />
+    <div className="space-y-10 pb-20">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Loan Management</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
+            Credit <span className="text-white/40">Portfolio</span>
+          </h1>
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="select select-bordered w-full max-w-xs"
-        >
-          <option value="">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="active">Active</option>
-          <option value="repaid">Repaid</option>
-          <option value="rejected">Rejected</option>
-        </select>
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="input input-bordered w-full max-w-xs"
-        />
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="input input-bordered w-full max-w-xs"
-        />
+        <div className="card-premium py-2 px-6 bg-white/5 border-white/10 flex items-center gap-3">
+          <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Total Repayments</span>
+          <span className="text-xl font-black text-emerald-400 shadow-glow-sm">{formatCurrency(totalRepayments)}</span>
+        </div>
       </div>
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <h2 className="text-lg font-medium text-gray-800">Total Repayments: {formatCurrency(totalRepayments)}</h2>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Member</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Purpose</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Sureties</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Remaining Loan Balance</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
+
+      {/* Filters Section */}
+      <div className="glass-card p-8 rounded-[2.5rem] border border-white/5 space-y-6">
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="relative flex-1 min-w-[280px]">
+            <FaSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-primary" />
+            <input
+              type="text"
+              placeholder="Search member or purpose..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:border-primary outline-none transition-all placeholder:text-white/10 font-bold"
+            />
+          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-sm focus:border-primary outline-none transition-all font-black uppercase tracking-widest min-w-[200px] appearance-none"
+          >
+            <option value="" className="bg-[#0a0a0a]">All Statuses</option>
+            <option value="pending" className="bg-[#0a0a0a]">Pending</option>
+            <option value="approved" className="bg-[#0a0a0a]">Approved</option>
+            <option value="active" className="bg-[#0a0a0a]">Active</option>
+            <option value="repaid" className="bg-[#0a0a0a]">Repaid</option>
+            <option value="rejected" className="bg-[#0a0a0a]">Rejected</option>
+          </select>
+          <div className="flex items-center gap-3 bg-white/5 rounded-2xl border border-white/10 p-2">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="bg-transparent text-white text-[10px] font-black uppercase outline-none px-2 py-1"
+            />
+            <span className="text-white/20">/</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="bg-transparent text-white text-[10px] font-black uppercase outline-none px-2 py-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Tables Section */}
+      <div className="card-premium p-0 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/3">
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Borrower</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Principal</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Status</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Purpose</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-center">Sureties</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Balance</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody className="divide-y divide-white/5">
               {filteredLoans.map((loan) => {
                 const approvedSureties = loan.sureties?.filter(s => s.status === 'approved').length || 0;
+                const totalSureties = loan.sureties?.length || 0;
+                
                 return (
-                  <tr key={loan._id}>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 text-capitalize">{loan.user ? `${loan.user.firstName} ${loan.user.lastName}` : 'Unknown'}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.amount)}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${loan.status === 'approved' ? 'bg-green-100 text-green-800' :
-                          loan.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            loan.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                              'bg-blue-100 text-blue-800'
-                          }`}
-                      >
-                        {loan.status}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{loan.purpose}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      <div className="tooltip" data-tip={loan.sureties?.map(s => `${s.user.toString()}: ${s.status}`).join('\n')}>
-                        {approvedSureties} / {loan.sureties?.length || 0} approved
+                  <tr key={loan._id} className="group hover:bg-white/3 transition-colors">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/20 flex items-center justify-center font-black text-primary text-xs">
+                          {loan.user ? loan.user.firstName[0] + loan.user.lastName[0] : '?'}
+                        </div>
+                        <span className="font-bold text-white text-sm">{loan.user ? `${loan.user.firstName} ${loan.user.lastName}` : 'Unknown Member'}</span>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(loan.remainingAmount || 0)}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                      <button onClick={() => setSelectedLoan(loan)} className="btn btn-info btn-sm mr-2">
-                        <FaEye />
-                      </button>
-                      {loan.status === 'pending' && (
-                        <>
-                          <button onClick={() => handleApproveLoan(loan._id)} className="btn btn-success btn-sm mr-2" disabled={approvedSureties < 2}>
-                            <FaCheck />
-                          </button>
-                          <button onClick={() => handleRejectLoan(loan._id)} className="btn btn-error btn-sm">
-                            <FaTimes />
-                          </button>
-                        </>
-                      )}
+                    <td className="px-8 py-6 font-black text-white text-sm tracking-tight">{formatCurrency(loan.amount)}</td>
+                    <td className="px-8 py-6">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                        loan.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                        loan.status === 'pending' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' :
+                        loan.status === 'rejected' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                        'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                      }`}>
+                         <div className={`w-1 h-1 rounded-full ${
+                           loan.status === 'approved' ? 'bg-emerald-500' :
+                           loan.status === 'pending' ? 'bg-amber-500' :
+                           'bg-current'
+                         }`} />
+                         {loan.status}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 text-white/40 text-xs font-medium truncate max-w-[150px]">{loan.purpose}</td>
+                    <td className="px-8 py-6">
+                       <div className="flex items-center justify-center gap-2">
+                         <div className="flex -space-x-2">
+                            {[...Array(totalSureties)].map((_, i) => (
+                              <div key={i} className={`w-6 h-6 rounded-full border-2 border-[#0a0a0a] ${i < approvedSureties ? 'bg-emerald-500' : 'bg-white/10'}`} />
+                            ))}
+                         </div>
+                         <span className="text-[10px] font-black text-white/20">{approvedSureties}/{totalSureties}</span>
+                       </div>
+                    </td>
+                    <td className="px-8 py-6 font-bold text-red-400 text-sm whitespace-nowrap">{formatCurrency(loan.remainingAmount || 0)}</td>
+                    <td className="px-8 py-6 text-right whitespace-nowrap">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => setSelectedLoan(loan)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-primary hover:border-primary/30 transition-all">
+                          <FaEye />
+                        </button>
+                        {loan.status === 'pending' && (
+                          <>
+                            <button 
+                              onClick={() => handleApproveLoan(loan._id)} 
+                              disabled={approvedSureties < 2}
+                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white disabled:opacity-30 disabled:hover:bg-emerald-500/10 transition-all"
+                            >
+                              <FaCheck />
+                            </button>
+                            <button onClick={() => handleRejectLoan(loan._id)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                              <FaTimes />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -200,35 +249,64 @@ export default function Loans() {
             </tbody>
           </table>
         </div>
+        {filteredLoans.length === 0 && (
+          <div className="p-20 text-center">
+            <p className="text-white/20 text-sm font-black uppercase tracking-[0.3em]">No loans matching criteria</p>
+          </div>
+        )}
       </div>
+
+      {/* Modal Section */}
       {selectedLoan && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="text-lg font-bold">Repayment History for {selectedLoan.user ? `${selectedLoan.user.firstName} ${selectedLoan.user.lastName}` : 'Unknown'}</h3>
-            <div className="mt-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setSelectedLoan(null)} />
+          <div className="relative glass-card p-10 rounded-[3rem] border border-white/5 shadow-2xl w-full max-w-2xl transform transition-all animate-float overflow-hidden">
+            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
+            
+            <div className="relative flex justify-between items-start mb-10">
+               <div>
+                  <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Ledger Insight</span>
+                  <h3 className="text-3xl font-black text-white tracking-tighter">Repayment <span className="text-white/40">History</span></h3>
+               </div>
+               <button onClick={() => setSelectedLoan(null)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-colors">
+                  <FaTimes className="h-6 w-6" />
+               </button>
+            </div>
+
+            <div className="card-premium bg-white/3 border-white/10 p-8 mb-8 flex justify-between items-center group">
+               <div>
+                  <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">Account Holder</p>
+                  <p className="text-xl font-bold text-white group-hover:text-primary transition-colors">{selectedLoan.user ? `${selectedLoan.user.firstName} ${selectedLoan.user.lastName}` : 'System User'}</p>
+               </div>
+               <div className="text-right">
+                  <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">Remaining</p>
+                  <p className="text-2xl font-black text-red-500 tracking-tighter">{formatCurrency(selectedLoan.remainingAmount || 0)}</p>
+               </div>
+            </div>
+
+            <div className="max-h-[350px] overflow-y-auto space-y-4 pr-4 custom-scrollbar">
               {selectedLoan.repaymentHistory.length > 0 ? (
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedLoan.repaymentHistory.map((payment, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-4 text-sm text-gray-500">{formatDate(payment.date)}</td>
-                        <td className="px-6 py-4 text-right text-sm text-gray-500">{formatCurrency(payment.amount)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="divide-y divide-white/5 border border-white/5 rounded-3xl overflow-hidden">
+                  <div className="grid grid-cols-2 bg-white/5 px-8 py-4">
+                     <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Transaction Date</span>
+                     <span className="text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Amount Applied</span>
+                  </div>
+                  {selectedLoan.repaymentHistory.map((payment, index) => (
+                    <div key={index} className="grid grid-cols-2 px-8 py-4 hover:bg-white/3 transition-colors">
+                       <span className="text-sm font-bold text-white/80">{formatDate(payment.date)}</span>
+                       <span className="text-sm font-black text-emerald-400 text-right">{formatCurrency(payment.amount)}</span>
+                    </div>
+                  ))}
+                </div>
               ) : (
-                <p>No repayments yet.</p>
+                <div className="py-20 text-center bg-white/3 rounded-3xl border border-dashed border-white/10">
+                   <p className="text-white/20 text-xs font-black uppercase tracking-widest italic">No repayments recorded for this cycle</p>
+                </div>
               )}
             </div>
-            <div className="modal-action">
-              <button onClick={() => setSelectedLoan(null)} className="btn">Close</button>
+
+            <div className="mt-10">
+               <button onClick={() => setSelectedLoan(null)} className="w-full btn-primary py-4 text-xs font-black tracking-widest uppercase rounded-2xl shadow-none">Dismiss Ledger</button>
             </div>
           </div>
         </div>

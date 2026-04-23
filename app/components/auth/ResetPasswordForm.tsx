@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { FaLock, FaCircleNotch, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaLock, FaCircleNotch, FaCheckCircle, FaExclamationCircle, FaShieldAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const schema = z
@@ -60,84 +60,69 @@ export default function ResetPasswordForm({ token }: { token: string }) {
         animate={{ opacity: 1, scale: 1 }}
         className="text-center py-10"
       >
-        <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
-          <FaCheckCircle className="text-emerald-500 text-4xl" />
+        <div className="w-24 h-24 bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 border border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.1)]">
+          <FaCheckCircle className="text-emerald-500 text-5xl" />
         </div>
-        <h3 className="text-xl font-bold text-foreground mb-2">Password Reset!</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Your password has been successfully updated. 
-          Redirecting you to the login page...
+        <h3 className="text-3xl font-black text-white tracking-tighter mb-4">Identity Re-Secured</h3>
+        <p className="text-white/40 text-sm font-medium leading-relaxed max-w-xs mx-auto">
+          Your access vector has been successfully recalibrated. Initiating entry sequence...
         </p>
       </motion.div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <AnimatePresence>
         {error && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 flex items-center space-x-3"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="rounded-2xl bg-red-500/10 border border-red-500/20 p-4"
           >
-            <FaExclamationCircle className="text-red-500 shrink-0" />
-            <div className="text-xs text-red-500 font-bold">{error}</div>
+            <div className="flex items-center gap-3">
+               <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+               <div className="text-[10px] font-black uppercase tracking-widest text-red-500">{error}</div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-xs font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">
-            New Password
-          </label>
-          <div className="relative group">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <FaLock className="h-4 w-4 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
-            </div>
-            <input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              className={`block w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-foreground dark:text-white placeholder:text-muted-foreground/50 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all ${
-                errors.password ? 'border-red-500/50 ring-2 ring-red-500/20' : ''
-              }`}
-              placeholder="••••••••"
-              {...register('password')}
-            />
-          </div>
+      <div className="space-y-6">
+        <div className="space-y-2 relative group/field">
+          <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">New Security Vector</span>
+          <input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            className={`w-full bg-white/5 border border-white/10 rounded-[2rem] p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 tracking-[0.3em] ${
+              errors.password ? 'border-red-500/50' : ''
+            }`}
+            placeholder="••••••••"
+            {...register('password')}
+          />
           {errors.password && (
-            <p className="mt-1 text-xs text-red-400 font-medium px-1">
+            <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">
               {errors.password.message}
             </p>
           )}
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="confirmPassword" className="text-xs font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">
-            Confirm Password
-          </label>
-          <div className="relative group">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <FaLock className="h-4 w-4 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
-            </div>
-            <input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-              className={`block w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-foreground dark:text-white placeholder:text-muted-foreground/50 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all ${
-                errors.confirmPassword ? 'border-red-500/50 ring-2 ring-red-500/20' : ''
-              }`}
-              placeholder="••••••••"
-              {...register('confirmPassword')}
-            />
-          </div>
+        <div className="space-y-2 relative group/field">
+          <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Verify Integrity</span>
+          <input
+            id="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            className={`w-full bg-white/5 border border-white/10 rounded-[2rem] p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 tracking-[0.3em] ${
+              errors.confirmPassword ? 'border-red-500/50' : ''
+            }`}
+            placeholder="••••••••"
+            {...register('confirmPassword')}
+          />
           {errors.confirmPassword && (
-            <p className="mt-1 text-xs text-red-400 font-medium px-1">
+            <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">
               {errors.confirmPassword.message}
             </p>
           )}
@@ -147,14 +132,16 @@ export default function ResetPasswordForm({ token }: { token: string }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-70 group overflow-hidden"
+        className="w-full btn-primary py-5 rounded-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 disabled:opacity-50"
       >
-        {isSubmitting ? (
-          <FaCircleNotch className="animate-spin text-lg" />
-        ) : (
-          <span>Update Password</span>
+        <span className={isSubmitting ? 'opacity-0' : 'opacity-100'}>Calibrate Identity Vector</span>
+        {isSubmitting && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          </div>
         )}
       </button>
     </form>
   );
 }
+

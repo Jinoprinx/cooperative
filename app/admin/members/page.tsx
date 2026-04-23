@@ -33,8 +33,8 @@ export default function Members() {
   }, []);
 
   const filteredMembers = members.filter(member =>
-    member.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.lastName.toLowerCase().includes(searchQuery.toLowerCase())
+    (member.firstName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (member.lastName || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleAddMember = async (e: React.FormEvent) => {
@@ -117,141 +117,199 @@ export default function Members() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Members</h1>
-      <div className="flex items-center justify-between">
-        <div className="relative">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="input input-bordered w-full max-w-xs pl-10"
-          />
+    <div className="space-y-10 pb-20">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Directorship Control</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
+            Member <span className="text-white/40">Directory</span>
+          </h1>
         </div>
-        <button onClick={() => setShowAddModal(true)} className="btn btn-primary">
-          <FaUserPlus className="mr-2" /> Add Member
+        <button 
+          onClick={() => setShowAddModal(true)} 
+          className="btn-primary flex items-center gap-3 px-8 py-4 rounded-2xl group transition-all duration-500 hover:scale-[1.02]"
+        >
+          <FaUserPlus className="h-5 w-5 group-hover:animate-pulse" />
+          <span className="text-xs uppercase tracking-widest font-black">Enroll Member</span>
         </button>
       </div>
-      <div className="rounded-lg bg-white p-6 shadow-md">
+
+      <div className="flex items-center gap-6">
+        <div className="relative flex-1 group">
+          <div className="absolute inset-x-0 bottom-0 h-0.5 bg-primary/20 scale-x-0 group-focus-within:scale-x-100 transition-transform duration-500" />
+          <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/50 group-focus-within:text-primary transition-colors" />
+          <input
+            type="text"
+            placeholder="Search by first or last name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white/5 border border-white/10 rounded-3xl py-5 pl-16 pr-8 text-white text-sm focus:border-primary/50 outline-none transition-all placeholder:text-white/20 font-bold"
+          />
+        </div>
+      </div>
+
+      <div className="card-premium p-0 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Account Number</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Join Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Balance</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Role</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/3">
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Full Name</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Account ID</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Entry Date</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Balance</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Access Role</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Operations</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody className="divide-y divide-white/5 font-medium">
               {filteredMembers.map((member) => (
-                <tr key={member._id}>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                    <Link href={`/admin/members/${member._id}/payment-ledger`} className="text-primary hover:underline">
-                      {`${member.firstName} ${member.lastName}`}
+                <tr key={member._id} className="group hover:bg-white/3 transition-colors">
+                  <td className="px-8 py-6">
+                    <Link href={`/admin/members/${member._id}/payment-ledger`} className="flex items-center gap-4 group/name">
+                       <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-white/40 group-hover/name:text-primary group-hover/name:border-primary/40 transition-all duration-300">
+                         {member.firstName[0]}{member.lastName[0]}
+                       </div>
+                       <div className="flex flex-col">
+                         <span className="text-white group-hover/name:text-primary transition-colors font-bold">{member.firstName} {member.lastName}</span>
+                         <span className="text-[10px] text-white/20 font-black uppercase tracking-tighter">View Financials</span>
+                       </div>
                     </Link>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member.accountNumber}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(member.joinDate)}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(member.accountBalance)}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${member.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
+                  <td className="px-8 py-6 text-sm text-white/60 font-mono tracking-wider">{member.accountNumber}</td>
+                  <td className="px-8 py-6 text-xs text-white/40">{formatDate(member.joinDate)}</td>
+                  <td className="px-8 py-6">
+                     <span className="text-lg font-black text-white tracking-tighter shadow-glow-sm">{formatCurrency(member.accountBalance)}</span>
+                  </td>
+                  <td className="px-8 py-6">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                      member.role === 'admin' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-white/5 border-white/10 text-white/40'
+                    }`}>
+                      <div className={`w-1 h-1 rounded-full ${member.role === 'admin' ? 'bg-purple-400 animate-pulse' : 'bg-white/20'}`} />
                       {member.role || 'member'}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium space-x-2">
-                    {isMainAdmin && (
-                      <>
-                        <button
-                          onClick={() => handleToggleAdmin(member)}
-                          className={`btn btn-sm ${member.role === 'admin' ? 'btn-ghost text-red-600 hover:bg-red-50' : 'btn-ghost text-primary hover:bg-blue-50'}`}
-                          title={member.role === 'admin' ? "Demote from Admin" : "Promote to Admin"}
-                        >
-                          <FaUserShield className="h-4 w-4" />
-                        </button>
-                        <button onClick={() => handleDeleteClick(member._id)} className="btn btn-error btn-sm">
-                          <FaTrash className="h-3 w-3" />
-                        </button>
-                      </>
-                    )}
+                  <td className="px-8 py-6 text-right whitespace-nowrap">
+                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {isMainAdmin && (
+                        <>
+                          <button
+                            onClick={() => handleToggleAdmin(member)}
+                            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all ${
+                              member.role === 'admin' 
+                                ? 'bg-amber-500/10 border border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white' 
+                                : 'bg-primary/10 border border-primary/20 text-primary hover:bg-primary hover:text-white'
+                            }`}
+                            title={member.role === 'admin' ? "Restrict Access" : "Grant Access"}
+                          >
+                            <FaUserShield className="h-4 w-4" />
+                          </button>
+                          <button onClick={() => handleDeleteClick(member._id)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                            <FaTrash className="h-4 w-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        {filteredMembers.length === 0 && (
+          <div className="p-32 text-center bg-white/2">
+            <p className="text-white/20 text-sm font-black uppercase tracking-[0.4em]">No members found in directory</p>
+          </div>
+        )}
       </div>
+
       {showAddModal && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="text-lg font-bold">Add New Member</h3>
-            <form onSubmit={handleAddMember}>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowAddModal(false)} />
+          <div className="relative glass-card p-12 rounded-[3.5rem] border border-white/10 w-full max-w-xl shadow-2xl animate-float">
+            <div className="mb-10 text-center">
+               <h3 className="text-3xl font-black text-white tracking-tighter mb-2">New Enrollment</h3>
+               <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Onboard a member into the platform</p>
+            </div>
+            
+            <form onSubmit={handleAddMember} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={newMember.firstName}
+                  onChange={(e) => setNewMember({ ...newMember, firstName: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-primary transition-all font-bold"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={newMember.lastName}
+                  onChange={(e) => setNewMember({ ...newMember, lastName: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-primary transition-all font-bold"
+                  required
+                />
+              </div>
               <input
                 type="text"
-                placeholder="First Name"
-                value={newMember.firstName}
-                onChange={(e) => setNewMember({ ...newMember, firstName: e.target.value })}
-                className="input input-bordered w-full mt-2"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={newMember.lastName}
-                onChange={(e) => setNewMember({ ...newMember, lastName: e.target.value })}
-                className="input input-bordered w-full mt-2"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Phone Number"
+                placeholder="Unique Mobile Number"
                 value={newMember.phoneNumber}
                 onChange={(e) => setNewMember({ ...newMember, phoneNumber: e.target.value })}
-                className="input input-bordered w-full mt-2"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-primary transition-all font-bold"
                 required
               />
               <input
                 type="email"
-                placeholder="Email (Optional)"
+                placeholder="Email Address (Security)"
                 value={newMember.email}
                 onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                className="input input-bordered w-full mt-2"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-primary transition-all font-bold"
               />
-              <input
-                type="date"
-                value={newMember.joinDate}
-                onChange={(e) => setNewMember({ ...newMember, joinDate: e.target.value })}
-                className="input input-bordered w-full mt-2"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Initial Balance"
-                value={newMember.accountBalance || ''}
-                onChange={(e) => setNewMember({ ...newMember, accountBalance: Number(e.target.value) })}
-                className="input input-bordered w-full mt-2"
-                required
-              />
-              <div className="modal-action">
-                <button type="submit" className="btn btn-primary">Add</button>
-                <button type="button" onClick={() => setShowAddModal(false)} className="btn">Close</button>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative">
+                   <div className="absolute top-2 left-5 text-[8px] font-black text-white/30 uppercase tracking-widest">Join Date</div>
+                   <input
+                    type="date"
+                    value={newMember.joinDate}
+                    onChange={(e) => setNewMember({ ...newMember, joinDate: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 pt-7 text-white outline-none focus:border-primary transition-all font-bold uppercase text-xs"
+                    required
+                  />
+                </div>
+                <div className="relative">
+                   <div className="absolute top-2 left-5 text-[8px] font-black text-white/30 uppercase tracking-widest">Opening Balance</div>
+                   <input
+                    type="number"
+                    placeholder="0.00"
+                    value={newMember.accountBalance || ''}
+                    onChange={(e) => setNewMember({ ...newMember, accountBalance: Number(e.target.value) })}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 pt-7 text-white outline-none focus:border-primary transition-all font-bold"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-4 mt-12">
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 btn-secondary py-4 rounded-2xl">Discard</button>
+                <button type="submit" className="flex-[2] btn-primary py-4 rounded-2xl shadow-none">Commit Enrollment</button>
               </div>
             </form>
           </div>
         </div>
       )}
+
       {showDeleteModal && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="text-lg font-bold">Confirm Deletion</h3>
-            <p>Are you sure you want to delete this member? This action cannot be undone.</p>
-            <div className="modal-action">
-              <button onClick={handleConfirmDelete} className="btn btn-error">Delete</button>
-              <button onClick={() => setShowDeleteModal(false)} className="btn">Cancel</button>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={() => setShowDeleteModal(false)} />
+          <div className="relative glass-card p-10 rounded-[3rem] border border-red-500/20 w-full max-w-sm text-center">
+            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mx-auto mb-6 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+               <FaTrash className="h-8 w-8" />
+            </div>
+            <h3 className="text-2xl font-black text-white tracking-tighter mb-4">Purge Member?</h3>
+            <p className="text-white/40 text-sm font-medium mb-8">This will irreversibly remove the member and all associated financial records from the platform.</p>
+            <div className="flex gap-4">
+              <button onClick={() => setShowDeleteModal(false)} className="flex-1 btn-secondary text-xs uppercase tracking-widest py-3 rounded-2xl">Cancel</button>
+              <button onClick={handleConfirmDelete} className="flex-1 btn-primary bg-red-600 hover:bg-red-500 text-xs uppercase tracking-widest py-3 rounded-2xl shadow-none border-none">Delete</button>
             </div>
           </div>
         </div>

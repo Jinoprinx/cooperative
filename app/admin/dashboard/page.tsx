@@ -124,9 +124,9 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-center">
+          <div className="text-center">
           <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p className="text-black">Loading dashboard...</p>
+          <p className="text-white/40 font-medium tracking-widest uppercase text-xs">Initializing Intelligence...</p>
         </div>
       </div>
     );
@@ -372,91 +372,100 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+    <div className="space-y-10 pb-20">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Executive Overview</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
+            Admin <span className="text-white/40">Dashboard</span>
+          </h1>
+        </div>
+        <div className="flex items-center gap-2 text-white/40 text-xs font-bold bg-white/5 px-4 py-2 rounded-full border border-white/10">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          System Live
+        </div>
+      </div>
 
       {isMainAdmin && !user?.hasPin && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded shadow-sm">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <FaExclamationTriangle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                <span className="font-bold">Security Alert:</span> You have not set an account balance PIN yet.{' '}
-                <Link href="/admin/settings" className="font-medium underline hover:text-yellow-600">
-                  Go to settings to set your 4-digit PIN
-                </Link>
-                {' '}to secure the total balance view.
-              </p>
-            </div>
+        <div className="card-premium bg-amber-500/10 border-amber-500/20 p-6 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center border border-amber-500/30">
+            <FaExclamationTriangle className="h-6 w-6 text-amber-500" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-amber-500 font-black text-sm uppercase tracking-widest mb-1">Security Alert</h3>
+            <p className="text-white/70 text-sm font-medium">
+              You have not set an account balance PIN yet.{' '}
+              <Link href="/admin/settings" className="text-amber-500 underline font-bold hover:text-amber-400">
+                Go to settings to set your 4-digit PIN
+              </Link>
+            </p>
           </div>
         </div>
       )}
 
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Members */}
-        <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md max-w-xs">
-          <div className="flex items-center">
-            <div className="mr-3 sm:mr-4 rounded-full bg-blue-100 p-2 sm:p-3">
-              <FaUsers className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+        <div className="card-premium group relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all duration-700" />
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.1)] group-hover:scale-110 transition-transform duration-500">
+              <FaUsers className="h-6 w-6 text-blue-500" />
             </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Members</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{stats?.totalMembers || 0}</p>
+            <div>
+              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Total Members</p>
+              <h3 className="text-3xl font-black text-white tracking-tighter">{stats?.totalMembers || 0}</h3>
             </div>
           </div>
-          <div className="mt-3 sm:mt-4 flex items-center justify-between">
-            <p className="text-xs text-gray-500 truncate">Active Members</p>
-            <p className="text-xs font-medium text-green-600">{stats?.activeMembers || 0}</p>
+          <div className="flex items-center justify-between text-xs mb-2">
+            <span className="text-white/40 font-bold">Active Members</span>
+            <span className="text-emerald-400 font-black">{stats?.activeMembers || 0}</span>
           </div>
-          <div className="mt-2 h-1.5 w-full rounded-full bg-gray-200">
-            <div className="h-1.5 rounded-full bg-blue-600" style={{ width: `${((stats?.activeMembers || 0) / (stats?.totalMembers || 1)) * 100}%` }}></div>
+          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-1000" 
+              style={{ width: `${((stats?.activeMembers || 0) / (stats?.totalMembers || 1)) * 100}%` }}
+            />
           </div>
         </div>
 
         {/* Total Balance */}
-        <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md max-w-xs relative overflow-hidden">
+        <div className="card-premium group relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all duration-700" />
           {!isMainAdmin ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-2 py-4">
-              <FaLock className="h-8 w-8 text-gray-400" />
-              <p className="text-xs font-medium text-gray-500 text-center uppercase tracking-tight">Main Admin Only</p>
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <FaLock className="h-8 w-8 text-white/20 mb-3" />
+              <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.2em]">Restricted View</p>
             </div>
           ) : !isUnlocked ? (
             <button
               onClick={() => setShowPinModal(true)}
-              className="flex flex-col items-center justify-center w-full h-full space-y-2 py-4 hover:bg-gray-50 transition-colors group"
+              className="flex flex-col items-center justify-center w-full py-6 group/btn"
             >
-              <FaLock className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
-              <p className="text-xs font-medium text-primary uppercase tracking-tight">Unlock Balance</p>
+              <div className="w-16 h-16 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-center mb-4 group-hover/btn:scale-110 group-hover/btn:border-emerald-500/30 transition-all duration-500">
+                <FaLock className="h-6 w-6 text-emerald-500 group-hover/btn:animate-pulse" />
+              </div>
+              <p className="text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em]">Unlock Balance</p>
             </button>
           ) : (
             <>
-              <div className="flex items-center">
-                <div className="mr-3 sm:mr-4 rounded-full bg-green-100 p-2 sm:p-3">
-                  <FaMoneyBillWave className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
-                </div>
-                <div className="flex-1 overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Balance</p>
-                    <button onClick={() => setIsUnlocked(false)} className="text-gray-400 hover:text-gray-600">
-                      <FaLockOpen className="h-3 w-3" />
-                    </button>
-                  </div>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{formatCurrency(stats?.totalBalance || 0)}</p>
-                </div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Total Liquidity</p>
+                <button onClick={() => setIsUnlocked(false)} className="text-white/20 hover:text-white transition-colors">
+                  <FaLockOpen className="h-3 w-3" />
+                </button>
               </div>
-              <div className="mt-3 sm:mt-4 flex items-center text-xs flex-wrap gap-2">
-                <div className="flex items-center">
-                  <FaArrowUp className="mr-1 h-3 w-3 text-green-600" />
-                  <span className="font-medium text-green-600 truncate">{formatCurrency(stats?.totalDeposits || 0)}</span>
-                  <span className="ml-1 text-gray-500">Deposits</span>
+              <h3 className="text-2xl font-black text-white tracking-tighter mb-6 break-words">
+                {formatCurrency(stats?.totalBalance || 0)}
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-white/5 p-2 rounded-xl border border-white/5">
+                  <span className="text-[8px] font-black text-white/30 uppercase tracking-tighter">Deposits</span>
+                  <p className="text-[10px] font-bold text-emerald-400 truncate">{formatCurrency(stats?.totalDeposits || 0)}</p>
                 </div>
-                <div className="flex items-center">
-                  <FaArrowDown className="mr-1 h-3 w-3 text-red-600" />
-                  <span className="font-medium text-red-600 truncate">{formatCurrency(stats?.totalWithdrawals || 0)}</span>
-                  <span className="ml-1 text-gray-500">Withdrawals</span>
+                <div className="bg-white/5 p-2 rounded-xl border border-white/5">
+                  <span className="text-[8px] font-black text-white/30 uppercase tracking-tighter">Withdrawals</span>
+                  <p className="text-[10px] font-bold text-red-400 truncate">{formatCurrency(stats?.totalWithdrawals || 0)}</p>
                 </div>
               </div>
             </>
@@ -464,345 +473,331 @@ export default function AdminDashboard() {
         </div>
 
         {/* Active Loans */}
-        <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md max-w-xs">
-          <div className="flex items-center">
-            <div className="mr-3 sm:mr-4 rounded-full bg-purple-100 p-2 sm:p-3">
-              <FaHandshake className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+        <div className="card-premium group relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all duration-700" />
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+              <FaHandshake className="h-6 w-6 text-purple-500" />
             </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-xs sm:text-sm font-medium text-gray-500 truncate">Active Loans</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{stats?.activeLoans || 0}</p>
+            <div>
+              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Active Loans</p>
+              <h3 className="text-3xl font-black text-white tracking-tighter">{stats?.activeLoans || 0}</h3>
             </div>
           </div>
-          <div className="mt-3 sm:mt-4 flex items-center justify-between">
-            <p className="text-xs text-gray-500 truncate">Total Loan Amount</p>
-            <p className="text-xs font-medium text-purple-600 truncate">{formatCurrency(stats?.totalLoanAmount || 0)}</p>
-          </div>
-          <div className="mt-2 h-1.5 w-full rounded-full bg-gray-200">
-            <div className="h-1.5 rounded-full bg-purple-600" style={{ width: '65%' }}></div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-white/40 font-bold">Total Disbursed</span>
+            <span className="text-purple-400 font-black">{formatCurrency(stats?.totalLoanAmount || 0)}</span>
           </div>
         </div>
 
-        {/* Pending Loans */}
-        <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md max-w-xs">
-          <div className="flex items-center">
-            <div className="mr-3 sm:mr-4 rounded-full bg-yellow-100 p-2 sm:p-3">
-              <FaChartLine className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600" />
+        {/* Pending Actions */}
+        <div className="card-premium group relative overflow-hidden border-amber-500/20">
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all duration-700" />
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+              <FaChartLine className="h-6 w-6 text-amber-500" />
             </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-xs sm:text-sm font-medium text-gray-500 truncate">Pending Loans</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{stats?.pendingLoans || 0}</p>
+            <div>
+              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Attention Required</p>
+              <h3 className="text-3xl font-black text-white tracking-tighter">{(stats?.pendingLoans || 0) + pendingPayments.length + pendingRegistrations.length}</h3>
             </div>
           </div>
-          <div className="mt-3 sm:mt-4">
-            <Link href="/admin/loans/pending" className="text-xs sm:text-sm font-medium text-yellow-600 hover:text-yellow-700 truncate">
-              Review pending applications
+          <Link href="/admin/loans/pending" className="text-[10px] font-black text-amber-500 hover:text-amber-400 uppercase tracking-widest flex items-center gap-2">
+            View All Action Items
+            <FaArrowUp className="rotate-45 h-2 w-2" />
+          </Link>
+        </div>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Recent Activity Feed */}
+        <div className="lg:col-span-2 space-y-8">
+          <div className="card-premium p-0 overflow-hidden">
+            <div className="p-8 border-b border-white/5 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-white tracking-tight">Recent Activity</h2>
+                <p className="text-white/40 text-xs font-medium">Real-time update of platform transactions</p>
+              </div>
+              <Link href="/admin/transactions" className="btn-secondary px-6 py-2 text-xs">View History</Link>
+            </div>
+            <div className="divide-y divide-white/5">
+              {recentTransactions.length > 0 ? recentTransactions.map((transaction) => {
+                const isDebit = transaction.type === 'loan' || transaction.type === 'withdrawal';
+                return (
+                  <div key={transaction._id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${
+                        isDebit 
+                          ? 'bg-purple-500/10 border-purple-500/20 text-purple-500 group-hover:bg-purple-500/20' 
+                          : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 group-hover:bg-emerald-500/20'
+                      }`}>
+                        {transaction.type === 'loan' ? <FaHandshake className="h-5 w-5" /> : <FaMoneyBillWave className="h-5 w-5" />}
+                      </div>
+                      <div>
+                        <p className={`font-bold text-white group-hover:text-primary transition-colors ${transaction.status === 'rejected' ? 'line-through opacity-50' : ''}`}>
+                          {transaction.user?.firstName} {transaction.user?.lastName}
+                        </p>
+                        <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">{transaction.purpose || transaction.description}</p>
+                        {transaction.status === 'rejected' && transaction.rejectionReason && (
+                          <span className="inline-block mt-1 bg-red-500/10 text-red-400 text-[10px] font-black px-2 py-0.5 rounded-full border border-red-500/20">
+                            REJECTED: {transaction.rejectionReason}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-black tracking-tight ${isDebit ? 'text-white' : 'text-emerald-400'} ${transaction.status === 'rejected' ? 'line-through opacity-30' : ''}`}>
+                        {isDebit ? '-' : '+'} {formatCurrency(transaction.amount)}
+                      </p>
+                      <p className="text-[10px] text-white/30 font-bold">{formatDate(transaction.createdAt)}</p>
+                    </div>
+                  </div>
+                );
+              }) : (
+                <div className="p-12 text-center text-white/20 italic text-sm font-medium">No recent transactions recorded.</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Center - Sidebar style */}
+        <div className="space-y-8">
+          {/* Recent Members List */}
+          <div className="card-premium p-0 overflow-hidden">
+            <div className="p-6 border-b border-white/5 bg-white/3">
+              <h2 className="text-lg font-black text-white tracking-tight uppercase tracking-widest">New Members</h2>
+            </div>
+            <div className="p-4 space-y-4">
+              {recentMembers.map((member) => (
+                <div key={member._id} className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/5 hover:border-primary/30 transition-all duration-300">
+                  <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center font-black text-primary text-xs">
+                    {member.firstName[0]}{member.lastName[0]}
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <p className="font-bold text-white text-sm truncate">{member.firstName} {member.lastName}</p>
+                    <p className="text-[10px] text-white/30 font-black tracking-tighter uppercase">{member.accountNumber}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-black text-primary">{formatCurrency(member.accountBalance)}</p>
+                  </div>
+                </div>
+              ))}
+              <Link href="/admin/members" className="block text-center text-[10px] font-black text-white/30 uppercase tracking-[0.2em] py-4 hover:text-primary transition-colors">
+                View Directory
+              </Link>
+            </div>
+          </div>
+
+          {/* Quick Shortcuts */}
+          <div className="grid grid-cols-2 gap-4">
+            <Link href="/admin/transactions" className="card-premium p-6 text-center hover:bg-emerald-500/10 hover:border-emerald-500/20 group transition-all duration-500">
+              <FaMoneyBillWave className="h-6 w-6 text-emerald-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-black text-white uppercase tracking-widest">Transactions</span>
+            </Link>
+            <Link href="/admin/members" className="card-premium p-6 text-center hover:bg-blue-500/10 hover:border-blue-500/20 group transition-all duration-500">
+              <FaUserPlus className="h-6 w-6 text-blue-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-black text-white uppercase tracking-widest">Add User</span>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Recent Members & Pending Loans */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
-        {/* Recent Transactions */}
-        <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-          <div className="mb-3 sm:mb-4 flex items-center justify-between">
-            <h2 className="text-base sm:text-lg font-medium text-gray-800 truncate">Recent Transactions</h2>
-            <Link href="/admin/transactions" className="text-xs sm:text-sm font-medium text-primary hover:text-primary-dark">
-              View All
-            </Link>
+      {/* Approvals Section */}
+      {(pendingPayments.length > 0 || pendingLoans.length > 0 || pendingRegistrations.length > 0) && (
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-3xl font-black text-white tracking-tighter">Queue <span className="text-white/40">Approvals</span></h2>
+            <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full animate-pulse">Action Required</span>
           </div>
-          <div className="divide-y divide-gray-200">
-            {recentTransactions.map((transaction) => (
-              <div key={transaction._id} className={`flex items-center justify-between py-2 sm:py-3 ${transaction.status === 'rejected' ? 'opacity-50' : ''}`}>
-                <div className="flex items-center min-w-0">
-                  <div className={`mr-2 sm:mr-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full ${transaction.type === 'loan' ? 'bg-purple-100' : 'bg-green-100'} text-white`}>
-                    {transaction.type === 'loan' ? <FaHandshake className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" /> : <FaMoneyBillWave className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />}
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {/* Pending Payments */}
+            {pendingPayments.map((payment) => (
+              <div key={payment._id} className="card-premium bg-white/5 border-white/10 hover:border-emerald-500/30 transition-all duration-500 group">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                    <FaMoneyBillWave className="h-6 w-6" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-medium text-gray-900 truncate ${transaction.status === 'rejected' ? 'line-through' : ''}`}>{transaction.user?.firstName} {transaction.user?.lastName}</p>
-                    <p className="text-xs text-gray-500 truncate">{transaction.purpose || transaction.description}</p>
-                    {transaction.status === 'rejected' && transaction.rejectionReason && (
-                      <p className="text-[10px] text-red-500 italic truncate">Reason: {transaction.rejectionReason}</p>
-                    )}
+                  <div className="text-right">
+                    <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Amount</span>
+                    <p className="text-xl font-black text-emerald-400 leading-none">{formatCurrency(payment.amount)}</p>
                   </div>
                 </div>
-                <div className="text-right flex-shrink-0">
-                  <p className={`font-medium truncate ${(transaction.type === 'loan' || transaction.type === 'withdrawal') ? 'text-purple-600' : 'text-green-600'} ${transaction.status === 'rejected' ? 'line-through' : ''}`}>{formatCurrency(transaction.amount)}</p>
-                  <p className="text-xs text-gray-500">{formatDate(transaction.createdAt)}</p>
+                <div className="mb-6">
+                  <p className="text-white font-bold text-sm truncate">{payment.user?.firstName} {payment.user?.lastName}</p>
+                  <p className="text-white/40 text-xs font-medium line-clamp-1">{payment.description}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex-1 btn-secondary text-[10px] py-2 px-0 bg-white/5 hover:bg-white/10">View Receipt</a>
+                  <button onClick={() => handleApprovePayment(payment._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-emerald-600 hover:bg-emerald-500 shadow-none">Approve</button>
+                  <button onClick={() => openRejectModal(payment._id)} className="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 transition-colors">
+                    <FaExclamationTriangle className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Pending Registrations */}
+            {pendingRegistrations.map((user) => (
+              <div key={user._id} className="card-premium bg-white/5 border-white/10 hover:border-blue-500/30 transition-all duration-500">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
+                    <FaUserPlus className="h-6 w-6" />
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Type</span>
+                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">Registration</span>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <p className="text-white font-bold text-sm truncate">{user.firstName} {user.lastName}</p>
+                  <p className="text-white/40 text-[10px] font-black tracking-tighter truncate">{user.email}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => handleApproveRegistrationClick(user._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-blue-600 hover:bg-blue-500 shadow-none">Approve Entry</button>
+                  <button onClick={() => handleRejectRegistration(user._id)} className="btn-secondary text-[10px] py-2 px-4 bg-white/5 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30">Reject</button>
                 </div>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Recent Members */}
-        <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-          <div className="mb-3 sm:mb-4 flex items-center justify-between">
-            <h2 className="text-base sm:text-lg font-medium text-gray-800 truncate">Recent Members</h2>
-            <Link href="/admin/members" className="text-xs sm:text-sm font-medium text-primary hover:text-primary-dark">
-              View All
-            </Link>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {recentMembers.map((member) => (
-              <div key={member._id} className="flex items-center justify-between py-2 sm:py-3">
-                <div className="flex items-center min-w-0">
-                  <div className="mr-2 sm:mr-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary-light text-white">
-                    <FaUserPlus className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{member.firstName} {member.lastName}</p>
-                    <p className="text-xs text-gray-500 truncate">{member.accountNumber}</p>
-                  </div>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="font-medium text-primary truncate">{formatCurrency(member.accountBalance)}</p>
-                  <p className="text-xs text-gray-500">Joined: {formatDate(member.joinDate)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Pending Loans */}
-        <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-          <div className="mb-3 sm:mb-4 flex items-center justify-between">
-            <h2 className="text-base sm:text-lg font-medium text-gray-800 truncate">Pending Loan Applications</h2>
-            <Link href="/admin/loans/pending" className="text-xs sm:text-sm font-medium text-primary hover:text-primary-dark">
-              View All
-            </Link>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {pendingLoans.map((loan) => (
-              <div key={loan._id} className="flex items-center justify-between py-2 sm:py-3">
-                <div className="flex items-center min-w-0">
-                  <div className={`mr-2 sm:mr-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full ${loan.status === 'pending' ? 'bg-red-500' : 'bg-green-500'} text-white`}>
-                    <FaHandshake className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{loan.user?.firstName || 'Unknown'} {loan.user?.lastName || ''}</p>
-                    <p className="text-xs text-gray-500 truncate">{loan.purpose}</p>
-                  </div>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="font-medium text-secondary truncate">{formatCurrency(loan.amount)}</p>
-                  <p className="text-xs text-gray-500">Applied: {formatDate(loan.createdAt)}</p>
-                  <div className="flex gap-2 mt-2">
-                    <button
-                      onClick={() => handleApproveLoan(loan._id)}
-                      className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleRejectLoan(loan._id)}
-                      className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Pending Payments */}
-      <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-        <div className="mb-3 sm:mb-4 flex items-center justify-between">
-          <h2 className="text-base sm:text-lg font-medium text-gray-800 truncate">Pending Payments</h2>
-          <Link href="/admin/payments/pending" className="text-xs sm:text-sm font-medium text-primary hover:text-primary-dark">
-            View All
-          </Link>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {pendingPayments.map((payment) => (
-            <div key={payment._id} className="flex items-center justify-between py-2 sm:py-3">
-              <div className="flex items-center min-w-0">
-                <div className={`mr-2 sm:mr-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full ${payment.status === 'pending' ? 'bg-red-500' : 'bg-green-500'} text-white`}>
-                  <FaMoneyBillWave className="h-4 w-4 sm:h-5 sm:w-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{payment.user?.firstName || 'Unknown'} {payment.user?.lastName || ''}</p>
-                  <p className="text-xs text-gray-500 truncate">{payment.description}</p>
-                </div>
-              </div>
-              <div className="text-right flex-shrink-0">
-                <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm font-medium text-primary hover:text-primary-dark">
-                  View Receipt
-                </a>
-                <p className="text-xs text-gray-500">{formatDate(payment.createdAt)}</p>
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={() => handleApprovePayment(payment._id)}
-                    className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => openRejectModal(payment._id)}
-                    className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Pending Registrations */}
-      <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-        <div className="mb-3 sm:mb-4 flex items-center justify-between">
-          <h2 className="text-base sm:text-lg font-medium text-gray-800 truncate">Pending Registrations</h2>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {pendingRegistrations.map((user) => (
-            <div key={user._id} className="flex items-center justify-between py-2 sm:py-3">
-              <div className="flex items-center min-w-0">
-                <div className="mr-2 sm:mr-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-blue-100 text-white">
-                  <FaUserPlus className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{user.firstName} {user.lastName}</p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                </div>
-              </div>
-              <div className="text-right flex-shrink-0">
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={() => handleApproveRegistrationClick(user._id)}
-                    className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleRejectRegistration(user._id)}
-                    className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-        <h2 className="mb-3 sm:mb-4 text-base sm:text-lg font-medium text-gray-800 truncate">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
-          <Link href="/admin/members" className="flex flex-col items-center rounded-lg bg-blue-50 p-3 sm:p-4 text-center hover:bg-blue-100">
-            <FaUserPlus className="mb-1 sm:mb-2 h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
-            <span className="text-xs sm:text-sm font-medium text-blue-700 break-words">Add Member</span>
-          </Link>
-          <Link href="/admin/transactions" className="flex flex-col items-center rounded-lg bg-green-50 p-3 sm:p-4 text-center hover:bg-green-100">
-            <FaMoneyBillWave className="mb-1 sm:mb-2 h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
-            <span className="text-xs sm:text-sm font-medium text-green-700 break-words">Record Transaction</span>
-          </Link>
-          <Link href="/admin/loans" className="flex flex-col items-center rounded-lg bg-purple-50 p-3 sm:p-4 text-center hover:bg-purple-100">
-            <FaHandshake className="mb-1 sm:mb-2 h-6 w-6 sm:h-8 sm:w-8 text-purple-500" />
-            <span className="text-xs sm:text-sm font-medium text-purple-700 break-words">Review Loans</span>
-          </Link>
-          <Link href="/admin/reports" className="flex flex-col items-center rounded-lg bg-yellow-50 p-3 sm:p-4 text-center hover:bg-yellow-100">
-            <FaChartLine className="mb-1 sm:mb-2 h-6 w-6 sm:h-8 sm:w-8 text-yellow-500" />
-            <span className="text-xs sm:text-sm font-medium text-yellow-700 break-words">Generate Reports</span>
-          </Link>
-        </div>
-      </div>
+      )}
 
       {/* PIN Modal */}
       {showPinModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
-          <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md transform transition-all">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                <FaLock className="h-8 w-8 text-primary" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowPinModal(false)} />
+          <div className="relative glass-card bg-black/40 p-10 rounded-[3rem] border border-white/5 shadow-2xl w-full max-w-md transform transition-all animate-float">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-[2rem] border border-primary/20 mb-6 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                <FaLock className="h-8 w-8 text-primary shadow-glow" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">Enter Security PIN</h3>
-              <p className="text-gray-500 mt-2">Please enter your 4-digit PIN to view financial totals</p>
+              <h3 className="text-3xl font-black text-white tracking-tighter mb-2">Authorize Access</h3>
+              <p className="text-white/40 text-sm font-medium">Enter your 4-digit security PIN to view sensitive totals.</p>
             </div>
 
-            <form onSubmit={handleVerifyPin} className="space-y-6">
+            <form onSubmit={handleVerifyPin} className="space-y-8">
               <div className="flex justify-center">
                 <input
                   type="password"
                   maxLength={4}
                   value={pin}
                   onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                  className="w-48 text-center text-3xl tracking-[1.5em] font-bold border-b-4 border-primary focus:outline-none bg-transparent py-2"
-                  placeholder="****"
+                  className="w-full text-center text-5xl tracking-[1.2em] font-black border-b-2 border-white/20 focus:border-primary outline-none bg-transparent py-4 text-white placeholder:text-white/5 appearance-none mb-4"
+                  placeholder="0000"
                   autoFocus
                   required
                 />
               </div>
 
               {pinError && (
-                <p className="text-red-500 text-sm text-center font-medium">{pinError}</p>
+                <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl animate-shake">
+                  <p className="text-red-400 text-xs font-black text-center uppercase tracking-widest">{pinError}</p>
+                </div>
               )}
 
               <div className="flex gap-4">
                 <button
                   type="button"
                   onClick={() => setShowPinModal(false)}
-                  className="flex-1 px-4 py-3 text-gray-700 font-semibold bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex-1 btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={pin.length !== 4 || verifyingPin}
-                  className="flex-1 px-4 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 btn-primary disabled:opacity-50"
                 >
-                  {verifyingPin ? 'Verifying...' : 'Unlock'}
+                  {verifyingPin ? 'Verifying...' : 'Unlock Now'}
                 </button>
               </div>
             </form>
-
-            <p className="mt-6 text-xs text-gray-400 text-center">
-              Only the Main Admin of the cooperative can unlock this data.
-            </p>
           </div>
         </div>
       )}
-      {/* Rejection Reason Modal */}
+
+      {/* Security Modals Styled to match */}
       {showRejectionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Reason for Payment Rejection</h3>
-            <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-semibold">Please provide a reason:</p>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={() => setShowRejectionModal(false)} />
+          <div className="relative glass-card p-10 rounded-[3rem] border border-white/10 w-full max-w-sm">
+            <h3 className="text-2xl font-black text-white tracking-tight mb-4">Reject Payment</h3>
+            <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-6">Brief explanation for member:</p>
             <textarea
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
-              rows={4}
-              placeholder="e.g., Receipt is blurry, amount mismatch, etc."
+              className="w-full p-4 bg-white/5 border border-white/10 rounded-[2rem] focus:border-red-500/40 outline-none text-white text-sm transition-all resize-none min-h-[120px]"
+              placeholder="e.g., Receipt is blurry or incomplete..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               autoFocus
             />
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-4 mt-8">
               <button
                 onClick={() => setShowRejectionModal(false)}
-                className="flex-1 px-4 py-2 text-gray-700 font-semibold bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                disabled={rejecting}
+                className="flex-1 btn-secondary py-3"
               >
                 Cancel
               </button>
               <button
                 onClick={handleRejectPayment}
                 disabled={!rejectionReason.trim() || rejecting}
-                className="flex-1 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                className="flex-1 btn-primary bg-red-600 hover:bg-red-500 py-3 shadow-none disabled:opacity-50"
               >
-                {rejecting ? 'Rejecting...' : 'Reject'}
+                {rejecting ? 'Wait...' : 'Confirm Reject'}
               </button>
             </div>
           </div>
         </div>
       )}
+      
+      {showRegistrationApprovalModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={() => setShowRegistrationApprovalModal(false)} />
+          <div className="relative glass-card p-10 rounded-[3rem] border border-white/10 w-full max-w-md">
+            <h3 className="text-2xl font-black text-white tracking-tighter mb-2">Finalize Onboarding</h3>
+            <p className="text-white/40 text-xs font-medium mb-8">Set the initial financial records for this new member.</p>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2 block">Opening Savings Balance (₦)</label>
+                <input
+                  type="number"
+                  className="w-full p-5 bg-white/5 border border-white/10 rounded-3xl outline-none focus:border-primary text-white font-bold"
+                  placeholder="0.00"
+                  value={initialDepositAmount}
+                  onChange={(e) => setInitialDepositAmount(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2 block">Existing Loan Debt (₦)</label>
+                <input
+                  type="number"
+                  className="w-full p-5 bg-white/5 border border-white/10 rounded-3xl outline-none focus:border-primary text-white font-bold"
+                  placeholder="0.00"
+                  value={initialLoanBalance}
+                  onChange={(e) => setInitialLoanBalance(e.target.value)}
+                />
+              </div>
+            </div>
 
+            <div className="flex gap-4 mt-10">
+              <button
+                onClick={() => setShowRegistrationApprovalModal(false)}
+                className="flex-1 btn-secondary text-sm"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => selectedRegistrationId && executeApproveRegistration(selectedRegistrationId)}
+                disabled={approvingRegistration}
+                className="flex-2 btn-primary text-sm shadow-none"
+              >
+                {approvingRegistration ? 'Onboarding...' : 'Approve & Activate Member'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Surety Error Modal */}
       {showSuretyErrorModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">

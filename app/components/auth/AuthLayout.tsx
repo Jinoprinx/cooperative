@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
+import { useTenant } from '@/app/context/TenantContext';
+
 interface AuthLayoutProps {
   title: string;
   subtitle: string;
@@ -18,49 +20,74 @@ export default function AuthLayout({
   linkHref,
   children,
 }: AuthLayoutProps) {
+  const { tenant } = useTenant();
+
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute inset-0 z-0 hero-gradient opacity-20"></div>
-      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-primary rounded-full blur-[120px] z-0 animate-pulse"></div>
-      <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-[120px] z-0 animate-pulse" style={{ animationDelay: '2s' }}></div>
+    <div className="relative min-h-screen flex flex-col items-center justify-center bg-[#030711] px-4 py-12 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#3b82f615,transparent)]" />
+        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_120%,#3b82f610,transparent)]" />
+        <div className="noise-overlay opacity-[0.03]" />
+      </div>
+
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-[140px] z-0 animate-pulse-slow"></div>
+      <div className="absolute bottom-1/4 -right-20 w-[30rem] h-[30rem] bg-indigo-500/10 rounded-full blur-[160px] z-0 animate-pulse-slower"></div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md z-10"
       >
-        <div className="card-premium bg-surface/70 backdrop-blur-3xl border border-glass-border p-10 rounded-3xl shadow-2xl text-foreground">
+        <div className="card-premium bg-white/[0.02] backdrop-blur-[40px] border border-white/5 p-8 sm:p-12 rounded-[2.5rem] shadow-2xl relative group">
+          <div className="absolute -inset-[1px] bg-gradient-to-br from-white/10 to-transparent rounded-[2.5rem] -z-10 opacity-50" />
+          
           <div className="text-center mb-10">
-            <Link href="/" className="inline-flex items-center space-x-2 mb-8">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transform rotate-12 shadow-lg shadow-primary/20">
-                <span className="text-white font-bold -rotate-12 italic text-xl">C</span>
+            <Link href="/" className="inline-flex items-center space-x-3 mb-10 group/logo">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                <span className="text-white font-black -rotate-[12deg] italic text-2xl tracking-tighter">
+                  {tenant ? tenant.name[0] : 'C'}
+                </span>
               </div>
-              <span className="text-2xl font-display font-bold text-foreground tracking-tight">
-                Coop
+              <span className="text-3xl font-black text-white tracking-tighter">
+                {tenant ? (
+                  <>
+                    {tenant.name.split(' ')[0]}<span className="text-primary">{tenant.name.split(' ')[1] ? ` ${tenant.name.split(' ')[1]}` : ''}</span>
+                  </>
+                ) : (
+                  <>
+                    Coop<span className="text-primary">.io</span>
+                  </>
+                )}
               </span>
             </Link>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
+            
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-white mb-4">
               {title}
             </h2>
-            <p className="text-sm text-muted-foreground dark:text-white/50">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/30">
               {subtitle}{' '}
               <Link
                 href={linkHref}
-                className="font-semibold text-primary hover:text-primary-light transition-colors"
+                className="text-primary hover:text-white transition-colors border-b border-primary/20 hover:border-white/20 pb-0.5 ml-1"
               >
                 {linkText}
               </Link>
             </p>
           </div>
-          {children}
+          
+          <div className="relative">
+            {children}
+          </div>
         </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-xs text-muted-foreground dark:text-white/20 font-medium italic">
-            &copy; {new Date().getFullYear()} Modern Cooperative. Built for legacy.
-          </p>
+        <div className="mt-10 text-center animate-fade-in">
+          <div className="text-[10px] text-white/20 font-black uppercase tracking-[0.4em] italic flex items-center justify-center gap-4">
+             <div className="w-8 h-px bg-white/5" />
+             &copy; {new Date().getFullYear()} NEXUS CORE
+             <div className="w-8 h-px bg-white/5" />
+          </div>
         </div>
       </motion.div>
     </div>

@@ -97,130 +97,137 @@ export default function Transactions() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">Transactions</h1>
-      <div className="mb-4 flex space-x-4">
-        <PayNowButton />
-        <Link href="/payment-ledger">
-          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-            View Payment Ledger
-          </button>
-        </Link>
+    <div className="space-y-10 pb-20 text-white">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
+        <div>
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Personal Ledger</span>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter">
+            Transaction <span className="text-white/40">Hub</span>
+          </h1>
+        </div>
+        <div className="flex flex-wrap items-center gap-4">
+           <Link href="/payment-ledger">
+             <button className="btn-secondary px-8 py-3.5 text-[10px] font-black uppercase tracking-widest rounded-2xl border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all">
+               Deep Ledger
+             </button>
+           </Link>
+           <div className="p-1 bg-white/5 rounded-2xl border border-white/10">
+              <PayNowButton />
+           </div>
+        </div>
       </div>
+
       {/* Filter Section */}
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="input input-bordered w-full md:w-auto"
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="input input-bordered w-full md:w-auto"
-          />
-          <button onClick={handleFilter} className="btn btn-primary">
-            <FaSearch className="mr-2" /> Search
+      <div className="glass-card p-8 rounded-[2.5rem] border border-white/5 space-y-8">
+        <div className="flex flex-wrap items-end gap-6">
+          <div className="space-y-2">
+             <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-4">Start Period</label>
+             <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-sm outline-none focus:border-primary transition-all font-black uppercase tracking-widest block"
+            />
+          </div>
+          <div className="space-y-2">
+             <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-4">End Period</label>
+             <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-sm outline-none focus:border-primary transition-all font-black uppercase tracking-widest block"
+            />
+          </div>
+          <button onClick={handleFilter} className="bg-primary/20 hover:bg-primary text-primary hover:text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-3">
+            <FaSearch /> Sync Ledger
           </button>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-500">Quick Filters:</span>
-            <button onClick={() => handleQuickFilter(5)} className="btn btn-outline btn-xs btn-primary">Last 5</button>
-            <button onClick={() => handleQuickFilter(10)} className="btn btn-outline btn-xs btn-primary">Last 10</button>
-            <button onClick={() => fetchTransactions()} className="btn btn-outline btn-xs text-gray-400">Clear</button>
+          
+          <div className="flex-1 flex justify-end gap-3 pb-1">
+            <button onClick={() => handleQuickFilter(5)} className="px-4 py-2 bg-white/3 border border-white/5 rounded-xl text-[8px] font-black uppercase tracking-widest hover:border-primary/50 transition-all text-white/40 hover:text-white">Recent 5</button>
+            <button onClick={() => handleQuickFilter(10)} className="px-4 py-2 bg-white/3 border border-white/5 rounded-xl text-[8px] font-black uppercase tracking-widest hover:border-primary/50 transition-all text-white/40 hover:text-white">Recent 10</button>
+            <button onClick={() => fetchTransactions()} className="px-4 py-2 text-[8px] font-black uppercase tracking-widest text-primary/60 hover:text-primary">Clear</button>
           </div>
         </div>
       </div>
+
       {/* Transactions Table */}
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Description</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Action</th>
+      <div className="card-premium p-0 overflow-hidden relative">
+        <div className="overflow-x-auto min-h-[400px]">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/3">
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Protocol Date</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Classification</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Integrity</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Value (NGN)</th>
+                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Documentation</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {filteredTransactions.map((transaction) => (
-                <tr key={transaction._id} className={`${transaction.status === 'rejected' ? 'line-through text-gray-400' : ''}`}>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm">{formatDate(transaction.date)}</td>
-                  <td className="px-6 py-4 text-sm">{transaction.description}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <span
-                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${transaction.type === 'deposit'
-                        ? 'bg-green-100 text-green-800'
-                        : transaction.type === 'withdrawal'
-                          ? 'bg-red-100 text-red-800'
-                          : transaction.type === 'loan_repayment'
-                            ? 'bg-blue-100 text-blue-800'
-                            : transaction.type === 'loan_disbursement'
-                              ? 'bg-purple-100 text-purple-800'
-                              : transaction.type === 'interest_payment'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : transaction.type === 'fee'
-                                  ? 'bg-gray-100 text-gray-800'
-                                  : 'bg-gray-100 text-gray-800'
-                        }`}
-                    >
-                      {transaction.type === 'deposit'
-                        ? 'Deposit'
-                        : transaction.type === 'withdrawal'
-                          ? 'Withdrawal'
-                          : transaction.type === 'loan_repayment'
-                            ? 'Loan Repayment'
-                            : transaction.type === 'loan_disbursement'
-                              ? 'Loan Disbursement'
-                              : transaction.type === 'interest_payment'
-                                ? 'Interest Payment'
-                                : transaction.type === 'fee'
-                                  ? 'Fee'
-                                  : transaction.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="flex flex-col">
-                      <span className={`inline-flex w-fit rounded-full px-2 text-xs font-semibold leading-5 ${transaction.status === 'approved'
-                        ? 'bg-green-100 text-green-800'
-                        : transaction.status === 'rejected'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
+            <tbody className="divide-y divide-white/5">
+              {filteredTransactions.map((transaction) => {
+                const isCredit = ['deposit', 'loan_disbursement'].includes(transaction.type);
+                const isRejected = transaction.status === 'rejected';
+
+                return (
+                  <tr key={transaction._id} className={`group hover:bg-white/3 transition-colors ${isRejected ? 'opacity-40' : ''}`}>
+                    <td className="px-8 py-6 whitespace-nowrap">
+                       <span className="text-xs font-bold text-white/60">{formatDate(transaction.date)}</span>
+                    </td>
+                    <td className="px-8 py-6">
+                       <div className="flex flex-col">
+                         <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">{transaction.description}</span>
+                         <span className={`text-[8px] font-black uppercase tracking-widest mt-1 w-fit px-1.5 py-0.5 rounded-md border ${
+                           transaction.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                           transaction.type === 'withdrawal' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                           'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                         }`}>
+                           {transaction.type.replace('_', ' ')}
+                         </span>
+                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex flex-col gap-1.5">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                          transaction.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                          isRejected ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                          'bg-amber-500/10 border-amber-500/20 text-amber-500'
                         }`}>
-                        {transaction.status}
-                      </span>
-                      {transaction.status === 'rejected' && transaction.rejectionReason && (
-                        <span className="text-[10px] text-red-500 mt-1 italic max-w-[150px] truncate">
-                          Reason: {transaction.rejectionReason}
+                           <div className={`w-1 h-1 rounded-full ${
+                             transaction.status === 'approved' ? 'bg-emerald-500' :
+                             isRejected ? 'bg-red-500' : 'bg-amber-500 animate-pulse'
+                           }`} />
+                           {transaction.status}
                         </span>
-                      )}
-                    </div>
-                  </td>
-                  <td
-                    className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${transaction.status === 'rejected' ? 'text-gray-400 opacity-50' : ['deposit', 'loan_disbursement'].includes(transaction.type) ? 'text-green-600' : 'text-red-600'
-                      }`}
-                  >
-                    <span className={transaction.status === 'rejected' ? 'line-through decoration-red-500' : ''}>
-                      {['deposit', 'loan_disbursement'].includes(transaction.type) ? '+' : '-'} {formatCurrency(transaction.amount)}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                    {transaction.receiptUrl && (
-                      <button
-                        onClick={() => handleViewReceipt(transaction._id)}
-                        className="text-primary hover:underline font-medium"
-                      >
-                        View Receipt
-                      </button>
-                    )}
-                  </td>
+                        {isRejected && transaction.rejectionReason && (
+                          <span className="text-[10px] text-red-500/80 font-bold italic max-w-[150px] truncate ml-1">! {transaction.rejectionReason}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                       <span className={`text-lg font-black tracking-tighter ${isRejected ? 'line-through decoration-red-500/50' : isCredit ? 'text-emerald-400 shadow-glow-sm' : 'text-white'}`}>
+                         {isCredit ? '+' : '-'} {formatCurrency(transaction.amount)}
+                       </span>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                       {transaction.receiptUrl && (
+                         <button 
+                           onClick={() => handleViewReceipt(transaction._id)}
+                           className="text-[10px] font-black text-primary hover:text-white uppercase tracking-widest px-4 py-2 bg-primary/10 border border-primary/20 rounded-xl transition-all"
+                         >
+                           Receipt
+                         </button>
+                       )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredTransactions.length === 0 && (
+                <tr>
+                   <td colSpan={5} className="py-24 text-center bg-white/2">
+                      <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em] italic">No transaction records found in ledger</p>
+                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

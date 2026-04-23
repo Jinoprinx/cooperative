@@ -41,87 +41,81 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <AnimatePresence>
         {error && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="rounded-xl bg-red-500 border border-red-500 p-4"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="rounded-2xl bg-red-500/10 border border-red-500/20 p-4"
           >
-            <div className="flex">
-              <div className="text-sm text-red-400 font-medium">{error}</div>
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              <div className="text-[10px] font-black uppercase tracking-widest text-red-500">{error}</div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="credential" className="text-xs font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest px-1">
-            Email or Phone
-          </label>
-          <div className="relative group">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <FaUser className="h-4 w-4 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
-            </div>
+      <div className="space-y-6">
+        <div className="space-y-2 relative group/field">
+          <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Entry Credentials</span>
+          <div className="relative">
             <input
               id="credential"
               type="text"
               autoComplete="email"
-              className={`block w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-foreground dark:text-white placeholder:text-muted-foreground/50 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all ${errors.credential ? 'border-red-500/50 ring-2 ring-red-500/20' : ''
-                }`}
-              placeholder="e.g. name@company.com"
+              className={`block w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${errors.credential ? 'border-red-500/50' : ''}`}
+              placeholder="Email or phone number"
               {...register('credential')}
             />
           </div>
           {errors.credential && (
-            <p className="mt-1 text-xs text-red-400 font-medium px-1" id="credential-error">
+            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">
               {errors.credential.message}
             </p>
           )}
         </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between items-center px-1">
-            <label htmlFor="password" className="text-xs font-bold text-muted-foreground dark:text-white/40 uppercase tracking-widest">
-              Password
-            </label>
-            <Link href="/auth/forgot-password" title="Forgot Password" className="text-xs font-bold text-muted-foreground/70 dark:text-white/30 hover:text-foreground dark:hover:text-white transition-colors">
-              Forgot?
+        <div className="space-y-2 relative group/field">
+          <div className="flex justify-between items-center absolute top-2 left-6 right-6 z-10">
+            <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Security Vector</span>
+            <Link href="/auth/forgot-password" title="Forgot Password" className="text-[8px] font-black text-white/20 hover:text-primary uppercase tracking-[0.2em] transition-colors">
+              Reset Key?
             </Link>
           </div>
-          <div className="relative group">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <FaLock className="h-4 w-4 text-muted-foreground/50 dark:text-white/20 group-focus-within:text-primary transition-colors" />
-            </div>
+          <div className="relative">
             <input
               id="password"
               type="password"
               autoComplete="current-password"
-              className={`block w-full bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-foreground dark:text-white placeholder:text-muted-foreground/50 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all ${errors.password ? 'border-red-500 ring-2 ring-red-500' : ''
-                }`}
+              className={`block w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 tracking-[0.3em] ${errors.password ? 'border-red-500/50' : ''}`}
               placeholder="••••••••"
               {...register('password')}
             />
           </div>
           {errors.password && (
-            <p className="mt-1 text-xs text-red-400 font-medium px-1" id="password-error">
+            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">
               {errors.password.message}
             </p>
           )}
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 px-1">
-        <input
-          id="remember-me"
-          name="remember-me"
-          type="checkbox"
-          className="h-4 w-4 rounded border-border dark:border-white/10 bg-surface-lighter dark:bg-white/5 text-primary focus:ring-primary/50"
-        />
-        <label htmlFor="remember-me" className="text-sm text-foreground/60 dark:text-white/40 font-medium cursor-pointer select-none">
+      <div className="flex items-center space-x-3 px-2">
+        <div className="relative">
+          <input
+            id="remember-me"
+            name="remember-me"
+            type="checkbox"
+            className="peer appearance-none h-5 w-5 rounded-lg border border-white/10 bg-white/5 checked:bg-primary checked:border-primary transition-all cursor-pointer"
+          />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+             <div className="w-2 h-2 rounded-full bg-white" />
+          </div>
+        </div>
+        <label htmlFor="remember-me" className="text-[10px] font-black text-white/30 uppercase tracking-widest cursor-pointer group-hover:text-white/60 transition-colors">
           Keep me signed in
         </label>
       </div>
@@ -129,14 +123,15 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="btn-primary w-full py-4 relative overflow-hidden group disabled:opacity-70"
+        className="w-full btn-primary py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 disabled:opacity-50"
       >
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
         <span className={loading ? 'opacity-0' : 'opacity-100 flex items-center justify-center'}>
           Enter Cooperative
         </span>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <FaCircleNotch className="animate-spin text-lg" />
+            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           </div>
         )}
       </button>
