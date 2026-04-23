@@ -13,6 +13,7 @@ export interface PendingLoan extends Loan {
 
 export interface PendingPayment {
   _id: string;
+  amount: number;
   user: {
     firstName: string;
     lastName: string;
