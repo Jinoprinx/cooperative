@@ -3,9 +3,7 @@ import { Platform } from 'react-native';
 // Central app config — all environment-specific constants live here
 export const Config = {
   // Production: 'https://coopbkend-acfb9cb075e5.herokuapp.com/api',
-  API_BASE_URL: Platform.OS === 'web' 
-    ? 'http://localhost:5000/api'
-    : 'http://10.30.191.1:5000/api', // Local dev backend (use your machine's IP)
+  API_BASE_URL: 'https://coopbkend-acfb9cb075e5.herokuapp.com/api',
   APP_NAME: 'Coopapp',
   VERSION: '1.0.0',
 };

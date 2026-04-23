@@ -10,7 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 
-export default function Profile() {
+export default function AdminProfile() {
   const { logout, refreshUser } = useAuth();
   const { user, refetch: refetchUser } = useUser();
   const { tenant } = useTenant();
@@ -66,7 +66,7 @@ export default function Profile() {
   const handleLogout = () => {
     Alert.alert(
       "Sign Out",
-      "Are you sure you want to log out of your account?",
+      "Are you sure you want to log out?",
       [
         { text: "Cancel", style: "cancel" },
         { 
@@ -79,13 +79,6 @@ export default function Profile() {
       ]
     );
   };
-
-  const menuItems = [
-    { icon: 'shield-check-outline', label: 'Security & Password', color: '#6b7280' },
-    { icon: 'bell-outline', label: 'Notifications', color: '#6b7280' },
-    { icon: 'help-circle-outline', label: 'Support Center', color: '#6b7280' },
-    { icon: 'information-outline', label: 'App Information', color: '#6b7280' },
-  ];
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -114,8 +107,8 @@ export default function Profile() {
           <Text className="text-3xl font-black text-white mt-6 tracking-tighter">
             {user?.firstName} {user?.lastName}
           </Text>
-          <Text className="text-white/40 font-bold uppercase tracking-[0.2em] mt-1">
-            Active Member
+          <Text className="text-primary font-bold uppercase tracking-[0.2em] mt-1">
+            Cooperative Admin
           </Text>
         </View>
 
@@ -126,28 +119,28 @@ export default function Profile() {
               <MaterialCommunityIcons name="office-building" size={24} color="white" />
             </View>
             <View>
-              <Text className="text-white/30 text-[9px] font-black uppercase tracking-widest mb-1">Your Cooperative</Text>
-              <Text className="text-white font-bold text-lg">{tenant?.name || 'Cooperative'}</Text>
+              <Text className="text-white/30 text-[9px] font-black uppercase tracking-widest mb-1">Organization</Text>
+              <Text className="text-white font-bold text-lg">{tenant?.name || 'Cooperative Ltd'}</Text>
             </View>
           </View>
-          <MaterialCommunityIcons name="check-decagram" size={24} color="#3b82f6" />
+          <MaterialCommunityIcons name="shield-check" size={24} color="#3b82f6" />
         </View>
 
         {/* Account Info */}
-        <Card title="Account Details" className="mb-8">
+        <Card title="Admin Details" className="mb-8">
           <View className="space-y-6">
             <View className="flex-row items-center">
               <MaterialCommunityIcons name="identifier" size={20} color="rgba(255,255,255,0.2)" className="mr-4" />
               <View>
-                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Account Number</Text>
-                <Text className="text-white font-bold text-base mt-0.5">{user?.accountNumber || 'Pending Verification'}</Text>
+                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Admin ID</Text>
+                <Text className="text-white font-bold text-base mt-0.5">{user?.accountNumber || 'ADM-001'}</Text>
               </View>
             </View>
             
             <View className="flex-row items-center">
               <MaterialCommunityIcons name="email-outline" size={20} color="rgba(255,255,255,0.2)" className="mr-4" />
               <View>
-                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Email Address</Text>
+                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Official Email</Text>
                 <Text className="text-white font-bold text-base mt-0.5">{user?.email}</Text>
               </View>
             </View>
@@ -162,24 +155,6 @@ export default function Profile() {
           </View>
         </Card>
 
-        {/* Menu Items */}
-        <View className="space-y-3 mb-10">
-          {menuItems.map((item, i) => (
-            <TouchableOpacity 
-              key={i}
-              className="bg-surface border border-border p-5 rounded-3xl flex-row items-center justify-between"
-            >
-              <View className="flex-row items-center">
-                <View className="w-10 h-10 bg-white/5 rounded-xl items-center justify-center mr-4">
-                  <MaterialCommunityIcons name={item.icon as any} size={20} color={item.color} />
-                </View>
-                <Text className="text-white font-bold">{item.label}</Text>
-              </View>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="rgba(255,255,255,0.1)" />
-            </TouchableOpacity>
-          ))}
-        </View>
-
         {/* Logout Button */}
         <TouchableOpacity 
           onPress={handleLogout}
@@ -189,7 +164,7 @@ export default function Profile() {
         </TouchableOpacity>
 
         <Text className="text-white/10 text-center text-xs font-bold uppercase tracking-[0.3em]">
-          Coopapp Mobile v1.0.0
+          Coopapp Admin Platform v1.0
         </Text>
       </ScrollView>
     </SafeAreaView>

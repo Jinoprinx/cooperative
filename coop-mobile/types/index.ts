@@ -9,7 +9,7 @@ export interface User {
   phoneNumber?: string;
   role: 'member' | 'admin' | 'super-admin';
   isVerified: boolean;
-  profileImageUrl?: string;
+  profileImage?: string;
   tenantId?: string;
 }
 

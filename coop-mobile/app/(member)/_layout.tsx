@@ -53,7 +53,17 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="view-dashboard" size={size} color={color} />
           ),
-          headerTitle: 'Coopapp',
+          headerTitle: 'Dashboard',
+        }}
+      />
+      <Tabs.Screen
+        name="transactions"
+        options={{
+          title: 'Transactions',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="swap-vertical" size={size} color={color} />
+          ),
+          headerTitle: 'Recent Activity',
         }}
       />
       <Tabs.Screen
@@ -84,6 +94,12 @@ export default function TabLayout() {
             <MaterialCommunityIcons name="account" size={size} color={color} />
           ),
           headerTitle: 'Profile',
+        }}
+      />
+      <Tabs.Screen
+        name="coming-soon"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

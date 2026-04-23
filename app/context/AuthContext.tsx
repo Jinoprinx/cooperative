@@ -166,6 +166,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isAdmin = isAuthenticated && user?.role === 'admin';
   const isMainAdmin = isAdmin && !!user?.isMainAdmin;
 
+  // Inactivity Logout (20 minutes)
+  useEffect(() => {
+    let idleTimer: NodeJS.Timeout;
+
+    const resetTimer = () => {
+      if (idleTimer) clearTimeout(idleTimer);
+      if (isAuthenticated) {
+        idleTimer = setTimeout(() => {
+          logout();
+        }, 20 * 60 * 1000); // 20 minutes
+      }
+    };
+
+    // Events that reset the timer
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    
+    if (isAuthenticated) {
+      activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+      resetTimer(); // Initialize timer
+    }
+
+    return () => {
+      if (idleTimer) clearTimeout(idleTimer);
+      activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [isAuthenticated]);
+
   return (
     <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated, isAdmin, isMainAdmin, loading, updateUser }}>
       {children}

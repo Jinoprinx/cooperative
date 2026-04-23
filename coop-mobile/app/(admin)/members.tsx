@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Image, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { User } from '../../types';
@@ -18,6 +19,15 @@ export default function Members() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [initialDeposit, setInitialDeposit] = useState('0');
   const [initialLoan, setInitialLoan] = useState('0');
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+
+  const { initialTab } = useLocalSearchParams<{ initialTab: Tab }>();
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const queryClient = useQueryClient();
 
@@ -172,7 +182,13 @@ export default function Members() {
                   <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Balance</Text>
                   <Text className="text-white font-black text-xl">{formatCurrency(user.accountBalance)}</Text>
                 </View>
-                <TouchableOpacity className="bg-white/5 p-3 rounded-xl">
+                <TouchableOpacity 
+                  onPress={() => {
+                    setSelectedUser(user);
+                    setIsDetailModalVisible(true);
+                  }}
+                  className="bg-white/5 p-3 rounded-xl"
+                >
                   <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.4)" />
                 </TouchableOpacity>
               </View>
@@ -202,6 +218,77 @@ export default function Members() {
           </View>
         )}
       </ScrollView>
+
+      {/* Member Detail Modal */}
+      <Modal
+        visible={isDetailModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsDetailModalVisible(false)}
+      >
+        <View className="flex-1 justify-end bg-black/60">
+          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-white/10 max-h-[85%]">
+            <View className="w-12 h-1.5 bg-white/10 rounded-full self-center mb-8" />
+            
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View className="items-center mb-8">
+                <View className="w-24 h-24 bg-primary/10 rounded-[2rem] items-center justify-center mb-4 border border-primary/20">
+                  {selectedUser?.profileImageUrl ? (
+                    <Image source={{ uri: selectedUser.profileImageUrl }} className="w-full h-full rounded-[2rem]" />
+                  ) : (
+                    <MaterialCommunityIcons name="account" size={56} color="#3b82f6" />
+                  )}
+                </View>
+                <Text className="text-white font-black text-3xl">{selectedUser?.firstName} {selectedUser?.lastName}</Text>
+                <Text className="text-white/40 font-bold uppercase tracking-widest text-[10px] mt-1">ID: {selectedUser?.accountNumber || 'PENDING'}</Text>
+              </View>
+
+              <View className="bg-white/5 rounded-[2rem] p-6 mb-6">
+                <View className="flex-row justify-between mb-6">
+                  <View>
+                    <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Savings Balance</Text>
+                    <Text className="text-white font-black text-2xl">{formatCurrency(selectedUser?.accountBalance || 0)}</Text>
+                  </View>
+                  <View className="items-end">
+                    <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Join Date</Text>
+                    <Text className="text-white font-bold">{selectedUser?.joinDate ? formatDate(selectedUser.joinDate) : 'N/A'}</Text>
+                  </View>
+                </View>
+
+                <View className="h-[1px] bg-white/5 mb-6" />
+
+                <View className="space-y-4">
+                  <View>
+                    <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Email Address</Text>
+                    <Text className="text-white font-medium">{selectedUser?.email}</Text>
+                  </View>
+                  <View>
+                    <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Phone Number</Text>
+                    <Text className="text-white font-medium">{selectedUser?.phoneNumber}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View className="bg-amber-500/10 border border-amber-500/20 p-5 rounded-3xl mb-8 flex-row items-center">
+                <MaterialCommunityIcons name="shield-account" size={24} color="#f59e0b" />
+                <View className="ml-4">
+                  <Text className="text-amber-500 font-bold">Membership Status</Text>
+                  <Text className="text-amber-500/60 text-xs">This user is an active participant.</Text>
+                </View>
+              </View>
+
+              <Button 
+                title="Close Profile" 
+                variant="outline"
+                onPress={() => {
+                  setIsDetailModalVisible(false);
+                  setSelectedUser(null);
+                }}
+              />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       {/* Approval Modal */}
       <Modal

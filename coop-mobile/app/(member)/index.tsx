@@ -96,6 +96,28 @@ export default function Dashboard() {
           <RefreshControl refreshing={isLoading} onRefresh={onRefresh} tintColor="#3b82f6" />
         }
       >
+        {/* Welcome Header */}
+        <View className="flex-row justify-between items-center mb-8">
+          <View>
+            <Text className="text-white font-black text-3xl tracking-tighter">
+              Welcome, {user?.firstName}
+            </Text>
+            <Text className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">
+              Have a productive day!
+            </Text>
+          </View>
+          <TouchableOpacity 
+            onPress={() => router.push('/(member)/profile')}
+            className="w-14 h-14 bg-surface border-2 border-primary/20 rounded-2xl items-center justify-center overflow-hidden"
+          >
+            {user?.profileImage ? (
+              <Image source={{ uri: user.profileImage }} className="w-full h-full" />
+            ) : (
+              <MaterialCommunityIcons name="account" size={30} color="rgba(255,255,255,0.1)" />
+            )}
+          </TouchableOpacity>
+        </View>
+
         {/* Account Balance Header */}
         <View className="mb-8">
           <Text className="text-white/40 text-xs font-bold uppercase tracking-[0.3em] mb-2">
@@ -122,8 +144,8 @@ export default function Dashboard() {
           {[
             { icon: 'plus-circle', label: 'Deposit', color: '#3b82f6', onPress: () => { setPayType('deposit'); setIsPayModalVisible(true); } },
             { icon: 'hand-coin', label: 'Repay Loan', color: '#10b981', onPress: () => { setPayType('loan_repayment'); setIsPayModalVisible(true); } },
-            { icon: 'history', label: 'Activity', color: '#6b7280', onPress: () => {} },
-            { icon: 'qrcode-scan', label: 'Scan Pay', color: '#f59e0b', onPress: () => {} },
+            { icon: 'history', label: 'Activity', color: '#6b7280', onPress: () => router.push('/(member)/transactions') },
+            { icon: 'qrcode-scan', label: 'Scan Pay', color: '#f59e0b', onPress: () => router.push('/(member)/coming-soon') },
           ].map((action, i) => (
             <TouchableOpacity key={i} onPress={action.onPress} className="items-center">
               <View className="w-16 h-16 bg-surface border border-border rounded-3xl items-center justify-center mb-2 shadow-sm">
@@ -168,7 +190,7 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <View className="mb-6 flex-row justify-between items-end">
           <Text className="text-2xl font-black text-white tracking-tight">Recent Activity</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/(member)/transactions')}>
             <Text className="text-primary font-bold text-xs">View All</Text>
           </TouchableOpacity>
         </View>

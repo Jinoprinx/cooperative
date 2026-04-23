@@ -84,6 +84,16 @@ export default function AdminLayout() {
           headerTitle: 'Payment Verification',
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account" size={size} color={color} />
+          ),
+          headerTitle: 'Admin Profile',
+        }}
+      />
     </Tabs>
   );
 }

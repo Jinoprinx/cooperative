@@ -91,6 +91,12 @@ export default function Login() {
               secureTextEntry
             />
             
+            <Link href="/(auth)/forgot-password" asChild>
+              <TouchableOpacity className="self-end pt-1">
+                <Text className="text-primary font-bold text-xs">Forgot Password?</Text>
+              </TouchableOpacity>
+            </Link>
+            
             {error && (
               <View className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mt-2">
                 <Text className="text-red-500 text-sm font-medium text-center">{error}</Text>

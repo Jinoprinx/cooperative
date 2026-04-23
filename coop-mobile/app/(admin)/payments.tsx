@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Image, Alert, Modal, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
-import { Transaction, User } from '../../types';
-import { formatCurrency, formatDate, getTransactionColor } from '../../lib/utils';
+import { Transaction } from '../../types';
+import { formatCurrency, formatDate } from '../../lib/utils';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 
 type Tab = 'pending' | 'history';
@@ -27,6 +29,16 @@ export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState<Tab>('pending');
   const [selectedTx, setSelectedTx] = useState<ExtendedTransaction | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isRejectModalVisible, setIsRejectModalVisible] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+
+  const { initialTab } = useLocalSearchParams<{ initialTab: Tab }>();
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const queryClient = useQueryClient();
 
@@ -50,7 +62,7 @@ export default function AdminPayments() {
 
   const approveMutation = useMutation({
     mutationFn: async (transactionId: string) => {
-      return api.put(`/admin/payments/${transactionId}/approve`);
+      return api.post(`/transactions/approve/${transactionId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-pending-payments'] });
@@ -67,14 +79,16 @@ export default function AdminPayments() {
 
   const rejectMutation = useMutation({
     mutationFn: async ({ transactionId, reason }: { transactionId: string, reason: string }) => {
-      return api.put(`/admin/payments/${transactionId}/reject`, { rejectionReason: reason });
+      return api.post(`/transactions/reject/${transactionId}`, { rejectionReason: reason });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-pending-payments'] });
       queryClient.invalidateQueries({ queryKey: ['admin-all-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+      setIsRejectModalVisible(false);
       setIsModalVisible(false);
       setSelectedTx(null);
+      setRejectionReason('');
       Alert.alert('Success', 'Payment rejected');
     },
     onError: (err: any) => {
@@ -92,20 +106,20 @@ export default function AdminPayments() {
     setIsModalVisible(true);
   };
 
-  const handleReject = () => {
+  const handleRejectPress = () => {
+    setIsRejectModalVisible(true);
+  };
+
+  const submitRejection = () => {
     if (!selectedTx) return;
-    Alert.prompt(
-      'Reject Payment',
-      'Please provide a reason for rejection:',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Reject', 
-          style: 'destructive',
-          onPress: (reason) => rejectMutation.mutate({ transactionId: selectedTx._id, reason: reason || 'Invalid receipt' })
-        }
-      ]
-    );
+    if (!rejectionReason.trim()) {
+      Alert.alert('Required', 'Please provide a reason for rejection');
+      return;
+    }
+    rejectMutation.mutate({ 
+      transactionId: selectedTx._id, 
+      reason: rejectionReason 
+    });
   };
 
   const isLoading = isPendingLoading || isHistoryLoading;
@@ -251,7 +265,7 @@ export default function AdminPayments() {
                     title="Reject" 
                     variant="outline"
                     className="flex-1 border-rose-500/30"
-                    onPress={handleReject}
+                    onPress={handleRejectPress}
                   />
                   <Button 
                     title="Approve & Credit" 
@@ -269,6 +283,50 @@ export default function AdminPayments() {
                 onPress={() => setIsModalVisible(false)}
               />
             </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Rejection Reason Modal */}
+      <Modal
+        visible={isRejectModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsRejectModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/80 px-6">
+          <View className="bg-surface w-full p-8 rounded-[3rem] border border-white/10">
+            <View className="w-16 h-16 bg-rose-500/10 rounded-2xl items-center justify-center mb-6 self-center">
+              <MaterialCommunityIcons name="alert-circle-outline" size={32} color="#f43f5e" />
+            </View>
+            
+            <Text className="text-white font-black text-2xl mb-2 text-center">Reject Payment</Text>
+            <Text className="text-white/40 mb-8 text-center">Enter the reason why this payment proof is being rejected.</Text>
+
+            <Input 
+              label="Rejection Reason"
+              placeholder="e.g. Image not clear, wrong amount, etc."
+              value={rejectionReason}
+              onChangeText={setRejectionReason}
+              multiline
+              numberOfLines={3}
+              className="bg-white/5 border-white/10 text-white"
+            />
+
+            <View className="flex-row space-x-4 mt-8">
+              <Button 
+                title="Cancel" 
+                variant="ghost"
+                className="flex-1"
+                onPress={() => setIsRejectModalVisible(false)}
+              />
+              <Button 
+                title="Confirm Reject" 
+                className="flex-1 bg-rose-600"
+                isLoading={rejectMutation.isPending}
+                onPress={submitRejection}
+              />
+            </View>
           </View>
         </View>
       </Modal>

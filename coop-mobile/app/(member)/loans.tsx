@@ -100,47 +100,58 @@ export default function Loans() {
         return;
       }
 
-      // Search for the member
-      newSureties[index].searching = true;
-      setSureties([...newSureties]);
+    // Search for the member
+    setSureties(prev => {
+      const updated = [...prev];
+      if (updated[index]) {
+        updated[index] = { ...updated[index], searching: true, error: undefined, found: false, name: '' };
+      }
+      return updated;
+    });
 
-      try {
-        const response = await api.get(`/users/search?phone=${phone}`);
-        const updatedSureties = [...sureties];
-        // Ensure we're updating the correct index (in case state changed)
-        if (updatedSureties[index]?.phone === phone) {
-          const foundRole = response.data?.role;
+    try {
+      const response = await api.get(`/users/search?phone=${phone}`);
+      const foundRole = response.data?.role;
+      const foundName = response.data?.name;
+
+      setSureties(prev => {
+        const updated = [...prev];
+        // Ensure we're still looking for the SAME phone number in this slot
+        if (updated[index] && updated[index].phone === phone) {
           if (foundRole === 'admin' || foundRole === 'super-admin') {
-            updatedSureties[index] = {
-              phone,
+            updated[index] = {
+              ...updated[index],
               name: '',
               found: false,
               searching: false,
               error: 'Admins cannot be used as sureties.',
             };
           } else {
-            updatedSureties[index] = {
-              phone,
-              name: response.data?.name || 'Found',
+            updated[index] = {
+              ...updated[index],
+              name: foundName || 'Member Found',
               found: true,
               searching: false,
             };
           }
-          setSureties(updatedSureties);
         }
-      } catch (err: any) {
-        const updatedSureties = [...sureties];
-        if (updatedSureties[index]?.phone === phone) {
-          updatedSureties[index] = {
-            phone,
+        return updated;
+      });
+    } catch (err: any) {
+      setSureties(prev => {
+        const updated = [...prev];
+        if (updated[index] && updated[index].phone === phone) {
+          updated[index] = {
+            ...updated[index],
             name: '',
             found: false,
             searching: false,
             error: 'Member not found with this number.',
           };
-          setSureties(updatedSureties);
         }
-      }
+        return updated;
+      });
+    }
     }
   };
 

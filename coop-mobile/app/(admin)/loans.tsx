@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { Loan, User } from '../../types';
@@ -34,6 +35,14 @@ export default function AdminLoans() {
   const [activeTab, setActiveTab] = useState<Tab>('active');
   const [selectedLoan, setSelectedLoan] = useState<ExtendedLoan | null>(null);
   const [isDetailsVisible, setIsDetailsVisible] = useState(false);
+
+  const { initialTab } = useLocalSearchParams<{ initialTab: Tab }>();
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const queryClient = useQueryClient();
 
