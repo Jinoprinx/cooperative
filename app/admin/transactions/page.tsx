@@ -240,7 +240,7 @@ export default function Transactions() {
                          <span className={`text-lg font-black tracking-tighter ${isCredit ? 'text-emerald-400 shadow-glow-sm' : 'text-white'} ${isRejected ? 'line-through decoration-red-500' : ''}`}>
                            {isCredit ? '+' : '-'} {formatCurrency(transaction.amount)}
                          </span>
-                         {(transaction.type === 'loan' || transaction.remainingAmount > 0) && (
+                         {(transaction.type === 'loan' || (transaction.remainingAmount || 0) > 0) && (
                            <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Bal: {formatCurrency(transaction.remainingAmount || 0)}</span>
                          )}
                        </div>
