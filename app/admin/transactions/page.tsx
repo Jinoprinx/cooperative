@@ -135,8 +135,8 @@ export default function Transactions() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
-          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p>Loading transactions...</p>
+          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-202 border-t-primary animate-spin"></div>
+          <p className="text-tertiary-text">Loading transactions...</p>
         </div>
       </div>
     );
@@ -147,24 +147,24 @@ export default function Transactions() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Ledger Operations</span>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
-            Transaction <span className="text-white/40">Feed</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-primary-text tracking-tighter">
+            Transaction <span className="text-tertiary-text">Feed</span>
           </h1>
         </div>
         <div className="flex items-center gap-3">
-           <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl p-1.5 gap-2">
+           <div className="flex items-center bg-surface border border-border rounded-2xl p-1.5 gap-2">
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="bg-transparent text-white text-[10px] font-black uppercase outline-none px-3 py-1.5 focus:text-primary transition-colors"
+                className="bg-transparent text-primary-text text-[10px] font-black uppercase outline-none px-3 py-1.5 focus:text-primary transition-colors"
               />
-              <span className="text-white/10 font-bold">/</span>
+              <span className="text-tertiary-text font-bold">/</span>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="bg-transparent text-white text-[10px] font-black uppercase outline-none px-3 py-1.5 focus:text-primary transition-colors"
+                className="bg-transparent text-primary-text text-[10px] font-black uppercase outline-none px-3 py-1.5 focus:text-primary transition-colors"
               />
               <button 
                 onClick={handleSearch} 
@@ -175,7 +175,7 @@ export default function Transactions() {
            </div>
            <button 
              onClick={() => { setStartDate(''); setEndDate(''); fetchData(); }} 
-             className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all"
+             className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface border border-border text-tertiary-text hover:text-primary-text transition-all"
              title="Clear Filters"
            >
              <FaSearch className="rotate-45" />
@@ -190,7 +190,7 @@ export default function Transactions() {
           placeholder="Search by member, description or type..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-3xl py-5 pl-16 pr-8 text-white text-sm focus:border-primary/50 outline-none transition-all placeholder:text-white/20 font-bold"
+          className="w-full bg-surface border border-border rounded-3xl py-5 pl-16 pr-8 text-primary-text text-sm focus:border-primary/50 outline-none transition-all placeholder:text-tertiary-text font-bold"
         />
       </div>
 
@@ -198,17 +198,17 @@ export default function Transactions() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-white/5 bg-white/3">
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Snapshot</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Account Holder</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-center">Protocol</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Value</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Description</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Status</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Actions</th>
+              <tr className="border-b border-border bg-surface">
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Snapshot</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Account Holder</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-center">Protocol</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Value</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Description</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Status</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border">
               {filteredTransactions.map((transaction) => {
                 const memberId = transaction.memberId || (typeof transaction.user === 'object' ? transaction.user?._id : transaction.user);
                 const member = members.find(m => m._id === memberId);
@@ -216,37 +216,37 @@ export default function Transactions() {
                 const isRejected = transaction.status === 'rejected';
 
                 return (
-                  <tr key={transaction._id} className={`group hover:bg-white/3 transition-colors ${isRejected ? 'opacity-40 grayscale' : ''}`}>
-                    <td className="px-8 py-6 text-[10px] font-black text-white/30 uppercase tracking-tighter whitespace-nowrap">
+                  <tr key={transaction._id} className={`group hover:bg-surface transition-colors ${isRejected ? 'opacity-40 grayscale' : ''}`}>
+                    <td className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-tighter whitespace-nowrap">
                        {formatDate(transaction.date || transaction.createdAt || '')}
                     </td>
                     <td className="px-8 py-6">
-                       <span className="font-bold text-white text-sm">
+                       <span className="font-bold text-primary-text text-sm">
                          {member ? `${member.firstName} ${member.lastName}` : (typeof transaction.user === 'object' ? `${transaction.user?.firstName} ${transaction.user?.lastName}` : 'Unknown')}
                        </span>
                     </td>
                     <td className="px-8 py-6 text-center">
                       <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                        transaction.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                        transaction.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
                         transaction.type === 'withdrawal' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
-                        transaction.type === 'loan' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' :
-                        'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                        transaction.type === 'loan' ? 'bg-purple-500/10 border-purple-500/20 text-purple-500' :
+                        'bg-blue-500/10 border-blue-500/20 text-blue-500'
                       }`}>
                         {transaction.type}
                       </span>
                     </td>
                     <td className="px-8 py-6">
                        <div className="flex flex-col">
-                         <span className={`text-lg font-black tracking-tighter ${isCredit ? 'text-emerald-400 shadow-glow-sm' : 'text-white'} ${isRejected ? 'line-through decoration-red-500' : ''}`}>
+                         <span className={`text-lg font-black tracking-tighter ${isCredit ? 'text-emerald-500 shadow-glow-sm' : 'text-primary-text'} ${isRejected ? 'line-through decoration-red-500' : ''}`}>
                            {isCredit ? '+' : '-'} {formatCurrency(transaction.amount)}
                          </span>
                          {(transaction.type === 'loan' || (transaction.remainingAmount || 0) > 0) && (
-                           <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Bal: {formatCurrency(transaction.remainingAmount || 0)}</span>
+                           <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest">Bal: {formatCurrency(transaction.remainingAmount || 0)}</span>
                          )}
                        </div>
                     </td>
                     <td className="px-8 py-6 max-w-[200px]">
-                       <p className={`text-xs text-white/40 font-medium truncate ${isRejected ? 'line-through decoration-white/10' : ''}`}>
+                       <p className={`text-xs text-tertiary-text font-medium truncate ${isRejected ? 'line-through decoration-border' : ''}`}>
                          {transaction.description || transaction.purpose}
                        </p>
                        {isRejected && transaction.rejectionReason && (
@@ -255,7 +255,7 @@ export default function Transactions() {
                     </td>
                     <td className="px-8 py-6">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                        transaction.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                        transaction.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
                         isRejected ? 'bg-red-500/10 border-red-500/20 text-red-500' :
                         'bg-amber-500/10 border-amber-500/20 text-amber-500'
                       }`}>
@@ -279,7 +279,7 @@ export default function Transactions() {
                          {transaction.status === 'pending' && (
                            <>
                              <button onClick={() => handleApproveTransaction(transaction._id)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all">
-                               <FaSearch className="h-4 w-4" /> {/* Use Check icon if preferred, but keeping flow */}
+                               <FaSearch className="h-4 w-4" />
                              </button>
                              <button onClick={() => openRejectModal(transaction._id)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all">
                                <FaSearch className="h-4 w-4 rotate-45" />
@@ -295,8 +295,8 @@ export default function Transactions() {
           </table>
         </div>
         {filteredTransactions.length === 0 && (
-          <div className="p-32 text-center bg-white/2">
-            <p className="text-white/20 text-sm font-black uppercase tracking-[0.4em]">No financial movements recorded</p>
+          <div className="p-32 text-center bg-surface">
+            <p className="text-tertiary-text text-sm font-black uppercase tracking-[0.4em]">No financial movements recorded</p>
           </div>
         )}
       </div>
@@ -304,14 +304,14 @@ export default function Transactions() {
       {showRejectModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowRejectModal(false)} />
-          <div className="relative glass-card p-10 rounded-[3rem] border border-red-500/20 w-full max-w-sm transform animate-float">
+          <div className="relative glass-card p-10 rounded-[3rem] border border-border w-full max-w-sm transform animate-float">
             <div className="mb-8 text-center">
-               <h3 className="text-2xl font-black text-white tracking-tighter mb-2">Flag Transaction</h3>
-               <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Protocol Rejection</p>
+               <h3 className="text-2xl font-black text-primary-text tracking-tighter mb-2">Flag Transaction</h3>
+               <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest">Protocol Rejection</p>
             </div>
             
             <textarea
-              className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white text-sm outline-none focus:border-red-500 transition-all font-bold resize-none mb-8"
+              className="w-full bg-surface border border-border rounded-2xl p-5 text-primary-text text-sm outline-none focus:border-red-500 transition-all font-bold resize-none mb-8"
               rows={4}
               placeholder="Specify rejection grounds..."
               value={rejectionReason}

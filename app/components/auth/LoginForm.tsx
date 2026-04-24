@@ -60,13 +60,13 @@ export default function LoginForm() {
 
       <div className="space-y-6">
         <div className="space-y-2 relative group/field">
-          <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Entry Credentials</span>
+          <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Entry Credentials</span>
           <div className="relative">
             <input
               id="credential"
               type="text"
               autoComplete="email"
-              className={`block w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 ${errors.credential ? 'border-red-500/50' : ''}`}
+              className={`block w-full bg-surface border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text ${errors.credential ? 'border-red-500/50' : ''}`}
               placeholder="Email or phone number"
               {...register('credential')}
             />
@@ -80,8 +80,8 @@ export default function LoginForm() {
 
         <div className="space-y-2 relative group/field">
           <div className="flex justify-between items-center absolute top-2 left-6 right-6 z-10">
-            <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Security Vector</span>
-            <Link href="/auth/forgot-password" title="Forgot Password" className="text-[8px] font-black text-white/20 hover:text-primary uppercase tracking-[0.2em] transition-colors">
+            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Security Vector</span>
+            <Link href="/auth/forgot-password" title="Forgot Password" className="text-[8px] font-black text-tertiary-text hover:text-primary uppercase tracking-[0.2em] transition-colors">
               Reset Key?
             </Link>
           </div>
@@ -90,7 +90,7 @@ export default function LoginForm() {
               id="password"
               type="password"
               autoComplete="current-password"
-              className={`block w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-10 text-white text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-white/10 tracking-[0.3em] ${errors.password ? 'border-red-500/50' : ''}`}
+              className={`block w-full bg-surface border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text tracking-[0.3em] ${errors.password ? 'border-red-500/50' : ''}`}
               placeholder="••••••••"
               {...register('password')}
             />
@@ -104,18 +104,18 @@ export default function LoginForm() {
       </div>
 
       <div className="flex items-center space-x-3 px-2">
-        <div className="relative">
+         <div className="relative">
           <input
             id="remember-me"
             name="remember-me"
             type="checkbox"
-            className="peer appearance-none h-5 w-5 rounded-lg border border-white/10 bg-white/5 checked:bg-primary checked:border-primary transition-all cursor-pointer"
+            className="peer appearance-none h-5 w-5 rounded-lg border border-border bg-surface checked:bg-primary checked:border-primary transition-all cursor-pointer"
           />
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
              <div className="w-2 h-2 rounded-full bg-white" />
           </div>
         </div>
-        <label htmlFor="remember-me" className="text-[10px] font-black text-white/30 uppercase tracking-widest cursor-pointer group-hover:text-white/60 transition-colors">
+        <label htmlFor="remember-me" className="text-[10px] font-black text-tertiary-text uppercase tracking-widest cursor-pointer hover:text-secondary-text transition-colors">
           Keep me signed in
         </label>
       </div>

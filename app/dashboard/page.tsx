@@ -8,8 +8,6 @@ import PayNowButton from '../components/PayNowButton';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-//const PayNowButton = dynamic(() => import('@/app/components/PayNowButton'), { ssr: false });
-
 interface Notification {
   _id: string;
   message: string;
@@ -19,7 +17,7 @@ interface Notification {
 
 export default function Dashboard() {
   const { user, loading: userLoading, error: userError } = useUser();
-  const { transactions, activeLoan, summary, loading: dataLoading, error: dataError, refetch } = useDashboardData();
+  const { transactions, activeLoan, summary, loading: dataLoading, error: dataError } = useDashboardData();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifLoading, setNotifLoading] = useState(true);
 
@@ -60,8 +58,8 @@ export default function Dashboard() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
-          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p className="text-black">Loading dashboard...</p>
+          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-202 border-t-primary animate-spin"></div>
+          <p className="text-tertiary-text">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -70,7 +68,7 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500 font-bold">{error}</p>
       </div>
     );
   }
@@ -95,14 +93,14 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Personal Ledger</span>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
-            Member <span className="text-white/40">Hub</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-primary-text tracking-tighter">
+            Member <span className="text-tertiary-text">Hub</span>
           </h1>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-end">
-            <span className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Status</span>
-            <span className="text-emerald-400 text-xs font-bold flex items-center gap-1.5">
+            <span className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Status</span>
+            <span className="text-emerald-500 text-xs font-bold flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Active Member
             </span>
@@ -118,7 +116,7 @@ export default function Dashboard() {
                <div className={`absolute inset-0 opacity-10 blur-xl group-hover:opacity-20 transition-opacity ${
                  notification.type === 'success' ? 'bg-emerald-500' : notification.type === 'alert' ? 'bg-amber-500' : 'bg-primary'
                }`} />
-               <div className={`relative flex items-center justify-between p-6 glass-card rounded-[2rem] border-l-4 ${
+               <div className={`relative flex items-center justify-between p-6 glass-card border border-border rounded-[2rem] border-l-4 ${
                  notification.type === 'success' ? 'border-emerald-500' : notification.type === 'alert' ? 'border-amber-500' : 'border-primary'
                }`}>
                 <div className="flex items-center gap-4">
@@ -129,11 +127,11 @@ export default function Dashboard() {
                   }`}>
                     <FaBell className="h-5 w-5" />
                   </div>
-                  <p className="text-sm font-bold text-white/90">{notification.message}</p>
+                  <p className="text-sm font-bold text-primary-text">{notification.message}</p>
                 </div>
                 <button
                   onClick={() => markNotificationAsRead(notification._id)}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all"
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface border border-border text-tertiary-text hover:text-primary-text transition-all"
                 >
                   <FaTimes className="h-4 w-4" />
                 </button>
@@ -145,30 +143,30 @@ export default function Dashboard() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Account Balance Card */}
-        <div className="card-premium group relative overflow-hidden">
+        <div className="card-premium group relative overflow-hidden bg-surface">
           <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
           <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Savings Balance</p>
-              <h3 className="text-3xl font-black text-white tracking-tighter shadow-glow-sm">{formatCurrency(user?.accountBalance || 0)}</h3>
+              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Savings Balance</p>
+              <h3 className="text-3xl font-black text-primary-text tracking-tighter shadow-glow-sm">{formatCurrency(user?.accountBalance || 0)}</h3>
             </div>
             <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
               <FaMoneyBillWave className="h-6 w-6" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-white/20 text-[10px] font-black uppercase tracking-widest mb-1">Account Identifier</span>
-            <p className="text-sm font-mono font-bold text-white/60 tracking-wider">{user?.accountNumber}</p>
+            <span className="text-tertiary-text/40 text-[10px] font-black uppercase tracking-widest mb-1">Account Identifier</span>
+            <p className="text-sm font-mono font-bold text-secondary-text tracking-wider">{user?.accountNumber}</p>
           </div>
         </div>
 
         {/* Loan Summary Card */}
         {activeLoan ? (
-          <div className="card-premium group relative overflow-hidden border-red-500/20">
+          <div className="card-premium group relative overflow-hidden bg-surface border-red-500/20">
             <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-red-500/10 rounded-full blur-3xl group-hover:bg-red-500/20 transition-all duration-700" />
             <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Outstanding Loan</p>
+                <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Outstanding Loan</p>
                 <h3 className="text-3xl font-black text-red-500 tracking-tighter">{formatCurrency(activeLoan.remainingAmount)}</h3>
               </div>
               <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform duration-500">
@@ -178,22 +176,22 @@ export default function Dashboard() {
             <div className="space-y-4">
               <div className="flex justify-between items-end">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">Next Payment Due</span>
-                  <span className="text-sm font-bold text-white/80">{activeLoan.nextPaymentDate ? formatDate(activeLoan.nextPaymentDate) : 'N/A'}</span>
+                  <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest mb-1">Next Payment Due</span>
+                  <span className="text-sm font-bold text-secondary-text">{activeLoan.nextPaymentDate ? formatDate(activeLoan.nextPaymentDate) : 'N/A'}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">Amount Due</span>
-                  <p className="text-sm font-black text-white">{formatCurrency(activeLoan.monthlyPayment)}</p>
+                  <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest mb-1">Amount Due</span>
+                  <p className="text-sm font-black text-primary-text">{formatCurrency(activeLoan.monthlyPayment)}</p>
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-surface-lighter rounded-full overflow-hidden border border-border">
                   <div
-                    className="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-1000"
+                    className="h-full bg-red-500 rounded-full transition-all duration-1000"
                     style={{ width: `${(activeLoan.amountPaid / activeLoan.totalRepayment) * 100}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-white/20">
+                <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-tertiary-text">
                   <span>Paid: {formatCurrency(activeLoan.amountPaid)}</span>
                   <span>Total: {formatCurrency(activeLoan.totalRepayment)}</span>
                 </div>
@@ -202,45 +200,45 @@ export default function Dashboard() {
             </div>
           </div>
         ) : (
-          <div className="card-premium group relative overflow-hidden border-emerald-500/20 flex flex-col justify-center items-center text-center">
+          <div className="card-premium group relative overflow-hidden bg-surface border-emerald-500/20 flex flex-col justify-center items-center text-center">
              <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 mb-4">
                 <FaHandHoldingUsd className="h-8 w-8" />
              </div>
-             <p className="text-white font-bold text-sm mb-1">No Active Loans</p>
-             <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Apply for funding today</p>
-             <Link href="/dashboard/loans" className="mt-6 btn-primary bg-emerald-600 hover:bg-emerald-500 px-8 text-xs py-2 shadow-none">Get Started</Link>
+             <p className="text-primary-text font-bold text-sm mb-1">No Active Loans</p>
+             <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest">Apply for funding today</p>
+             <Link href="/dashboard/loans" className="mt-6 btn-primary bg-emerald-600 hover:bg-emerald-500 px-8 text-xs py-2 shadow-none border-none">Get Started</Link>
           </div>
         )}
 
         {/* Activity Summary Card */}
-        <div className="card-premium group relative overflow-hidden">
+        <div className="card-premium group relative overflow-hidden bg-surface">
           <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all duration-700" />
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-[10px] font-black text-white/40 uppercase tracking-widest">Quick Snapshot</h2>
+            <h2 className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Quick Snapshot</h2>
             <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500">
               <FaHistory className="h-5 w-5" />
             </div>
           </div>
           <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+            <div className="flex items-center justify-between p-4 bg-surface-lighter rounded-2xl border border-border">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/10">
                   <FaArrowUp className="h-3 w-3" />
                 </div>
-                <span className="text-xs font-bold text-white/60">Last Deposit</span>
+                <span className="text-xs font-bold text-secondary-text">Last Deposit</span>
               </div>
-              <span className="text-sm font-black text-emerald-400">{formatCurrency(summary.lastDepositAmount || 0)}</span>
+              <span className="text-sm font-black text-emerald-500">{formatCurrency(summary.lastDepositAmount || 0)}</span>
             </div>
-            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+            <div className="flex items-center justify-between p-4 bg-surface-lighter rounded-2xl border border-border">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/10">
                   <FaArrowDown className="h-3 w-3" />
                 </div>
-                <span className="text-xs font-bold text-white/60">Debt Exposure</span>
+                <span className="text-xs font-bold text-secondary-text">Debt Exposure</span>
               </div>
-              <span className="text-sm font-black text-red-400">{activeLoan ? formatCurrency(activeLoan.remainingAmount) : formatCurrency(0)}</span>
+              <span className="text-sm font-black text-red-500">{activeLoan ? formatCurrency(activeLoan.remainingAmount) : formatCurrency(0)}</span>
             </div>
-            <Link href="/dashboard/transactions" className="block text-center text-[10px] font-black text-primary hover:text-white uppercase tracking-widest transition-colors">See Complete History</Link>
+            <Link href="/dashboard/transactions" className="block text-center text-[10px] font-black text-primary hover:text-primary-text uppercase tracking-widest transition-colors">See Complete History</Link>
           </div>
         </div>
       </div>
@@ -248,19 +246,19 @@ export default function Dashboard() {
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Recent Transactions Feed */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="card-premium p-0 overflow-hidden">
-            <div className="p-8 border-b border-white/5 flex items-center justify-between">
+          <div className="card-premium p-0 overflow-hidden bg-surface">
+            <div className="p-8 border-b border-border flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-black text-white tracking-tight">Financial Feed</h2>
-                <p className="text-white/40 text-xs font-medium uppercase tracking-widest mt-1">Transaction Stream</p>
+                <h2 className="text-2xl font-black text-primary-text tracking-tight">Financial Feed</h2>
+                <p className="text-tertiary-text text-xs font-medium uppercase tracking-widest mt-1">Transaction Stream</p>
               </div>
-              <Link href="/dashboard/transactions" className="btn-secondary px-6 py-2 text-xs">Full History</Link>
+              <Link href="/dashboard/transactions" className="btn-secondary px-6 py-2 text-xs border border-border">Full History</Link>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-border">
               {transactions.slice(0, 5).map((transaction) => {
                 const isCredit = ['deposit', 'loan_disbursement'].includes(transaction.type);
                 return (
-                  <div key={transaction._id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                  <div key={transaction._id} className="p-6 flex items-center justify-between hover:bg-surface-lighter transition-colors group">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${
                         isCredit 
@@ -272,7 +270,7 @@ export default function Dashboard() {
                          <FaArrowDown className="h-5 w-5" />}
                       </div>
                       <div>
-                        <p className="font-bold text-white group-hover:text-primary transition-colors">{transaction.description}</p>
+                        <p className="font-bold text-primary-text group-hover:text-primary transition-colors">{transaction.description}</p>
                         <div className="flex items-center gap-2 mt-1">
                           <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full border uppercase tracking-widest ${
                             transaction.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
@@ -281,12 +279,12 @@ export default function Dashboard() {
                           }`}>
                             {transaction.type.replace('_', ' ')}
                           </span>
-                          <span className="text-[10px] text-white/30 font-bold">{formatDate(transaction.date)}</span>
+                          <span className="text-[10px] text-tertiary-text font-bold">{formatDate(transaction.date)}</span>
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`text-lg font-black tracking-tighter ${isCredit ? 'text-emerald-400 shadow-glow-sm' : 'text-white/80'}`}>
+                      <p className={`text-lg font-black tracking-tighter ${isCredit ? 'text-emerald-500 shadow-glow-sm' : 'text-primary-text'}`}>
                         {isCredit ? '+' : '-'} {formatCurrency(transaction.amount)}
                       </p>
                     </div>
@@ -294,7 +292,7 @@ export default function Dashboard() {
                 );
               })}
               {transactions.length === 0 && (
-                <div className="p-12 text-center text-white/20 italic text-sm font-medium">No recorded movements found.</div>
+                <div className="p-12 text-center text-tertiary-text italic text-sm font-medium">No recorded movements found.</div>
               )}
             </div>
           </div>
@@ -302,46 +300,46 @@ export default function Dashboard() {
 
         {/* Quick Actions Sidebar */}
         <div className="space-y-8">
-          <div className="card-premium bg-gradient-to-br from-primary/20 to-transparent border-primary/20 p-8">
-            <h2 className="text-xl font-black text-white tracking-tighter mb-6">Payment Core</h2>
-            <div className="p-1 bg-white/5 rounded-[2.5rem] border border-white/10 mb-8">
+          <div className="card-premium bg-surface border-border p-8">
+            <h2 className="text-xl font-black text-primary-text tracking-tighter mb-6 underline decoration-primary/30 decoration-4 underline-offset-8">Payment Core</h2>
+            <div className="p-1 bg-surface-lighter rounded-[2.5rem] border border-border mb-8 shadow-inner">
                <PayNowButton />
             </div>
             <div className="space-y-4">
-               <Link href="/dashboard/loans" className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/5 hover:border-primary/30 group transition-all duration-300">
+               <Link href="/dashboard/loans" className="flex items-center gap-4 p-4 bg-surface-lighter rounded-3xl border border-border hover:border-primary/30 group transition-all duration-300">
                   <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
                     <FaHandHoldingUsd className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-white leading-none mb-1">Apply for Loan</p>
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Growth Capital</p>
+                    <p className="text-sm font-bold text-primary-text leading-none mb-1">Apply for Loan</p>
+                    <p className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Growth Capital</p>
                   </div>
                </Link>
-               <Link href="/dashboard/account" className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/5 hover:border-emerald-500/30 group transition-all duration-300">
+               <Link href="/dashboard/account" className="flex items-center gap-4 p-4 bg-surface-lighter rounded-3xl border border-border hover:border-emerald-500/30 group transition-all duration-300">
                   <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all">
                     <FaArrowUp className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-white leading-none mb-1">Auto-Payment</p>
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Set & Forget</p>
+                    <p className="text-sm font-bold text-primary-text leading-none mb-1">Auto-Payment</p>
+                    <p className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Set & Forget</p>
                   </div>
                </Link>
-               <Link href="/dashboard/account" className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/5 hover:border-purple-500/30 group transition-all duration-300">
+               <Link href="/dashboard/account" className="flex items-center gap-4 p-4 bg-surface-lighter rounded-3xl border border-border hover:border-purple-500/30 group transition-all duration-300">
                   <div className="w-10 h-10 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition-all">
                     <FaUserCircle className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-white leading-none mb-1">Account Secure</p>
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Verify Details</p>
+                    <p className="text-sm font-bold text-primary-text leading-none mb-1">Account Secure</p>
+                    <p className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Verify Details</p>
                   </div>
                </Link>
             </div>
           </div>
 
-          <div className="glass-card p-8 rounded-[2.5rem] border border-white/5 text-center">
-            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">Support Hub</p>
-            <p className="text-sm font-medium text-white/60 mb-6">Need assistance with your financial records?</p>
-            <Link href="mailto:support@coop.com" className="btn-secondary w-full py-3 text-xs tracking-widest font-black rounded-2xl block">Contact Desk</Link>
+          <div className="glass-card p-8 rounded-[2.5rem] border border-border text-center bg-surface">
+            <p className="text-[10px] font-black text-tertiary-text uppercase tracking-[0.4em] mb-4">Support Hub</p>
+            <p className="text-sm font-medium text-secondary-text mb-6">Need assistance with your financial records?</p>
+            <Link href="mailto:support@coop.com" className="btn-secondary w-full py-3 text-xs tracking-widest font-black rounded-2xl block border border-border">Contact Desk</Link>
           </div>
         </div>
       </div>

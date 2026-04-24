@@ -70,7 +70,7 @@ export default function TenantSelectPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#030711] relative overflow-hidden">
+        <div className="min-h-screen bg-background relative overflow-hidden transition-colors duration-300">
             {/* Dynamic Background */}
             <div className="absolute inset-0 z-0">
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#3b82f615,transparent)]" />
@@ -85,7 +85,7 @@ export default function TenantSelectPage() {
             <main className="container mx-auto px-4 pt-32 pb-20 max-w-2xl relative z-10">
                 <Link
                     href="/"
-                    className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] text-white/30 hover:text-primary transition-all mb-8 group"
+                    className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] text-tertiary-text hover:text-primary transition-all mb-8 group"
                 >
                     <FaBuilding className="text-[10px] transition-transform group-hover:-translate-y-0.5" />
                     Return Home
@@ -100,10 +100,10 @@ export default function TenantSelectPage() {
                         <FaBuilding className="text-2xl text-primary" />
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-6 leading-none">
+                    <h1 className="text-5xl md:text-7xl font-black text-primary-text tracking-tighter mb-6 leading-none">
                         Locate your <span className="text-primary italic">Society.</span>
                     </h1>
-                    <p className="text-sm text-white/30 font-black uppercase tracking-[0.2em] mb-12 max-w-md">
+                    <p className="text-sm text-secondary-text font-black uppercase tracking-[0.2em] mb-12 max-w-md">
                         Enter your cooperative name to establish connection.
                     </p>
 
@@ -111,14 +111,14 @@ export default function TenantSelectPage() {
                         <form onSubmit={handleSearch}>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-8 flex items-center pointer-events-none z-10">
-                                    <FaSearch className="text-white/20 group-focus-within/search:text-primary transition-colors" />
+                                    <FaSearch className="text-tertiary-text group-focus-within/search:text-primary transition-colors" />
                                 </div>
                                 <input
                                     type="text"
                                     placeholder="Search by name or subdomain"
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
-                                    className="w-full bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-3xl py-7 pl-16 pr-36 text-white text-sm font-bold focus:outline-none focus:border-primary/50 transition-all shadow-2xl placeholder:text-white/10"
+                                    className="w-full bg-surface/50 backdrop-blur-3xl border border-border rounded-3xl py-7 pl-16 pr-36 text-primary-text text-sm font-bold focus:outline-none focus:border-primary/50 transition-all shadow-2xl placeholder:text-tertiary-text"
                                 />
                                 <button
                                     type="submit"
@@ -131,10 +131,10 @@ export default function TenantSelectPage() {
                         </form>
                     </div>
 
-                    <div className="flex items-center justify-center gap-6 my-12 opacity-30">
-                        <div className="h-px bg-white/10 flex-1"></div>
-                        <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/50">Connectivity Options</span>
-                        <div className="h-px bg-white/10 flex-1"></div>
+                    <div className="flex items-center justify-center gap-6 my-12 opacity-50">
+                        <div className="h-px bg-border flex-1"></div>
+                        <span className="text-[8px] font-black uppercase tracking-[0.4em] text-tertiary-text">Connectivity Options</span>
+                        <div className="h-px bg-border flex-1"></div>
                     </div>
 
                     <button
@@ -157,7 +157,7 @@ export default function TenantSelectPage() {
 
                             window.location.href = `${protocol}//${mainDomain}${port}/auth/register`;
                         }}
-                        className="group relative w-full py-6 mb-12 bg-white/[0.01] border border-white/5 text-white/30 text-[10px] font-black uppercase tracking-[0.4em] rounded-2xl hover:bg-white/[0.03] hover:text-white hover:border-primary/20 transition-all duration-500 overflow-hidden"
+                        className="group relative w-full py-6 mb-12 bg-surface/30 border border-border text-secondary-text text-[10px] font-black uppercase tracking-[0.4em] rounded-2xl hover:bg-surface hover:text-primary-text hover:border-primary/20 transition-all duration-500 overflow-hidden"
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                         Initialize a New Cooperative Portal
@@ -172,10 +172,10 @@ export default function TenantSelectPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.1 }}
                                     onClick={() => handleSelect(t)}
-                                    className="w-full p-8 bg-white/[0.02] border border-white/5 rounded-[2.5rem] flex items-center justify-between group hover:bg-white/[0.04] hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 overflow-hidden relative"
+                                    className="w-full p-8 bg-surface border border-border rounded-[2.5rem] flex items-center justify-between group hover:bg-surface-lighter hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 overflow-hidden relative"
                                 >
                                     <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition-opacity">
-                                        <FaBuilding className="text-7xl text-white" />
+                                        <FaBuilding className="text-7xl text-primary-text" />
                                     </div>
 
                                     <div className="flex items-center gap-6 relative z-10">
@@ -185,22 +185,22 @@ export default function TenantSelectPage() {
                                             </span>
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-black text-white group-hover:text-primary transition-colors tracking-tighter">
+                                            <h3 className="text-xl font-black text-primary-text group-hover:text-primary transition-colors tracking-tighter">
                                                 {t.name}
                                             </h3>
-                                            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-1">
+                                            <p className="text-[10px] font-black text-tertiary-text uppercase tracking-[0.2em] mt-1">
                                                 {t.subdomain}<span className="text-primary/30">.coop.io</span>
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary transition-all duration-500 relative z-10">
-                                        <FaArrowRight className="text-white/20 group-hover:text-white transition-all text-sm group-hover:translate-x-1" />
+                                    <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center group-hover:bg-primary transition-all duration-500 relative z-10">
+                                        <FaArrowRight className="text-tertiary-text group-hover:text-white transition-all text-sm group-hover:translate-x-1" />
                                     </div>
                                 </motion.button>
                             ))
                         ) : query && !loading ? (
                             <div className="text-center py-16 animate-fade-in">
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">No matching societies found in registry</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-tertiary-text">No matching societies found in registry</p>
                             </div>
                         ) : null}
                     </div>

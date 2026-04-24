@@ -80,20 +80,31 @@ export default function PendingPaymentsPage() {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="text-center">
+          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-202 border-t-primary animate-spin"></div>
+          <p className="text-tertiary-text">Verifying Protocols...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-red-500 font-bold">{error}</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-10 pb-20 text-white">
+    <div className="space-y-10 pb-20 text-primary-text">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Verification Protocol</span>
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter">
-            Pending <span className="text-white/40">Inbound</span>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-primary-text">
+            Pending <span className="text-tertiary-text">Inbound</span>
           </h1>
         </div>
       </div>
@@ -102,31 +113,31 @@ export default function PendingPaymentsPage() {
         <div className="overflow-x-auto min-h-[400px]">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-white/5 bg-white/3">
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Protocol Date</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Account Holder</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Description</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Value (NGN)</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Actions</th>
+              <tr className="border-b border-border bg-surface">
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Protocol Date</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Account Holder</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Description</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Value (NGN)</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border">
               {transactions.map((transaction) => (
-                <tr key={transaction._id} className="group hover:bg-white/3 transition-colors">
+                <tr key={transaction._id} className="group hover:bg-surface transition-colors">
                   <td className="px-8 py-6 whitespace-nowrap">
-                     <span className="text-xs font-bold text-white/60">{new Date(transaction.date).toLocaleDateString()}</span>
+                     <span className="text-xs font-bold text-tertiary-text">{new Date(transaction.date).toLocaleDateString()}</span>
                   </td>
                   <td className="px-8 py-6">
                      <div className="flex flex-col">
-                       <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">{transaction.user.firstName} {transaction.user.lastName}</span>
-                       <span className="text-[10px] font-medium text-white/20 truncate max-w-[200px]">{transaction.user.email}</span>
+                       <span className="text-sm font-bold text-primary-text group-hover:text-primary transition-colors">{transaction.user.firstName} {transaction.user.lastName}</span>
+                       <span className="text-[10px] font-medium text-tertiary-text truncate max-w-[200px]">{transaction.user.email}</span>
                      </div>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-xs font-medium text-white/70 max-w-[150px] truncate">{transaction.description}</p>
+                    <p className="text-xs font-medium text-secondary-text max-w-[150px] truncate">{transaction.description}</p>
                   </td>
                   <td className="px-8 py-6 text-right">
-                     <span className="text-lg font-black tracking-tighter text-emerald-400 shadow-glow-sm">
+                     <span className="text-lg font-black tracking-tighter text-emerald-500 shadow-glow-sm">
                        {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(transaction.amount)}
                      </span>
                   </td>
@@ -138,11 +149,11 @@ export default function PendingPaymentsPage() {
                        >
                          Doc
                        </button>
-                       <div className="flex gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
+                       <div className="flex gap-2 p-1 bg-surface rounded-xl border border-border">
                           <button onClick={() => handleApprove(transaction._id)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all">
                              <div className="w-2.5 h-2.5 border-b-2 border-r-2 border-current rotate-45 mb-1" />
                           </button>
-                          <button onClick={() => handleReject(transaction._id)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                          <button onClick={() => handleReject(transaction._id)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all relative">
                              <div className="w-3 h-0.5 bg-current rotate-45 absolute" />
                              <div className="w-3 h-0.5 bg-current -rotate-45 absolute" />
                           </button>
@@ -153,8 +164,8 @@ export default function PendingPaymentsPage() {
               ))}
               {transactions.length === 0 && (
                 <tr>
-                   <td colSpan={5} className="py-24 text-center bg-white/2">
-                      <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em] italic">No pending inbound protocols</p>
+                   <td colSpan={5} className="py-24 text-center bg-surface">
+                      <p className="text-tertiary-text text-[10px] font-black uppercase tracking-[0.4em] italic">No pending inbound protocols</p>
                    </td>
                 </tr>
               )}

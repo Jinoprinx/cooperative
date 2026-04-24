@@ -3,19 +3,25 @@
 @tailwind utilities;
 
 :root {
-  /* Default Dark Mode Variables */
+  /* Default Theme Variables (mapped to Dark Mode for backward compatibility) */
   --foreground-rgb: 255, 255, 255;
   --background-rgb: 5, 5, 5;
+  
   --primary-color: #3b82f6;
   --primary-dark-color: #1d4ed8;
   --primary-light-color: #60a5fa;
   --secondary-color: #10b981;
   --accent-color: #f59e0b;
 
+  /* Semantic Variables - Dark (Base) */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-muted: rgba(255, 255, 255, 0.2);
+
   --surface-color: #111111;
   --surface-hover: #1a1a1a;
   --border-color: rgba(255, 255, 255, 0.08);
-  /* Default border for dark */
 
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-bg: rgba(255, 255, 255, 0.03);
@@ -24,54 +30,41 @@
   --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.1) 0px, transparent 50%);
 }
 
-/* Explicit Dark Theme Overrides (if needed beyond root) */
-:root[data-theme='dark'] {
+/* Explicit Dark Theme Overrides */
+[data-theme='dark'] {
   --foreground-rgb: 255, 255, 255;
   --background-rgb: 5, 5, 5;
-
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-secondary: rgba(255, 255, 255, 0.8);
   --text-tertiary: rgba(255, 255, 255, 0.5);
-
-  --surface-color: #111111;
-  --surface-hover: #1a1a1a;
-  --border-color: rgba(255, 255, 255, 0.08);
-
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --text-muted: rgba(255, 255, 255, 0.25);
+  --surface-color: #0a0a0a;
+  --surface-hover: #161616;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.12);
   --glass-bg: rgba(255, 255, 255, 0.03);
-  --shadow-color: rgba(0, 0, 0, 0.36);
-  --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.1) 0px, transparent 50%);
+  --shadow-color: rgba(0, 0, 0, 0.4);
 }
 
 /* Light Theme (White Luxury) */
-:root[data-theme='light'] {
+[data-theme='light'] {
   --foreground-rgb: 15, 23, 42;
-  /* Darker Slate - High Contrast */
   --background-rgb: 255, 255, 255;
-  /* Pure White */
 
-  --text-primary: #0f172a;
-  /* Deep, sharp dark blue/grey */
-  --text-secondary: #334155;
-  /* Readable secondary text */
-  --text-tertiary: #64748b;
+  --text-primary: #0f172a; /* Deep Slate */
+  --text-secondary: #475569; /* Slate 600 */
+  --text-tertiary: #94a3b8; /* Slate 400 */
+  --text-muted: #cbd5e1; /* Slate 300 */
 
-  --surface-color: #ffffff;
-  --surface-hover: #f8fafc;
-  /* Very subtle grey */
+  --surface-color: #f8fafc; /* Slate 50 */
+  --surface-hover: #f1f5f9; /* Slate 100 */
+  --border-color: #e2e8f0; /* Slate 200 */
 
-  --border-color: #e2e8f0;
-  /* Crisp light grey border */
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --shadow-color: rgba(148, 163, 184, 0.12);
 
-  --glass-border: rgba(0, 0, 0, 0.06);
-  /* Simpler, cleaner glass border */
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  /* More opaque, frosted glass */
-  --shadow-color: rgba(148, 163, 184, 0.15);
-  /* Colored shadow for premium feel */
-
-  /* Adjusted mesh for light mode - subtle and airy */
-  --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.03) 0px, transparent 50%);
+  --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.04) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.04) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.02) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.02) 0px, transparent 50%);
 }
 
 @layer base {
@@ -80,20 +73,9 @@
     background-color: rgb(var(--background-rgb));
     color: var(--text-primary);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
-    font-display: swap;
   }
 
-  ::selection {
-    background-color: var(--primary-color);
-    color: white;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-tight;
     color: var(--text-primary);
   }

@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import AuthLayout from '@/app/components/auth/AuthLayout';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -34,7 +34,6 @@ export default function AdminLogin() {
 
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, data);
-
       const token = response.data.token;
       localStorage.setItem('token', token);
       router.push('/admin/dashboard');
@@ -46,79 +45,63 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold tracking-tight text-primary">
-            Admin Login
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link href="/admin/auth/register" className="font-medium text-secondary hover:text-secondary-dark">
-              Register
-            </Link>
-          </p>
+    <AuthLayout
+      title="Admin Login"
+      subtitle="Access administrative console"
+      linkText="Register"
+      linkHref="/admin/auth/register"
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {error && (
+          <div className="rounded-2xl bg-red-500/10 border border-red-500/20 p-4 animate-shake">
+            <div className="text-xs font-black uppercase tracking-widest text-red-500 text-center">{error}</div>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div className="relative group/field">
+            <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Credential ID</span>
+            <input
+              type="email"
+              autoComplete="email"
+              className={`w-full bg-surface border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold ${
+                errors.email ? 'border-red-500/50' : 'border-border'
+              }`}
+              placeholder="Email address"
+              {...register('email')}
+            />
+            {errors.email && (
+              <p className="mt-1 text-[10px] font-black text-red-500 uppercase tracking-widest ml-4">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="relative group/field">
+            <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Access Vector</span>
+            <input
+              type="password"
+              autoComplete="current-password"
+              className={`w-full bg-surface border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold ${
+                errors.password ? 'border-red-500/50' : 'border-border'
+              }`}
+              placeholder="Password"
+              {...register('password')}
+            />
+            {errors.password && (
+              <p className="mt-1 text-[10px] font-black text-red-500 uppercase tracking-widest ml-4">{errors.password.message}</p>
+            )}
+          </div>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <div className="text-sm text-red-700">{error}</div>
-              </div>
-            </div>
-          )}
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                className={`relative block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ${
-                  errors.email ? 'ring-red-300' : 'ring-gray-300'
-                } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-                placeholder="Email address"
-                {...register('email')}
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                className={`relative block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ${
-                  errors.password ? 'ring-red-300' : 'ring-gray-300'
-                } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-                placeholder="Password"
-                {...register('password')}
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            >
-              {loading ? 'Logging in...' : 'Log in'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full btn-primary py-5 rounded-2xl text-xs font-black uppercase tracking-[0.4em] shadow-none border-none disabled:opacity-50"
+          >
+            {loading ? 'Authenticating...' : 'Initiate Login'}
+          </button>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

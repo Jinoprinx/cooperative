@@ -125,8 +125,8 @@ export default function AdminDashboard() {
     return (
       <div className="flex h-64 items-center justify-center">
           <div className="text-center">
-          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p className="text-white/40 font-medium tracking-widest uppercase text-xs">Initializing Intelligence...</p>
+          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-202 border-t-primary animate-spin"></div>
+          <p className="text-tertiary-text font-medium tracking-widest uppercase text-xs">Initializing Intelligence...</p>
         </div>
       </div>
     );
@@ -376,11 +376,11 @@ export default function AdminDashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Executive Overview</span>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
-            Admin <span className="text-white/40">Dashboard</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-primary-text tracking-tighter">
+            Admin <span className="text-tertiary-text">Dashboard</span>
           </h1>
         </div>
-        <div className="flex items-center gap-2 text-white/40 text-xs font-bold bg-white/5 px-4 py-2 rounded-full border border-white/10">
+        <div className="flex items-center gap-2 text-tertiary-text text-xs font-bold bg-surface px-4 py-2 rounded-full border border-border">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           System Live
         </div>
@@ -393,7 +393,7 @@ export default function AdminDashboard() {
           </div>
           <div className="flex-1">
             <h3 className="text-amber-500 font-black text-sm uppercase tracking-widest mb-1">Security Alert</h3>
-            <p className="text-white/70 text-sm font-medium">
+            <p className="text-secondary-text text-sm font-medium">
               You have not set an account balance PIN yet.{' '}
               <Link href="/admin/settings" className="text-amber-500 underline font-bold hover:text-amber-400">
                 Go to settings to set your 4-digit PIN
@@ -413,15 +413,15 @@ export default function AdminDashboard() {
               <FaUsers className="h-6 w-6 text-blue-500" />
             </div>
             <div>
-              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Total Members</p>
-              <h3 className="text-3xl font-black text-white tracking-tighter">{stats?.totalMembers || 0}</h3>
+              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Total Members</p>
+              <h3 className="text-3xl font-black text-primary-text tracking-tighter">{stats?.totalMembers || 0}</h3>
             </div>
           </div>
           <div className="flex items-center justify-between text-xs mb-2">
-            <span className="text-white/40 font-bold">Active Members</span>
-            <span className="text-emerald-400 font-black">{stats?.activeMembers || 0}</span>
+            <span className="text-tertiary-text font-bold">Active Members</span>
+            <span className="text-emerald-500 font-black">{stats?.activeMembers || 0}</span>
           </div>
-          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+          <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-1000" 
               style={{ width: `${((stats?.activeMembers || 0) / (stats?.totalMembers || 1)) * 100}%` }}
@@ -434,8 +434,8 @@ export default function AdminDashboard() {
           <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all duration-700" />
           {!isMainAdmin ? (
             <div className="flex flex-col items-center justify-center py-6 text-center">
-              <FaLock className="h-8 w-8 text-white/20 mb-3" />
-              <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.2em]">Restricted View</p>
+              <FaLock className="h-8 w-8 text-tertiary-text mb-3" />
+              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-[0.2em]">Restricted View</p>
             </div>
           ) : !isUnlocked ? (
             <button
@@ -450,22 +450,22 @@ export default function AdminDashboard() {
           ) : (
             <>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Total Liquidity</p>
-                <button onClick={() => setIsUnlocked(false)} className="text-white/20 hover:text-white transition-colors">
+                <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest">Total Liquidity</p>
+                <button onClick={() => setIsUnlocked(false)} className="text-tertiary-text hover:text-primary-text transition-colors">
                   <FaLockOpen className="h-3 w-3" />
                 </button>
               </div>
-              <h3 className="text-2xl font-black text-white tracking-tighter mb-6 break-words">
+              <h3 className="text-2xl font-black text-primary-text tracking-tighter mb-6 break-words">
                 {formatCurrency(stats?.totalBalance || 0)}
               </h3>
               <div className="grid grid-cols-2 gap-2">
-                <div className="bg-white/5 p-2 rounded-xl border border-white/5">
-                  <span className="text-[8px] font-black text-white/30 uppercase tracking-tighter">Deposits</span>
-                  <p className="text-[10px] font-bold text-emerald-400 truncate">{formatCurrency(stats?.totalDeposits || 0)}</p>
+                <div className="bg-surface p-2 rounded-xl border border-border">
+                  <span className="text-[8px] font-black text-tertiary-text uppercase tracking-tighter">Deposits</span>
+                  <p className="text-[10px] font-bold text-emerald-500 truncate">{formatCurrency(stats?.totalDeposits || 0)}</p>
                 </div>
-                <div className="bg-white/5 p-2 rounded-xl border border-white/5">
-                  <span className="text-[8px] font-black text-white/30 uppercase tracking-tighter">Withdrawals</span>
-                  <p className="text-[10px] font-bold text-red-400 truncate">{formatCurrency(stats?.totalWithdrawals || 0)}</p>
+                <div className="bg-surface p-2 rounded-xl border border-border">
+                  <span className="text-[8px] font-black text-tertiary-text uppercase tracking-tighter">Withdrawals</span>
+                  <p className="text-[10px] font-bold text-red-500 truncate">{formatCurrency(stats?.totalWithdrawals || 0)}</p>
                 </div>
               </div>
             </>
@@ -480,13 +480,13 @@ export default function AdminDashboard() {
               <FaHandshake className="h-6 w-6 text-purple-500" />
             </div>
             <div>
-              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Active Loans</p>
-              <h3 className="text-3xl font-black text-white tracking-tighter">{stats?.activeLoans || 0}</h3>
+              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Active Loans</p>
+              <h3 className="text-3xl font-black text-primary-text tracking-tighter">{stats?.activeLoans || 0}</h3>
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-white/40 font-bold">Total Disbursed</span>
-            <span className="text-purple-400 font-black">{formatCurrency(stats?.totalLoanAmount || 0)}</span>
+            <span className="text-tertiary-text font-bold">Total Disbursed</span>
+            <span className="text-purple-500 font-black">{formatCurrency(stats?.totalLoanAmount || 0)}</span>
           </div>
         </div>
 
@@ -498,8 +498,8 @@ export default function AdminDashboard() {
               <FaChartLine className="h-6 w-6 text-amber-500" />
             </div>
             <div>
-              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Attention Required</p>
-              <h3 className="text-3xl font-black text-white tracking-tighter">{(stats?.pendingLoans || 0) + pendingPayments.length + pendingRegistrations.length}</h3>
+              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Attention Required</p>
+              <h3 className="text-3xl font-black text-primary-text tracking-tighter">{(stats?.pendingLoans || 0) + pendingPayments.length + pendingRegistrations.length}</h3>
             </div>
           </div>
           <Link href="/admin/loans/pending" className="text-[10px] font-black text-amber-500 hover:text-amber-400 uppercase tracking-widest flex items-center gap-2">
@@ -513,18 +513,18 @@ export default function AdminDashboard() {
         {/* Recent Activity Feed */}
         <div className="lg:col-span-2 space-y-8">
           <div className="card-premium p-0 overflow-hidden">
-            <div className="p-8 border-b border-white/5 flex items-center justify-between">
+            <div className="p-8 border-b border-border flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-black text-white tracking-tight">Recent Activity</h2>
-                <p className="text-white/40 text-xs font-medium">Real-time update of platform transactions</p>
+                <h2 className="text-2xl font-black text-primary-text tracking-tight">Recent Activity</h2>
+                <p className="text-tertiary-text text-xs font-medium">Real-time update of platform transactions</p>
               </div>
               <Link href="/admin/transactions" className="btn-secondary px-6 py-2 text-xs">View History</Link>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-border">
               {recentTransactions.length > 0 ? recentTransactions.map((transaction) => {
                 const isDebit = transaction.type === 'loan' || transaction.type === 'withdrawal';
                 return (
-                  <div key={transaction._id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                  <div key={transaction._id} className="p-6 flex items-center justify-between hover:bg-surface transition-colors group">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${
                         isDebit 
@@ -534,27 +534,27 @@ export default function AdminDashboard() {
                         {transaction.type === 'loan' ? <FaHandshake className="h-5 w-5" /> : <FaMoneyBillWave className="h-5 w-5" />}
                       </div>
                       <div>
-                        <p className={`font-bold text-white group-hover:text-primary transition-colors ${transaction.status === 'rejected' ? 'line-through opacity-50' : ''}`}>
+                        <p className={`font-bold text-primary-text group-hover:text-primary transition-colors ${transaction.status === 'rejected' ? 'line-through opacity-50' : ''}`}>
                           {transaction.user?.firstName} {transaction.user?.lastName}
                         </p>
-                        <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">{transaction.purpose || transaction.description}</p>
+                        <p className="text-[10px] text-tertiary-text font-black uppercase tracking-widest">{transaction.purpose || transaction.description}</p>
                         {transaction.status === 'rejected' && transaction.rejectionReason && (
-                          <span className="inline-block mt-1 bg-red-500/10 text-red-400 text-[10px] font-black px-2 py-0.5 rounded-full border border-red-500/20">
+                          <span className="inline-block mt-1 bg-red-500/10 text-red-500 text-[10px] font-black px-2 py-0.5 rounded-full border border-red-500/20">
                             REJECTED: {transaction.rejectionReason}
                           </span>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`font-black tracking-tight ${isDebit ? 'text-white' : 'text-emerald-400'} ${transaction.status === 'rejected' ? 'line-through opacity-30' : ''}`}>
+                      <p className={`font-black tracking-tight ${isDebit ? 'text-primary-text' : 'text-emerald-500'} ${transaction.status === 'rejected' ? 'line-through opacity-30' : ''}`}>
                         {isDebit ? '-' : '+'} {formatCurrency(transaction.amount)}
                       </p>
-                      <p className="text-[10px] text-white/30 font-bold">{formatDate(transaction.createdAt)}</p>
+                      <p className="text-[10px] text-tertiary-text font-bold">{formatDate(transaction.createdAt)}</p>
                     </div>
                   </div>
                 );
               }) : (
-                <div className="p-12 text-center text-white/20 italic text-sm font-medium">No recent transactions recorded.</div>
+                <div className="p-12 text-center text-tertiary-text italic text-sm font-medium">No recent transactions recorded.</div>
               )}
             </div>
           </div>
@@ -564,25 +564,25 @@ export default function AdminDashboard() {
         <div className="space-y-8">
           {/* Recent Members List */}
           <div className="card-premium p-0 overflow-hidden">
-            <div className="p-6 border-b border-white/5 bg-white/3">
-              <h2 className="text-lg font-black text-white tracking-tight uppercase tracking-widest">New Members</h2>
+            <div className="p-6 border-b border-border bg-surface">
+              <h2 className="text-lg font-black text-primary-text tracking-tight uppercase tracking-widest">New Members</h2>
             </div>
             <div className="p-4 space-y-4">
               {recentMembers.map((member) => (
-                <div key={member._id} className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/5 hover:border-primary/30 transition-all duration-300">
-                  <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center font-black text-primary text-xs">
+                <div key={member._id} className="flex items-center gap-4 bg-surface p-4 rounded-3xl border border-border hover:border-primary/30 transition-all duration-300">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center font-black text-primary text-xs border border-primary/20">
                     {member.firstName[0]}{member.lastName[0]}
                   </div>
                   <div className="flex-1 overflow-hidden">
-                    <p className="font-bold text-white text-sm truncate">{member.firstName} {member.lastName}</p>
-                    <p className="text-[10px] text-white/30 font-black tracking-tighter uppercase">{member.accountNumber}</p>
+                    <p className="font-bold text-primary-text text-sm truncate">{member.firstName} {member.lastName}</p>
+                    <p className="text-[10px] text-tertiary-text font-black tracking-tighter uppercase">{member.accountNumber}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-black text-primary">{formatCurrency(member.accountBalance)}</p>
                   </div>
                 </div>
               ))}
-              <Link href="/admin/members" className="block text-center text-[10px] font-black text-white/30 uppercase tracking-[0.2em] py-4 hover:text-primary transition-colors">
+              <Link href="/admin/members" className="block text-center text-[10px] font-black text-tertiary-text uppercase tracking-[0.2em] py-4 hover:text-primary transition-colors">
                 View Directory
               </Link>
             </div>
@@ -592,11 +592,11 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-2 gap-4">
             <Link href="/admin/transactions" className="card-premium p-6 text-center hover:bg-emerald-500/10 hover:border-emerald-500/20 group transition-all duration-500">
               <FaMoneyBillWave className="h-6 w-6 text-emerald-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-black text-white uppercase tracking-widest">Transactions</span>
+              <span className="text-[10px] font-black text-primary-text uppercase tracking-widest">Transactions</span>
             </Link>
             <Link href="/admin/members" className="card-premium p-6 text-center hover:bg-blue-500/10 hover:border-blue-500/20 group transition-all duration-500">
               <FaUserPlus className="h-6 w-6 text-blue-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-black text-white uppercase tracking-widest">Add User</span>
+              <span className="text-[10px] font-black text-primary-text uppercase tracking-widest">Add User</span>
             </Link>
           </div>
         </div>
@@ -606,30 +606,30 @@ export default function AdminDashboard() {
       {(pendingPayments.length > 0 || pendingLoans.length > 0 || pendingRegistrations.length > 0) && (
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <h2 className="text-3xl font-black text-white tracking-tighter">Queue <span className="text-white/40">Approvals</span></h2>
+            <h2 className="text-3xl font-black text-primary-text tracking-tighter">Queue <span className="text-tertiary-text">Approvals</span></h2>
             <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full animate-pulse">Action Required</span>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {/* Pending Payments */}
             {pendingPayments.map((payment) => (
-              <div key={payment._id} className="card-premium bg-white/5 border-white/10 hover:border-emerald-500/30 transition-all duration-500 group">
+              <div key={payment._id} className="card-premium bg-surface border-border hover:border-emerald-500/30 transition-all duration-500 group">
                 <div className="flex justify-between items-start mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
                     <FaMoneyBillWave className="h-6 w-6" />
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Amount</span>
-                    <p className="text-xl font-black text-emerald-400 leading-none">{formatCurrency(payment.amount)}</p>
+                    <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest block mb-1">Amount</span>
+                    <p className="text-xl font-black text-emerald-500 leading-none">{formatCurrency(payment.amount)}</p>
                   </div>
                 </div>
                 <div className="mb-6">
-                  <p className="text-white font-bold text-sm truncate">{payment.user?.firstName} {payment.user?.lastName}</p>
-                  <p className="text-white/40 text-xs font-medium line-clamp-1">{payment.description}</p>
+                  <p className="text-primary-text font-bold text-sm truncate">{payment.user?.firstName} {payment.user?.lastName}</p>
+                  <p className="text-tertiary-text text-xs font-medium line-clamp-1">{payment.description}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex-1 btn-secondary text-[10px] py-2 px-0 bg-white/5 hover:bg-white/10">View Receipt</a>
-                  <button onClick={() => handleApprovePayment(payment._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-emerald-600 hover:bg-emerald-500 shadow-none">Approve</button>
+                  <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex-1 btn-secondary text-[10px] py-2 px-0">View Receipt</a>
+                  <button onClick={() => handleApprovePayment(payment._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-emerald-600 hover:bg-emerald-500 shadow-none border-none">Approve</button>
                   <button onClick={() => openRejectModal(payment._id)} className="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 transition-colors">
                     <FaExclamationTriangle className="h-4 w-4" />
                   </button>
@@ -639,23 +639,23 @@ export default function AdminDashboard() {
 
             {/* Pending Registrations */}
             {pendingRegistrations.map((user) => (
-              <div key={user._id} className="card-premium bg-white/5 border-white/10 hover:border-blue-500/30 transition-all duration-500">
+              <div key={user._id} className="card-premium bg-surface border-border hover:border-blue-500/30 transition-all duration-500">
                 <div className="flex justify-between items-start mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
                     <FaUserPlus className="h-6 w-6" />
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Type</span>
-                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">Registration</span>
+                    <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest block mb-1">Type</span>
+                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">Registration</span>
                   </div>
                 </div>
                 <div className="mb-6">
-                  <p className="text-white font-bold text-sm truncate">{user.firstName} {user.lastName}</p>
-                  <p className="text-white/40 text-[10px] font-black tracking-tighter truncate">{user.email}</p>
+                  <p className="text-primary-text font-bold text-sm truncate">{user.firstName} {user.lastName}</p>
+                  <p className="text-tertiary-text text-[10px] font-black tracking-tighter truncate">{user.email}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button onClick={() => handleApproveRegistrationClick(user._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-blue-600 hover:bg-blue-500 shadow-none">Approve Entry</button>
-                  <button onClick={() => handleRejectRegistration(user._id)} className="btn-secondary text-[10px] py-2 px-4 bg-white/5 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30">Reject</button>
+                  <button onClick={() => handleApproveRegistrationClick(user._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-blue-600 hover:bg-blue-500 shadow-none border-none">Approve Entry</button>
+                  <button onClick={() => handleRejectRegistration(user._id)} className="btn-secondary text-[10px] py-2 px-4 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30">Reject</button>
                 </div>
               </div>
             ))}
@@ -667,13 +667,13 @@ export default function AdminDashboard() {
       {showPinModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowPinModal(false)} />
-          <div className="relative glass-card bg-black/40 p-10 rounded-[3rem] border border-white/5 shadow-2xl w-full max-w-md transform transition-all animate-float">
+          <div className="relative glass-card bg-surface/40 p-10 rounded-[3rem] border border-border shadow-2xl w-full max-w-md transform transition-all animate-float">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-[2rem] border border-primary/20 mb-6 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
                 <FaLock className="h-8 w-8 text-primary shadow-glow" />
               </div>
-              <h3 className="text-3xl font-black text-white tracking-tighter mb-2">Authorize Access</h3>
-              <p className="text-white/40 text-sm font-medium">Enter your 4-digit security PIN to view sensitive totals.</p>
+              <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-2">Authorize Access</h3>
+              <p className="text-tertiary-text text-sm font-medium">Enter your 4-digit security PIN to view sensitive totals.</p>
             </div>
 
             <form onSubmit={handleVerifyPin} className="space-y-8">
@@ -683,7 +683,7 @@ export default function AdminDashboard() {
                   maxLength={4}
                   value={pin}
                   onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                  className="w-full text-center text-5xl tracking-[1.2em] font-black border-b-2 border-white/20 focus:border-primary outline-none bg-transparent py-4 text-white placeholder:text-white/5 appearance-none mb-4"
+                  className="w-full text-center text-5xl tracking-[1.2em] font-black border-b-2 border-border focus:border-primary outline-none bg-transparent py-4 text-primary-text placeholder:text-tertiary-text appearance-none mb-4"
                   placeholder="0000"
                   autoFocus
                   required
@@ -692,7 +692,7 @@ export default function AdminDashboard() {
 
               {pinError && (
                 <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl animate-shake">
-                  <p className="text-red-400 text-xs font-black text-center uppercase tracking-widest">{pinError}</p>
+                  <p className="text-red-500 text-xs font-black text-center uppercase tracking-widest">{pinError}</p>
                 </div>
               )}
 
@@ -717,15 +717,15 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Security Modals Styled to match */}
+      {/* Security Modals */}
       {showRejectionModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={() => setShowRejectionModal(false)} />
-          <div className="relative glass-card p-10 rounded-[3rem] border border-white/10 w-full max-w-sm">
-            <h3 className="text-2xl font-black text-white tracking-tight mb-4">Reject Payment</h3>
-            <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-6">Brief explanation for member:</p>
+          <div className="relative glass-card p-10 rounded-[3rem] border border-border w-full max-w-sm">
+            <h3 className="text-2xl font-black text-primary-text tracking-tight mb-4">Reject Payment</h3>
+            <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest mb-6">Brief explanation for member:</p>
             <textarea
-              className="w-full p-4 bg-white/5 border border-white/10 rounded-[2rem] focus:border-red-500/40 outline-none text-white text-sm transition-all resize-none min-h-[120px]"
+              className="w-full p-4 bg-surface border border-border rounded-[2rem] focus:border-red-500/40 outline-none text-primary-text text-sm transition-all resize-none min-h-[120px]"
               placeholder="e.g., Receipt is blurry or incomplete..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
@@ -741,7 +741,7 @@ export default function AdminDashboard() {
               <button
                 onClick={handleRejectPayment}
                 disabled={!rejectionReason.trim() || rejecting}
-                className="flex-1 btn-primary bg-red-600 hover:bg-red-500 py-3 shadow-none disabled:opacity-50"
+                className="flex-1 btn-primary bg-red-600 hover:bg-red-500 py-3 shadow-none border-none disabled:opacity-50"
               >
                 {rejecting ? 'Wait...' : 'Confirm Reject'}
               </button>
@@ -753,26 +753,26 @@ export default function AdminDashboard() {
       {showRegistrationApprovalModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={() => setShowRegistrationApprovalModal(false)} />
-          <div className="relative glass-card p-10 rounded-[3rem] border border-white/10 w-full max-w-md">
-            <h3 className="text-2xl font-black text-white tracking-tighter mb-2">Finalize Onboarding</h3>
-            <p className="text-white/40 text-xs font-medium mb-8">Set the initial financial records for this new member.</p>
+          <div className="relative glass-card p-10 rounded-[3rem] border border-border w-full max-w-md">
+            <h3 className="text-2xl font-black text-primary-text tracking-tighter mb-2">Finalize Onboarding</h3>
+            <p className="text-tertiary-text text-xs font-medium mb-8">Set the initial financial records for this new member.</p>
             
             <div className="space-y-6">
               <div>
-                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2 block">Opening Savings Balance (₦)</label>
+                <label className="text-[10px] font-black text-tertiary-text uppercase tracking-[0.2em] mb-2 block">Opening Savings Balance (₦)</label>
                 <input
                   type="number"
-                  className="w-full p-5 bg-white/5 border border-white/10 rounded-3xl outline-none focus:border-primary text-white font-bold"
+                  className="w-full p-5 bg-surface border border-border rounded-3xl outline-none focus:border-primary text-primary-text font-bold"
                   placeholder="0.00"
                   value={initialDepositAmount}
                   onChange={(e) => setInitialDepositAmount(e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2 block">Existing Loan Debt (₦)</label>
+                <label className="text-[10px] font-black text-tertiary-text uppercase tracking-[0.2em] mb-2 block">Existing Loan Debt (₦)</label>
                 <input
                   type="number"
-                  className="w-full p-5 bg-white/5 border border-white/10 rounded-3xl outline-none focus:border-primary text-white font-bold"
+                  className="w-full p-5 bg-surface border border-border rounded-3xl outline-none focus:border-primary text-primary-text font-bold"
                   placeholder="0.00"
                   value={initialLoanBalance}
                   onChange={(e) => setInitialLoanBalance(e.target.value)}
@@ -790,7 +790,7 @@ export default function AdminDashboard() {
               <button
                 onClick={() => selectedRegistrationId && executeApproveRegistration(selectedRegistrationId)}
                 disabled={approvingRegistration}
-                className="flex-2 btn-primary text-sm shadow-none"
+                className="flex-[2] btn-primary text-sm shadow-none border-none"
               >
                 {approvingRegistration ? 'Onboarding...' : 'Approve & Activate Member'}
               </button>
@@ -798,18 +798,20 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
       {/* Surety Error Modal */}
       {showSuretyErrorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
-              <FaExclamationTriangle className="h-8 w-8 text-yellow-600" />
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={() => setShowSuretyErrorModal(false)} />
+          <div className="relative glass-card p-10 rounded-[3rem] border border-border w-full max-w-sm text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-500/10 rounded-full mb-4 border border-amber-500/20">
+              <FaExclamationTriangle className="h-8 w-8 text-amber-500" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Approval Restricted</h3>
-            <p className="text-gray-600 mb-6">{suretyErrorMessage}</p>
+            <h3 className="text-xl font-black text-primary-text tracking-tight mb-2">Approval Restricted</h3>
+            <p className="text-tertiary-text mb-6">{suretyErrorMessage}</p>
             <button
               onClick={() => setShowSuretyErrorModal(false)}
-              className="w-full px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors"
+              className="w-full btn-primary py-3 rounded-2xl border-none shadow-none"
             >
               Understand
             </button>
@@ -819,12 +821,13 @@ export default function AdminDashboard() {
 
       {/* Loan Rejection Reason Modal */}
       {showLoanRejectionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Reason for Loan Rejection</h3>
-            <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-semibold">Please provide a reason:</p>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={() => setShowLoanRejectionModal(false)} />
+          <div className="relative glass-card p-10 rounded-[3rem] border border-border w-full max-w-sm">
+            <h3 className="text-xl font-black text-primary-text tracking-tight mb-4">Reason for Loan Rejection</h3>
+            <p className="text-xs text-tertiary-text mb-3 uppercase tracking-wider font-semibold">Please provide a reason:</p>
             <textarea
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
+              className="w-full p-3 bg-surface border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all resize-none text-primary-text"
               rows={4}
               placeholder="e.g., Inadequate surety history, income mismatch, etc."
               value={loanRejectionReason}
@@ -834,7 +837,7 @@ export default function AdminDashboard() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowLoanRejectionModal(false)}
-                className="flex-1 px-4 py-2 text-gray-700 font-semibold bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="flex-1 btn-secondary text-sm"
                 disabled={rejectingLoan}
               >
                 Cancel
@@ -842,7 +845,7 @@ export default function AdminDashboard() {
               <button
                 onClick={confirmRejectLoan}
                 disabled={!loanRejectionReason.trim() || rejectingLoan}
-                className="flex-1 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                className="flex-1 btn-primary bg-red-600 hover:bg-red-700 text-white font-semibold rounded-2xl border-none shadow-none transition-colors disabled:opacity-50"
               >
                 {rejectingLoan ? 'Rejecting...' : 'Reject'}
               </button>
@@ -850,61 +853,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-
-      {/* Registration Approval Modal (Main Admin Only) */}
-      {showRegistrationApprovalModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Initial Member Balances</h3>
-            <p className="text-sm text-gray-500 mb-4">As the main admin, you can set initial balances for imported members prior to approval. Leave empty if 0.</p>
-
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Initial Deposit (Savings) (₦)</label>
-                <input
-                  type="number"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all"
-                  placeholder="0.00"
-                  value={initialDepositAmount}
-                  onChange={(e) => setInitialDepositAmount(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Initial Loan Balance (₦)</label>
-                <input
-                  type="number"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all"
-                  placeholder="0.00"
-                  value={initialLoanBalance}
-                  onChange={(e) => setInitialLoanBalance(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => {
-                  setShowRegistrationApprovalModal(false);
-                  setSelectedRegistrationId(null);
-                  setInitialDepositAmount('');
-                  setInitialLoanBalance('');
-                }}
-                className="flex-1 px-4 py-2 text-gray-700 font-semibold bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                disabled={approvingRegistration}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => selectedRegistrationId && executeApproveRegistration(selectedRegistrationId)}
-                disabled={approvingRegistration}
-                className="flex-1 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-              >
-                {approvingRegistration ? 'Approving...' : 'Approve'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
-  )
+  );
 }

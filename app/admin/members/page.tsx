@@ -110,7 +110,7 @@ export default function Members() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p>Loading members...</p>
+          <p className="text-secondary-text">Loading members...</p>
         </div>
       </div>
     );
@@ -121,8 +121,8 @@ export default function Members() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Directorship Control</span>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
-            Member <span className="text-white/40">Directory</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-primary-text tracking-tighter">
+            Member <span className="text-tertiary-text">Directory</span>
           </h1>
         </div>
         <button 
@@ -143,7 +143,7 @@ export default function Members() {
             placeholder="Search by first or last name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-3xl py-5 pl-16 pr-8 text-white text-sm focus:border-primary/50 outline-none transition-all placeholder:text-white/20 font-bold"
+            className="w-full bg-surface border border-border rounded-3xl py-5 pl-16 pr-8 text-primary-text text-sm focus:border-primary/50 outline-none transition-all placeholder:text-tertiary-text font-bold"
           />
         </div>
       </div>
@@ -152,37 +152,37 @@ export default function Members() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-white/5 bg-white/3">
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Full Name</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Account ID</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Entry Date</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Balance</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Access Role</th>
-                <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Operations</th>
+              <tr className="border-b border-border bg-surface">
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Full Name</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Account ID</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Entry Date</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Balance</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Access Role</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Operations</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 font-medium">
+            <tbody className="divide-y divide-border font-medium">
               {filteredMembers.map((member) => (
-                <tr key={member._id} className="group hover:bg-white/3 transition-colors">
+                <tr key={member._id} className="group hover:bg-surface-lighter transition-colors">
                   <td className="px-8 py-6">
                     <Link href={`/admin/members/${member._id}/payment-ledger`} className="flex items-center gap-4 group/name">
-                       <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-white/40 group-hover/name:text-primary group-hover/name:border-primary/40 transition-all duration-300">
+                       <div className="w-12 h-12 rounded-2xl bg-surface border border-border flex items-center justify-center font-black text-tertiary-text group-hover/name:text-primary group-hover/name:border-primary/40 transition-all duration-300">
                          {member.firstName[0]}{member.lastName[0]}
                        </div>
                        <div className="flex flex-col">
-                         <span className="text-white group-hover/name:text-primary transition-colors font-bold">{member.firstName} {member.lastName}</span>
-                         <span className="text-[10px] text-white/20 font-black uppercase tracking-tighter">View Financials</span>
+                         <span className="text-primary-text group-hover/name:text-primary transition-colors font-bold">{member.firstName} {member.lastName}</span>
+                         <span className="text-[10px] text-tertiary-text font-black uppercase tracking-tighter">View Financials</span>
                        </div>
                     </Link>
                   </td>
-                  <td className="px-8 py-6 text-sm text-white/60 font-mono tracking-wider">{member.accountNumber}</td>
-                  <td className="px-8 py-6 text-xs text-white/40">{formatDate(member.joinDate)}</td>
+                  <td className="px-8 py-6 text-sm text-secondary-text font-mono tracking-wider">{member.accountNumber}</td>
+                  <td className="px-8 py-6 text-xs text-tertiary-text">{formatDate(member.joinDate)}</td>
                   <td className="px-8 py-6">
-                     <span className="text-lg font-black text-white tracking-tighter shadow-glow-sm">{formatCurrency(member.accountBalance)}</span>
+                     <span className="text-lg font-black text-primary-text tracking-tighter shadow-glow-sm">{formatCurrency(member.accountBalance)}</span>
                   </td>
                   <td className="px-8 py-6">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                      member.role === 'admin' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-white/5 border-white/10 text-white/40'
+                      member.role === 'admin' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-surface border-border text-tertiary-text'
                     }`}>
                       <div className={`w-1 h-1 rounded-full ${member.role === 'admin' ? 'bg-purple-400 animate-pulse' : 'bg-white/20'}`} />
                       {member.role || 'member'}
@@ -216,8 +216,8 @@ export default function Members() {
           </table>
         </div>
         {filteredMembers.length === 0 && (
-          <div className="p-32 text-center bg-white/2">
-            <p className="text-white/20 text-sm font-black uppercase tracking-[0.4em]">No members found in directory</p>
+          <div className="p-32 text-center bg-surface">
+            <p className="text-tertiary-text text-sm font-black uppercase tracking-[0.4em]">No members found in directory</p>
           </div>
         )}
       </div>
@@ -225,10 +225,10 @@ export default function Members() {
       {showAddModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowAddModal(false)} />
-          <div className="relative glass-card p-12 rounded-[3.5rem] border border-white/10 w-full max-w-xl shadow-2xl animate-float">
+          <div className="relative glass-card p-12 rounded-[3.5rem] border border-border w-full max-w-xl shadow-2xl animate-float">
             <div className="mb-10 text-center">
-               <h3 className="text-3xl font-black text-white tracking-tighter mb-2">New Enrollment</h3>
-               <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Onboard a member into the platform</p>
+               <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-2">New Enrollment</h3>
+               <p className="text-tertiary-text text-xs font-bold uppercase tracking-widest">Onboard a member into the platform</p>
             </div>
             
             <form onSubmit={handleAddMember} className="space-y-4">
@@ -238,7 +238,7 @@ export default function Members() {
                   placeholder="First Name"
                   value={newMember.firstName}
                   onChange={(e) => setNewMember({ ...newMember, firstName: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-primary transition-all font-bold"
+                  className="w-full bg-surface border border-border rounded-2xl p-5 text-primary-text outline-none focus:border-primary transition-all font-bold"
                   required
                 />
                 <input
@@ -246,7 +246,7 @@ export default function Members() {
                   placeholder="Last Name"
                   value={newMember.lastName}
                   onChange={(e) => setNewMember({ ...newMember, lastName: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-primary transition-all font-bold"
+                  className="w-full bg-surface border border-border rounded-2xl p-5 text-primary-text outline-none focus:border-primary transition-all font-bold"
                   required
                 />
               </div>
@@ -255,7 +255,7 @@ export default function Members() {
                 placeholder="Unique Mobile Number"
                 value={newMember.phoneNumber}
                 onChange={(e) => setNewMember({ ...newMember, phoneNumber: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-primary transition-all font-bold"
+                className="w-full bg-surface border border-border rounded-2xl p-5 text-primary-text outline-none focus:border-primary transition-all font-bold"
                 required
               />
               <input
@@ -263,27 +263,27 @@ export default function Members() {
                 placeholder="Email Address (Security)"
                 value={newMember.email}
                 onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-primary transition-all font-bold"
+                className="w-full bg-surface border border-border rounded-2xl p-5 text-primary-text outline-none focus:border-primary transition-all font-bold"
               />
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative">
-                   <div className="absolute top-2 left-5 text-[8px] font-black text-white/30 uppercase tracking-widest">Join Date</div>
+                   <div className="absolute top-2 left-5 text-[8px] font-black text-tertiary-text uppercase tracking-widest">Join Date</div>
                    <input
                     type="date"
                     value={newMember.joinDate}
                     onChange={(e) => setNewMember({ ...newMember, joinDate: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 pt-7 text-white outline-none focus:border-primary transition-all font-bold uppercase text-xs"
+                    className="w-full bg-surface border border-border rounded-2xl p-5 pt-7 text-primary-text outline-none focus:border-primary transition-all font-bold uppercase text-xs"
                     required
                   />
                 </div>
                 <div className="relative">
-                   <div className="absolute top-2 left-5 text-[8px] font-black text-white/30 uppercase tracking-widest">Opening Balance</div>
+                   <div className="absolute top-2 left-5 text-[8px] font-black text-tertiary-text uppercase tracking-widest">Opening Balance</div>
                    <input
                     type="number"
                     placeholder="0.00"
                     value={newMember.accountBalance || ''}
                     onChange={(e) => setNewMember({ ...newMember, accountBalance: Number(e.target.value) })}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 pt-7 text-white outline-none focus:border-primary transition-all font-bold"
+                    className="w-full bg-surface border border-border rounded-2xl p-5 pt-7 text-primary-text outline-none focus:border-primary transition-all font-bold"
                     required
                   />
                 </div>
@@ -305,8 +305,8 @@ export default function Members() {
             <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mx-auto mb-6 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
                <FaTrash className="h-8 w-8" />
             </div>
-            <h3 className="text-2xl font-black text-white tracking-tighter mb-4">Purge Member?</h3>
-            <p className="text-white/40 text-sm font-medium mb-8">This will irreversibly remove the member and all associated financial records from the platform.</p>
+            <h3 className="text-2xl font-black text-primary-text tracking-tighter mb-4">Purge Member?</h3>
+            <p className="text-tertiary-text text-sm font-medium mb-8">This will irreversibly remove the member and all associated financial records from the platform.</p>
             <div className="flex gap-4">
               <button onClick={() => setShowDeleteModal(false)} className="flex-1 btn-secondary text-xs uppercase tracking-widest py-3 rounded-2xl">Cancel</button>
               <button onClick={handleConfirmDelete} className="flex-1 btn-primary bg-red-600 hover:bg-red-500 text-xs uppercase tracking-widest py-3 rounded-2xl shadow-none border-none">Delete</button>

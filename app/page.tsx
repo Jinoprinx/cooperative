@@ -96,11 +96,11 @@ export default function Home() {
                 Official Portal
               </div>
               
-              <h1 className="text-6xl md:text-8xl font-black text-foreground dark:text-white tracking-tighter leading-none mb-8">
+              <h1 className="text-6xl md:text-8xl font-black text-primary-text tracking-tighter leading-none mb-8">
                 {tenant.name}
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground dark:text-white/40 font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl md:text-2xl text-secondary-text font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
                 Welcome to your cooperative's digital home. Manage your contributions, applications, and accounts with ease in our secure environment.
               </p>
 
@@ -121,10 +121,10 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="pt-20 border-t border-border dark:border-white/5">
+              <div className="pt-20 border-t border-border">
                 <button 
                   onClick={handleVisitMainSite}
-                  className="text-xs font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.3em] flex items-center gap-3 mx-auto"
+                  className="text-xs font-black text-secondary-text hover:text-primary transition-colors uppercase tracking-[0.3em] flex items-center gap-3 mx-auto"
                 >
                   <div className="w-8 h-px bg-current opacity-20" />
                   Visit Cooperatives.io Main Site
@@ -166,7 +166,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.8 }}
-                  className="inline-flex items-center gap-2 px-5 py-2 mb-8 text-xs font-black tracking-[0.2em] text-primary uppercase bg-surface/50 dark:bg-white/[0.03] rounded-full border border-border dark:border-white/[0.08] backdrop-blur-md"
+                  className="inline-flex items-center gap-2 px-5 py-2 mb-8 text-xs font-black tracking-[0.2em] text-primary uppercase bg-surface border border-border backdrop-blur-md"
                 >
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -175,7 +175,7 @@ export default function Home() {
                   Eliminate Paperwork. Elevate Efficiency.
                 </motion.div>
 
-                <h1 className="mb-8 text-7xl font-black md:text-[9rem] text-foreground dark:text-white tracking-tighter leading-[0.85] perspective-1000">
+                <h1 className="mb-8 text-7xl font-black md:text-[9rem] text-primary-text tracking-tighter leading-[0.85] perspective-1000">
                   <motion.span
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -198,7 +198,7 @@ export default function Home() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8, duration: 1 }}
-                  className="mb-14 text-xl md:text-2xl text-muted-foreground dark:text-white/50 font-medium leading-relaxed max-w-2xl mx-auto px-4"
+                  className="mb-14 text-xl md:text-2xl text-secondary-text font-medium leading-relaxed max-w-2xl mx-auto px-4"
                 >
                   The ultimate paperless management system for modern cooperatives. Streamline your operations, digitize every record, and automate financial workflows with surgical precision.
                 </motion.p>
@@ -274,11 +274,11 @@ export default function Home() {
             <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
               <div className="max-w-2xl">
                 <span className="text-primary font-black tracking-[0.3em] uppercase text-xs mb-4 block">Paperless Core</span>
-                <h2 className="text-5xl md:text-7xl font-black text-foreground dark:text-white tracking-tighter leading-none">
-                  Built for <span className="text-muted-foreground dark:text-white/30">Total Automation.</span>
+                <h2 className="text-5xl md:text-7xl font-black text-primary-text tracking-tighter leading-none">
+                  Built for <span className="text-tertiary-text">Total Automation.</span>
                 </h2>
               </div>
-              <p className="text-muted-foreground dark:text-white/40 font-medium max-w-xs text-lg border-l border-border dark:border-white/10 pl-6">
+              <p className="text-secondary-text font-medium max-w-xs text-lg border-l border-border pl-6">
                 Modernize your cooperative with a suite of tools designed to eliminate manual entry and reduce administrative overhead.
               </p>
             </div>
@@ -300,8 +300,8 @@ export default function Home() {
                   <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-10 transition-all duration-700 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] ${feature.color}`}>
                     <feature.icon className="text-3xl" />
                   </div>
-                  <h3 className="text-2xl font-black text-foreground dark:text-white mb-4 tracking-tight">{feature.title}</h3>
-                  <p className="text-muted-foreground dark:text-white/40 font-medium leading-relaxed group-hover:text-foreground dark:group-hover:text-white/60 transition-colors">
+                  <h3 className="text-2xl font-black text-primary-text mb-4 tracking-tight">{feature.title}</h3>
+                  <p className="text-secondary-text font-medium leading-relaxed group-hover:text-primary-text transition-colors">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -311,12 +311,12 @@ export default function Home() {
         </section>
 
         {/* Infographic Section */}
-        <section id="process" className="py-32 bg-surface/30 dark:bg-white/[0.01] border-y border-border dark:border-white/[0.05]">
+        <section id="process" className="py-32 bg-surface/30 border-y border-border">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col lg:flex-row items-center gap-24">
               <div className="lg:w-1/2">
                 <span className="text-secondary font-black tracking-[0.3em] uppercase text-xs mb-4 block">Workflow</span>
-                <h2 className="text-5xl md:text-7xl font-black text-foreground dark:text-white mb-10 tracking-tighter leading-[0.9]">
+                <h2 className="text-5xl md:text-7xl font-black text-primary-text mb-10 tracking-tighter leading-[0.9]">
                   Go Paperless <span className="text-gradient">in Minutes</span>
                 </h2>
 
@@ -331,12 +331,12 @@ export default function Home() {
                       transition={{ delay: idx * 0.2 }}
                     >
                       <div className="flex flex-col items-center">
-                        <div className="text-4xl font-black text-muted-foreground/20 dark:text-white/10 group-hover:text-primary transition-colors duration-500 leading-none">{step.id}</div>
-                        {idx !== steps.length - 1 && <div className="w-px h-full bg-border dark:bg-white/5 my-4"></div>}
+                        <div className="text-4xl font-black text-tertiary-text/20 group-hover:text-primary transition-colors duration-500 leading-none">{step.id}</div>
+                        {idx !== steps.length - 1 && <div className="w-px h-full bg-border my-4"></div>}
                       </div>
                       <div className="pt-1">
-                        <h3 className="text-2xl font-bold text-foreground dark:text-white mb-3 tracking-tight">{step.title}</h3>
-                        <p className="text-muted-foreground dark:text-white/40 leading-relaxed font-medium group-hover:text-foreground dark:group-hover:text-white/60 transition-colors">{step.description}</p>
+                        <h3 className="text-2xl font-bold text-primary-text mb-3 tracking-tight">{step.title}</h3>
+                        <p className="text-secondary-text leading-relaxed font-medium group-hover:text-primary-text transition-colors">{step.description}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -349,38 +349,38 @@ export default function Home() {
                   whileInView={{ rotateY: 12, rotateX: 0, y: 0, opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="relative z-10 glass-card rounded-[3rem] p-4 border-white/[0.1] shadow-2xl"
+                  className="relative z-10 glass-card rounded-[3rem] p-4 border-border shadow-2xl"
                 >
-                  <div className="bg-surface dark:bg-[#0a0a0a] rounded-[2.5rem] flex flex-col p-10 overflow-hidden min-h-[500px]">
+                  <div className="bg-surface rounded-[2.5rem] flex flex-col p-10 overflow-hidden min-h-[500px]">
                     <div className="flex justify-between items-center mb-12">
                       <div className="space-y-2">
                         <div className="h-1.5 w-20 bg-primary/30 rounded-full"></div>
-                        <div className="text-xs font-black text-muted-foreground dark:text-white/40 uppercase tracking-widest">Digital Treasury</div>
+                        <div className="text-xs font-black text-tertiary-text uppercase tracking-widest">Digital Treasury</div>
                       </div>
-                      <div className="w-12 h-12 rounded-2xl bg-surface-lighter dark:bg-white/[0.03] flex items-center justify-center border border-border dark:border-white/[0.08]">
+                      <div className="w-12 h-12 rounded-2xl bg-surface-lighter flex items-center justify-center border border-border">
                         <FaChartLine className="text-primary text-xl" />
                       </div>
                     </div>
 
                     <div className="mb-12">
-                      <div className="text-6xl font-black text-foreground dark:text-white mb-4 tracking-tighter">
-                        ₦124,592<span className="text-muted-foreground dark:text-white/20">.00</span>
+                      <div className="text-6xl font-black text-primary-text mb-4 tracking-tighter">
+                        ₦124,592<span className="text-tertiary-text">.00</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center text-xs font-black text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/10">
                           +12.50%
                         </span>
-                        <span className="text-[10px] text-muted-foreground dark:text-white/30 uppercase tracking-[0.2em] font-black">Monthly Delta</span>
+                        <span className="text-[10px] text-tertiary-text uppercase tracking-[0.2em] font-black">Monthly Delta</span>
                       </div>
                     </div>
 
                     <div className="space-y-6 mb-12">
-                      <div className="bg-surface-lighter dark:bg-white/[0.02] rounded-2xl p-6 border border-border dark:border-white/[0.05]">
+                      <div className="bg-surface-lighter rounded-2xl p-6 border border-border">
                         <div className="flex justify-between items-center mb-4">
-                          <span className="text-[10px] font-black text-muted-foreground dark:text-white/30 uppercase tracking-widest">Automated Disbursements</span>
+                          <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Automated Disbursements</span>
                           <span className="text-[10px] font-black text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/10">Authorized</span>
                         </div>
-                        <div className="h-3 w-full bg-surface-hover dark:bg-white/[0.03] rounded-full overflow-hidden">
+                        <div className="h-3 w-full bg-surface-hover rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: "78%" }}
@@ -389,20 +389,20 @@ export default function Home() {
                           ></motion.div>
                         </div>
                         <div className="flex justify-between mt-3">
-                          <span className="text-[10px] text-muted-foreground dark:text-white/40 font-bold">₦7,800 Released</span>
-                          <span className="text-[10px] text-muted-foreground dark:text-white/40 font-bold">₦10k Ceiling</span>
+                          <span className="text-[10px] text-secondary-text font-bold">₦7,800 Released</span>
+                          <span className="text-[10px] text-secondary-text font-bold">₦10k Ceiling</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-surface-lighter dark:bg-white/[0.02] rounded-2xl p-5 border border-border dark:border-white/[0.05]">
-                        <div className="text-[9px] text-muted-foreground dark:text-white/30 uppercase font-black mb-1 tracking-widest">System Uptime</div>
-                        <div className="text-xl font-bold text-foreground dark:text-white">420.2 km</div>
+                      <div className="bg-surface-lighter rounded-2xl p-5 border border-border">
+                        <div className="text-[9px] text-tertiary-text uppercase font-black mb-1 tracking-widest">System Uptime</div>
+                        <div className="text-xl font-bold text-primary-text">420.2 km</div>
                       </div>
-                      <div className="bg-surface-lighter dark:bg-white/[0.02] rounded-2xl p-5 border border-border dark:border-white/[0.05]">
-                        <div className="text-[9px] text-muted-foreground dark:text-white/30 uppercase font-black mb-1 tracking-widest">Active Units</div>
-                        <div className="text-xl font-bold text-foreground dark:text-white">12.8k</div>
+                      <div className="bg-surface-lighter rounded-2xl p-5 border border-border">
+                        <div className="text-[9px] text-tertiary-text uppercase font-black mb-1 tracking-widest">Active Units</div>
+                        <div className="text-xl font-bold text-primary-text">12.8k</div>
                       </div>
                     </div>
                   </div>
@@ -417,7 +417,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="py-20 border-t border-border dark:border-white/[0.05]">
+        <footer className="py-20 border-t border-border">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
               <div className="space-y-6">
@@ -425,19 +425,19 @@ export default function Home() {
                   <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                     <span className="text-white font-black italic text-2xl tracking-tighter">C</span>
                   </div>
-                  <span className="text-3xl font-display font-black text-foreground dark:text-white tracking-tight">
+                  <span className="text-3xl font-display font-black text-primary-text tracking-tight">
                     Cooperatives.io
                   </span>
                 </Link>
-                <p className="text-muted-foreground dark:text-white/30 max-w-xs font-medium">The definitive paperless management system for modern cooperatives.</p>
+                <p className="text-secondary-text max-w-xs font-medium">The definitive paperless management system for modern cooperatives.</p>
               </div>
 
               <div className="flex flex-col items-end gap-6 text-right">
                 <div className="flex space-x-12">
-                  <Link href="#" className="text-muted-foreground dark:text-white/30 hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase">Privacy Protocol</Link>
-                  <Link href="#" className="text-muted-foreground dark:text-white/30 hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase">Terms of Use</Link>
+                  <Link href="#" className="text-secondary-text hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase">Privacy Protocol</Link>
+                  <Link href="#" className="text-secondary-text hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase">Terms of Use</Link>
                 </div>
-                <p className="text-muted-foreground dark:text-white/20 text-xs font-black tracking-widest uppercase italic">
+                <p className="text-tertiary-text text-xs font-black tracking-widest uppercase italic">
                   &copy; {new Date().getFullYear()} Paperless Cooperative Systems. Built for legacy.
                 </p>
               </div>

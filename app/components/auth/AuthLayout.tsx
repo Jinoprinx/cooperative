@@ -23,7 +23,7 @@ export default function AuthLayout({
   const { tenant } = useTenant();
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-[#030711] px-4 py-12 sm:px-6 lg:px-8 overflow-hidden">
+    <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#3b82f615,transparent)]" />
@@ -40,17 +40,17 @@ export default function AuthLayout({
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md z-10"
       >
-        <div className="card-premium bg-white/[0.02] backdrop-blur-[40px] border border-white/5 p-8 sm:p-12 rounded-[2.5rem] shadow-2xl relative group">
-          <div className="absolute -inset-[1px] bg-gradient-to-br from-white/10 to-transparent rounded-[2.5rem] -z-10 opacity-50" />
+        <div className="card-premium bg-surface backdrop-blur-[40px] border border-border p-8 sm:p-12 rounded-[2.5rem] shadow-2xl relative group">
+          <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/10 to-transparent rounded-[2.5rem] -z-10 opacity-50" />
           
           <div className="text-center mb-10">
             <Link href="/" className="inline-flex items-center space-x-3 mb-10 group/logo">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-                <span className="text-white font-black -rotate-[12deg] italic text-2xl tracking-tighter">
+                <span className="text-primary-foreground font-black -rotate-[12deg] italic text-2xl tracking-tighter">
                   {tenant ? tenant.name[0] : 'C'}
                 </span>
               </div>
-              <span className="text-3xl font-black text-white tracking-tighter">
+              <span className="text-3xl font-black text-primary-text tracking-tighter">
                 {tenant ? (
                   <>
                     {tenant.name.split(' ')[0]}<span className="text-primary">{tenant.name.split(' ')[1] ? ` ${tenant.name.split(' ')[1]}` : ''}</span>
@@ -63,14 +63,14 @@ export default function AuthLayout({
               </span>
             </Link>
             
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-primary-text mb-4">
               {title}
             </h2>
-            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/30">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-tertiary-text">
               {subtitle}{' '}
               <Link
                 href={linkHref}
-                className="text-primary hover:text-white transition-colors border-b border-primary/20 hover:border-white/20 pb-0.5 ml-1"
+                className="text-primary hover:text-primary-text transition-colors border-b border-primary/20 hover:border-border pb-0.5 ml-1"
               >
                 {linkText}
               </Link>
@@ -83,10 +83,10 @@ export default function AuthLayout({
         </div>
 
         <div className="mt-10 text-center animate-fade-in">
-          <div className="text-[10px] text-white/20 font-black uppercase tracking-[0.4em] italic flex items-center justify-center gap-4">
-             <div className="w-8 h-px bg-white/5" />
+          <div className="text-[10px] text-tertiary-text font-black uppercase tracking-[0.4em] italic flex items-center justify-center gap-4">
+             <div className="w-8 h-px bg-border" />
              &copy; {new Date().getFullYear()} NEXUS CORE
-             <div className="w-8 h-px bg-white/5" />
+             <div className="w-8 h-px bg-border" />
           </div>
         </div>
       </motion.div>

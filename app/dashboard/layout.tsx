@@ -13,10 +13,13 @@ import {
   FaUserCircle,
   FaBars,
   FaUserShield,
-  FaTimes
+  FaTimes,
+  FaSun,
+  FaMoon
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 import { getImageUrl } from '@/app/utils/imageUtils';
+import ThemeToggle from '@/app/components/ThemeToggle';
 
 export default function DashboardLayout({
   children,
@@ -55,14 +58,14 @@ export default function DashboardLayout({
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="text-center">
           <FaChartLine className="h-10 w-10 text-primary animate-pulse mx-auto mb-4" />
-          <p className="text-white/40 font-medium tracking-widest uppercase text-xs">Authenticating...</p>
+          <p className="text-secondary-text font-medium tracking-widest uppercase text-xs">Authenticating...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#050505] selection:bg-primary selection:text-white">
+    <div className="flex min-h-screen bg-background selection:bg-primary selection:text-white transition-colors duration-300">
       <div className="fixed inset-0 z-0 bg-[var(--mesh-gradient)] opacity-30 pointer-events-none" />
       <div className="noise-overlay" />
 
@@ -82,25 +85,25 @@ export default function DashboardLayout({
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-[110] flex w-full max-w-xs flex-col glass-card border-r border-white/5 pt-5 pb-4"
+              className="fixed inset-y-0 left-0 z-[110] flex w-full max-w-xs flex-col glass-card border-r border-border pt-5 pb-4"
             >
               <div className="px-6 flex items-center justify-between mb-10">
                 <Link href="/" className="flex items-center gap-3">
-                  <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
-                    <span className="text-white font-black italic text-xl">C</span>
+                  <div className="relative w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                    <span className="text-primary-foreground font-black italic text-xl">C</span>
                   </div>
-                  <span className="text-xl font-black text-white tracking-tighter uppercase">Coop</span>
+                  <span className="text-xl font-black text-primary-text tracking-tighter uppercase">Coop</span>
                 </Link>
                 <button
                   type="button"
-                  className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-2xl bg-surface border border-border text-secondary-text hover:text-primary-text transition-colors"
                   onClick={toggleSidebar}
                 >
                   <FaTimes className="h-5 w-5" />
                 </button>
               </div>
               <div className="flex-1 px-4 space-y-2 overflow-y-auto">
-                <div className="px-4 mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Main Menu</div>
+                <div className="px-4 mb-4 text-[10px] font-black text-tertiary-text uppercase tracking-[0.3em]">Main Menu</div>
                 {navigation.map((item) => {
                    const isActive = pathname === item.href;
                    return (
@@ -111,7 +114,7 @@ export default function DashboardLayout({
                       className={`group flex items-center rounded-2xl px-5 py-4 text-sm font-bold transition-all duration-300 ${
                         isActive
                           ? 'bg-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]'
-                          : 'text-white/40 hover:bg-white/5 hover:text-white'
+                          : 'text-secondary-text hover:bg-surface hover:text-primary-text'
                       }`}
                     >
                       <item.icon className={`mr-4 h-5 w-5 transition-transform ${isActive ? 'text-white' : 'text-current group-hover:scale-110'}`} />
@@ -120,10 +123,10 @@ export default function DashboardLayout({
                   );
                 })}
               </div>
-              <div className="px-4 pt-6 border-t border-white/5">
+              <div className="px-4 pt-6 border-t border-border">
                 <button
                   onClick={handleSignOut}
-                  className="group flex items-center rounded-2xl px-5 py-4 text-sm font-bold text-white/40 hover:bg-red-500/10 hover:text-red-400 w-full transition-all"
+                  className="group flex items-center rounded-2xl px-5 py-4 text-sm font-bold text-secondary-text hover:bg-red-500/10 hover:text-red-400 w-full transition-all"
                 >
                   <FaSignOutAlt className="mr-4 h-5 w-5" />
                   Sign out
@@ -136,22 +139,22 @@ export default function DashboardLayout({
 
       {/* Static sidebar for desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col z-20">
-        <div className="flex flex-col flex-1 glass-card border-r border-white/5 m-4 rounded-[2.5rem] p-6 pt-10">
+        <div className="flex flex-col flex-1 glass-card border-r border-border m-4 rounded-[2.5rem] p-6 pt-10">
           <div className="px-4 mb-14">
             <Link href="/" className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20 group hover:scale-105 transition-transform duration-500">
-                <span className="text-white font-black italic text-2xl">C</span>
+              <div className="relative w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group hover:scale-105 transition-transform duration-500">
+                <span className="text-primary-foreground font-black italic text-2xl">C</span>
                 <div className="absolute inset-0 bg-primary/40 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-black text-white tracking-tighter uppercase leading-none">Coop</span>
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] leading-none mt-1">Platform</span>
+                <span className="text-2xl font-black text-primary-text tracking-tighter uppercase leading-none">Coop</span>
+                <span className="text-[10px] font-black text-tertiary-text uppercase tracking-[0.4em] leading-none mt-1">Platform</span>
               </div>
             </Link>
           </div>
           
           <nav className="flex-1 space-y-2">
-            <div className="px-5 mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Navigator</div>
+            <div className="px-5 mb-4 text-[10px] font-black text-tertiary-text uppercase tracking-[0.4em]">Navigator</div>
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -161,7 +164,7 @@ export default function DashboardLayout({
                   className={`group flex items-center rounded-2xl px-6 py-4 text-sm font-bold transition-all duration-500 hover:scale-[1.02] active:scale-95 ${
                     isActive
                       ? 'bg-primary text-white shadow-[0_0_30px_rgba(59,130,246,0.3)]'
-                      : 'text-white/40 hover:bg-white/5 hover:text-white'
+                      : 'text-secondary-text hover:bg-surface hover:text-primary-text'
                   }`}
                 >
                   <item.icon className={`mr-4 h-5 w-5 transition-transform duration-300 ${isActive ? 'text-white' : 'text-current group-hover:scale-110'}`} />
@@ -171,10 +174,10 @@ export default function DashboardLayout({
             })}
           </nav>
 
-          <div className="pt-8 border-t border-white/5">
+          <div className="pt-8 border-t border-border">
             <button
               onClick={handleSignOut}
-              className="group flex items-center rounded-2xl px-6 py-4 text-sm font-bold text-white/40 hover:bg-red-500/10 hover:text-red-400 w-full transition-all duration-300"
+              className="group flex items-center rounded-2xl px-6 py-4 text-sm font-bold text-secondary-text hover:bg-red-500/10 hover:text-red-400 w-full transition-all duration-300"
             >
               <FaSignOutAlt className="mr-4 h-5 w-5 transition-colors" />
               Logout Session
@@ -185,10 +188,10 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="flex flex-1 flex-col lg:pl-80 transition-all duration-300">
-        <header className="sticky top-0 z-30 flex h-20 flex-shrink-0 backdrop-blur-xl bg-black/20 border-b border-white/5 px-4 lg:px-10 items-center justify-between">
+        <header className="sticky top-0 z-30 flex h-20 flex-shrink-0 backdrop-blur-xl bg-background/20 border-b border-border px-4 lg:px-10 items-center justify-between">
           <button
             type="button"
-            className="p-3 bg-white/5 rounded-2xl border border-white/10 text-white/50 lg:hidden"
+            className="p-3 bg-surface rounded-2xl border border-border text-secondary-text lg:hidden"
             onClick={toggleSidebar}
           >
             <FaBars className="h-6 w-6" />
@@ -198,20 +201,22 @@ export default function DashboardLayout({
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/80 leading-none mb-1">
               Member Workspace
             </span>
-            <h2 className="text-xl font-black text-white tracking-tighter leading-none">
+            <h2 className="text-xl font-black text-primary-text tracking-tighter leading-none">
               {navigation.find(n => n.href === pathname)?.name || 'Account'}
             </h2>
           </div>
 
           <div className="flex items-center gap-6">
+            <ThemeToggle />
+            
             <div className="hidden sm:flex flex-col items-end">
-              <span className="text-sm font-black text-white tracking-tight leading-none mb-1">{user?.firstName} {user?.lastName}</span>
+              <span className="text-sm font-black text-primary-text tracking-tight leading-none mb-1">{user?.firstName} {user?.lastName}</span>
               <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.3em] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Verified Member</span>
             </div>
             
             <Link href="/dashboard/account" className="relative group">
               <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative h-12 w-12 rounded-2xl bg-white/5 border border-white/10 p-0.5 overflow-hidden transition-transform duration-500 group-hover:scale-105">
+              <div className="relative h-12 w-12 rounded-2xl bg-surface border border-border p-0.5 overflow-hidden transition-transform duration-500 group-hover:scale-105">
                 {user?.profileImage ? (
                   <img
                     src={getImageUrl(user.profileImage)}

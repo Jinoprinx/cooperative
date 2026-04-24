@@ -125,19 +125,19 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="space-y-10 pb-20 text-white max-w-6xl mx-auto">
+        <div className="space-y-10 pb-20 text-primary-text max-w-6xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <div>
                     <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Core Configuration</span>
-                    <h1 className="text-4xl sm:text-5xl font-black tracking-tighter">
-                        Cooperative <span className="text-white/40">Nexus</span>
+                    <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-primary-text">
+                        Cooperative <span className="text-tertiary-text">Nexus</span>
                     </h1>
                 </div>
             </div>
 
             {message.text && (
                 <div className={`p-6 rounded-[2rem] flex items-center border animate-float ${
-                    message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                    message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'
                 }`}>
                     {message.type === 'success' ? <FaCheckCircle className="mr-3 h-5 w-5" /> : <FaExclamationCircle className="mr-3 h-5 w-5" />}
                     <span className="text-xs font-black uppercase tracking-widest">{message.text}</span>
@@ -148,24 +148,24 @@ export default function SettingsPage() {
                 <form onSubmit={handleSubmit} className="lg:col-span-1 space-y-10">
                     {/* General Info */}
                     <div className="card-premium relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
+                        <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
                         <div className="flex items-center gap-3 mb-8">
                              <FaCog className="text-primary h-5 w-5" />
-                             <h2 className="text-xl font-black tracking-tighter uppercase">General Params</h2>
+                             <h2 className="text-xl font-black tracking-tighter uppercase text-primary-text">General Params</h2>
                         </div>
                         <div className="space-y-8">
                             <div className="relative group/field">
-                                <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Registry Designation</span>
+                                <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Registry Designation</span>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-8 text-white outline-none focus:border-primary transition-all font-bold"
+                                    className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold"
                                     required
                                 />
                             </div>
-                            <div className="flex items-center gap-4 bg-white/3 p-6 rounded-2xl border border-white/5 group hover:bg-white/5 transition-all">
-                                <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out bg-white/10 rounded-full cursor-pointer">
+                            <div className="flex items-center gap-4 bg-surface p-6 rounded-2xl border border-border group hover:bg-surface-lighter transition-all">
+                                <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out bg-border rounded-full cursor-pointer">
                                     <input
                                         type="checkbox"
                                         id="registrationOpen"
@@ -177,7 +177,7 @@ export default function SettingsPage() {
                                         className="absolute w-6 h-6 rounded-full appearance-none cursor-pointer checked:bg-primary border-none left-0 checked:left-6 transition-all duration-300"
                                     />
                                 </div>
-                                <label htmlFor="registrationOpen" className="text-xs font-black uppercase tracking-widest text-white/60 cursor-pointer group-hover:text-white transition-colors">
+                                <label htmlFor="registrationOpen" className="text-xs font-black uppercase tracking-widest text-tertiary-text cursor-pointer group-hover:text-primary-text transition-colors">
                                     Member Intake Protocol Open
                                 </label>
                             </div>
@@ -188,12 +188,12 @@ export default function SettingsPage() {
                     <div className="card-premium relative overflow-hidden">
                         <div className="flex items-center gap-3 mb-8">
                              <FaPalette className="text-primary h-5 w-5" />
-                             <h2 className="text-xl font-black tracking-tighter uppercase">Visual Identity</h2>
+                             <h2 className="text-xl font-black tracking-tighter uppercase text-primary-text">Visual Identity</h2>
                         </div>
                         <div className="grid gap-6 sm:grid-cols-2">
                             <div className="space-y-4">
-                                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Dominant Hue</label>
-                                <div className="flex items-center gap-3 bg-white/3 p-2 rounded-2xl border border-white/5 hover:bg-white/5 transition-all">
+                                <label className="text-[10px] font-black text-tertiary-text uppercase tracking-widest ml-1">Dominant Hue</label>
+                                <div className="flex items-center gap-3 bg-surface p-2 rounded-2xl border border-border hover:bg-surface-lighter transition-all">
                                     <input
                                         type="color"
                                         name="primaryColor"
@@ -206,13 +206,13 @@ export default function SettingsPage() {
                                         name="primaryColor"
                                         value={formData.branding.primaryColor}
                                         onChange={handleBrandingChange}
-                                        className="flex-1 bg-transparent text-xs font-mono font-bold text-white outline-none uppercase"
+                                        className="flex-1 bg-transparent text-xs font-mono font-bold text-primary-text outline-none uppercase"
                                     />
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Accent Calibration</label>
-                                <div className="flex items-center gap-3 bg-white/3 p-2 rounded-2xl border border-white/5 hover:bg-white/5 transition-all">
+                                <label className="text-[10px] font-black text-tertiary-text uppercase tracking-widest ml-1">Accent Calibration</label>
+                                <div className="flex items-center gap-3 bg-surface p-2 rounded-2xl border border-border hover:bg-surface-lighter transition-all">
                                     <input
                                         type="color"
                                         name="accentColor"
@@ -225,18 +225,18 @@ export default function SettingsPage() {
                                         name="accentColor"
                                         value={formData.branding.accentColor}
                                         onChange={handleBrandingChange}
-                                        className="flex-1 bg-transparent text-xs font-mono font-bold text-white outline-none uppercase"
+                                        className="flex-1 bg-transparent text-xs font-mono font-bold text-primary-text outline-none uppercase"
                                     />
                                 </div>
                             </div>
                             <div className="sm:col-span-2 space-y-4 mt-4">
-                                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Symbol Asset URL</label>
+                                <label className="text-[10px] font-black text-tertiary-text uppercase tracking-widest ml-1">Symbol Asset URL</label>
                                 <input
                                     type="url"
                                     name="logoUrl"
                                     value={formData.branding.logoUrl}
                                     onChange={handleBrandingChange}
-                                    className="w-full bg-white/3 border border-white/5 rounded-2xl p-6 text-white text-xs outline-none focus:border-primary transition-all font-mono"
+                                    className="w-full bg-surface border border-border rounded-2xl p-6 text-primary-text text-xs outline-none focus:border-primary transition-all font-mono"
                                     placeholder="https://assets.nexus.io/logo.svg"
                                 />
                             </div>
@@ -246,7 +246,7 @@ export default function SettingsPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full btn-primary py-6 rounded-3xl text-sm font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500"
+                        className="w-full btn-primary py-6 rounded-3xl text-sm font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 border-none"
                     >
                         {loading ? (
                             <div className="w-5 h-5 border-4 border-white/20 border-t-white rounded-full animate-spin" />
@@ -264,24 +264,24 @@ export default function SettingsPage() {
                         </div>
                         <div className="space-y-8">
                             <div className="relative group/field">
-                                <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-white transition-colors">Max Exposure (NGN)</span>
+                                <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-primary-text transition-colors">Max Exposure (NGN)</span>
                                 <input
                                     type="number"
                                     name="maxApprovalAmount"
                                     value={formData.settings.loanRules.maxApprovalAmount}
                                     onChange={handleLoanRulesChange}
-                                    className="w-full bg-primary/10 border border-primary/20 rounded-2xl p-6 pt-8 text-white outline-none focus:border-white transition-all font-black text-2xl tracking-tighter"
+                                    className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-black text-2xl tracking-tighter"
                                 />
                             </div>
                             <div className="relative group/field">
-                                <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-white transition-colors">Yield Rate (%)</span>
+                                <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-primary-text transition-colors">Yield Rate (%)</span>
                                 <input
                                     type="number"
                                     name="interestRate"
                                     step="0.1"
                                     value={formData.settings.loanRules.interestRate}
                                     onChange={handleLoanRulesChange}
-                                    className="w-full bg-primary/10 border border-primary/20 rounded-2xl p-6 pt-8 text-white outline-none focus:border-white transition-all font-black text-2xl tracking-tighter"
+                                    className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-black text-2xl tracking-tighter"
                                 />
                             </div>
                         </div>
@@ -289,7 +289,7 @@ export default function SettingsPage() {
 
                     {/* Security - PIN Management (Main Admin Only) */}
                     {isMainAdmin && (
-                        <div className="card-premium relative overflow-hidden border-red-500/20 bg-red-500/3">
+                        <div className="card-premium relative overflow-hidden border-red-500/20 bg-red-500/5">
                             <div className="flex items-center gap-3 mb-8 border-b border-red-500/10 pb-6">
                                 <FaLock className="text-red-500 h-5 w-5" />
                                 <h2 className="text-xl font-black tracking-tighter uppercase text-red-500">Encrypted Logic</h2>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
 
                             {pinMessage.text && (
                                 <div className={`mb-8 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
-                                    pinMessage.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                                    pinMessage.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'
                                 }`}>
                                     {pinMessage.text}
                                 </div>
@@ -312,7 +312,7 @@ export default function SettingsPage() {
                                             maxLength={4}
                                             value={pinData.pin}
                                             onChange={(e) => setPinData({ ...pinData, pin: e.target.value.replace(/\D/g, '') })}
-                                            className="w-full bg-red-500/5 border border-red-500/10 rounded-2xl p-6 text-white text-center text-2xl tracking-[0.5em] outline-none focus:border-red-500 transition-all font-mono"
+                                            className="w-full bg-surface border border-border rounded-2xl p-6 text-primary-text text-center text-2xl tracking-[0.5em] outline-none focus:border-red-500 transition-all font-mono"
                                             placeholder="****"
                                         />
                                     </div>
@@ -323,7 +323,7 @@ export default function SettingsPage() {
                                             maxLength={4}
                                             value={pinData.confirmPin}
                                             onChange={(e) => setPinData({ ...pinData, confirmPin: e.target.value.replace(/\D/g, '') })}
-                                            className="w-full bg-red-500/5 border border-red-500/10 rounded-2xl p-6 text-white text-center text-2xl tracking-[0.5em] outline-none focus:border-red-500 transition-all font-mono"
+                                            className="w-full bg-surface border border-border rounded-2xl p-6 text-primary-text text-center text-2xl tracking-[0.5em] outline-none focus:border-red-500 transition-all font-mono"
                                             placeholder="****"
                                         />
                                     </div>
@@ -331,7 +331,7 @@ export default function SettingsPage() {
                                 <button
                                     type="submit"
                                     disabled={pinLoading || pinData.pin.length !== 4}
-                                    className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_30px_rgba(220,38,38,0.1)]"
+                                    className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_30px_rgba(220,38,38,0.1)] border-none"
                                 >
                                     {pinLoading ? 'Protocols Updating...' : 'Refresh Access Vector'}
                                 </button>

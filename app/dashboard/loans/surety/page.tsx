@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Loan } from '@/app/types';
+import { FaUserShield, FaCheck, FaTimes, FaHistory, FaUserCircle } from 'react-icons/fa';
 
 export default function SuretyPage() {
   const [requests, setRequests] = useState<Loan[]>([]);
@@ -87,80 +88,142 @@ export default function SuretyPage() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="text-center">
+          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-202 border-t-primary animate-spin"></div>
+          <p className="text-tertiary-text">Synchronizing Surety Requests...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-red-500 font-bold">{error}</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">Surety Requests</h1>
-      {requests.length === 0 ? (
-        <p>You have no pending surety requests.</p>
-      ) : (
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <ul className="divide-y divide-gray-200">
-            {requests.map(request => (
-              <li key={request._id} className="py-4 flex items-center justify-between">
-                <div>
-                  <p className="text-lg font-medium">
-                    {request.user ? `${request.user.firstName} ${request.user.lastName}` : 'Unknown User'}
-                  </p>
-                  <p className="text-gray-500">Wants you to be a surety for a loan of {request.amount}</p>
-                </div>
-                <div className="space-x-2">
-                  <button onClick={() => handleResponse(request._id, 'approved')} className="btn btn-success">Approve</button>
-                  <button onClick={() => handleResponse(request._id, 'rejected')} className="btn btn-danger">Reject</button>
-                </div>
-              </li>
-            ))}
-          </ul>
+    <div className="space-y-10 pb-20 text-primary-text max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Security Protocol</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-primary-text tracking-tighter">
+            Surety <span className="text-tertiary-text">Verification</span>
+          </h1>
         </div>
-      )}
+      </div>
 
-      <h2 className="text-xl font-bold text-white mt-10">Surety History</h2>
-      {history.length === 0 ? (
-        <p>You have no past surety history.</p>
-      ) : (
-        <div className="rounded-lg bg-white p-6 shadow-md overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Applicant</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Loan Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Your Response</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {history.map((item) => {
-                const status = getMySuretyStatus(item);
-                return (
-                  <tr key={item._id}>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                      {item.user ? `${item.user.firstName} ${item.user.lastName}` : 'Unknown User'}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      ₦{item.amount?.toLocaleString()}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm">
-                      <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {new Date(item.createdAt).toLocaleDateString()}
-                    </td>
+      <div className="space-y-8">
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+             <FaUserShield className="text-primary h-5 w-5" />
+             <h2 className="text-xl font-black tracking-tighter uppercase">Inbound Requests</h2>
+          </div>
+          
+          {requests.length === 0 ? (
+            <div className="card-premium p-12 text-center bg-surface border-dashed border-border flex flex-col items-center">
+              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-[0.4em] italic mb-2">No pending verification cycles</p>
+              <p className="text-sm font-medium text-secondary-text">You have no active requests requiring your authentication.</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2">
+              {requests.map(request => (
+                <div key={request._id} className="card-premium bg-surface border-border p-6 flex flex-col justify-between group hover:border-primary/30 transition-all duration-500">
+                  <div className="flex items-center gap-4 mb-6">
+                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                        <FaUserCircle className="h-6 w-6" />
+                     </div>
+                     <div>
+                        <p className="font-black text-lg text-primary-text tracking-tighter leading-none mb-1">
+                          {request.user ? `${request.user.firstName} ${request.user.lastName}` : 'Unknown Applicant'}
+                        </p>
+                        <p className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Protocol Identification</p>
+                     </div>
+                  </div>
+                  
+                  <div className="bg-surface-lighter rounded-2xl p-4 border border-border mb-6">
+                     <p className="text-[10px] font-black text-tertiary-text uppercase tracking-widest mb-1 leading-none text-center">Value Endorsement</p>
+                     <p className="text-2xl font-black text-primary-text text-center tracking-tighter">₦{request.amount?.toLocaleString()}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={() => handleResponse(request._id, 'approved')} 
+                      className="flex items-center justify-center gap-2 py-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all"
+                    >
+                      <FaCheck className="h-3 w-3" /> Authenticate
+                    </button>
+                    <button 
+                      onClick={() => handleResponse(request._id, 'rejected')} 
+                      className="flex items-center justify-center gap-2 py-3 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                    >
+                      <FaTimes className="h-3 w-3" /> Decline
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="pt-10">
+          <div className="flex items-center gap-3 mb-6">
+             <FaHistory className="text-primary h-5 w-5" />
+             <h2 className="text-xl font-black tracking-tighter uppercase">Historical Archive</h2>
+          </div>
+          
+          {history.length === 0 ? (
+            <div className="card-premium p-12 text-center bg-surface border-border">
+              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest">No past endorsements in registry</p>
+            </div>
+          ) : (
+            <div className="card-premium p-0 overflow-hidden bg-surface border-border">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-border bg-surface-lighter">
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Applicant</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Endorsed Value</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Identity Status</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Timestamp</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {history.map((item) => {
+                    const status = getMySuretyStatus(item);
+                    return (
+                      <tr key={item._id} className="group hover:bg-surface-lighter transition-colors">
+                        <td className="px-8 py-6">
+                          <p className="font-bold text-primary-text group-hover:text-primary transition-colors">
+                            {item.user ? `${item.user.firstName} ${item.user.lastName}` : 'System Subject'}
+                          </p>
+                        </td>
+                        <td className="px-8 py-6">
+                          <p className="font-black text-primary-text">₦{item.amount?.toLocaleString()}</p>
+                        </td>
+                        <td className="px-8 py-6">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                            status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                          }`}>
+                            <div className={`w-1 h-1 rounded-full ${status === 'approved' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                            {status}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 text-right font-black text-tertiary-text text-xs">
+                          {new Date(item.createdAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

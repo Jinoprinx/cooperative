@@ -48,7 +48,7 @@ const Navbar = () => {
                 <span className="text-white font-black italic text-2xl tracking-tighter">{logoChar}</span>
               )}
             </motion.div>
-            <span className="text-2xl font-display font-black text-white dark:text-white text-gray-900 tracking-tight group-hover:text-primary transition-colors">
+            <span className="text-2xl font-display font-black text-primary-text tracking-tight group-hover:text-primary transition-colors">
               {coopName}
             </span>
           </Link>
@@ -58,7 +58,7 @@ const Navbar = () => {
               <Link
                 key={item}
                 href={`#${item.toLowerCase().replace(' ', '-')}`}
-                className="text-sm font-semibold text-gray-600 dark:text-white/60 hover:text-gray-900 dark:hover:text-white transition-all hover:tracking-wider"
+                className="text-sm font-semibold text-secondary-text hover:text-primary transition-all hover:tracking-wider"
               >
                 {item}
               </Link>
@@ -72,7 +72,7 @@ const Navbar = () => {
               <>
                 <button
                   onClick={logout}
-                  className="px-6 py-2.5 text-sm font-bold text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  className="px-6 py-2.5 text-sm font-bold text-secondary-text hover:text-primary-text transition-colors"
                 >
                   Log out
                 </button>
@@ -86,7 +86,7 @@ const Navbar = () => {
               <>
                 <Link
                   href={tenant ? "/auth/login" : "/tenant-select"}
-                  className="px-3 md:px-6 py-2.5 text-sm font-bold text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  className="px-3 md:px-6 py-2.5 text-sm font-bold text-secondary-text hover:text-primary-text transition-colors"
                 >
                   Log in
                 </Link>

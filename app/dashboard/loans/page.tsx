@@ -156,8 +156,8 @@ export default function Loans() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
-          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p className="text-black">Loading loans history...</p>
+          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-202 border-t-primary animate-spin"></div>
+          <p className="text-tertiary-text">Loading loans history...</p>
         </div>
       </div>
     );
@@ -166,32 +166,18 @@ export default function Loans() {
   if (error) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500 font-bold">{error}</p>
       </div>
     );
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <FaHourglassHalf className="text-yellow-500" />;
-      case 'approved':
-      case 'active':
-        return <FaCheckCircle className="text-green-500" />;
-      case 'rejected':
-        return <FaTimesCircle className="text-red-500" />;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="space-y-10 pb-20 text-white">
+    <div className="space-y-10 pb-20 text-primary-text">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Capital Management</span>
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter">
-            Personal <span className="text-white/40">Portfolio</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-primary-text tracking-tighter">
+            Personal <span className="text-tertiary-text">Portfolio</span>
           </h1>
         </div>
       </div>
@@ -199,49 +185,49 @@ export default function Loans() {
       <div className="grid gap-10 lg:grid-cols-5 items-start">
         {/* Application Form */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="card-premium relative overflow-hidden group">
-            <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-all duration-700" />
+          <div className="card-premium relative overflow-hidden group bg-surface">
+            <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
             <h2 className="text-xl font-black tracking-tighter mb-8 flex items-center gap-3">
                <FaHandHoldingUsd className="text-primary" />
                Request Capital
             </h2>
             <div className="space-y-4">
               <div className="relative group/field">
-                 <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Principle Amount (NGN)</span>
+                 <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Principle Amount (NGN)</span>
                  <input
                   type="number"
                   placeholder="0.00"
                   value={loanAmount}
                   onChange={(e) => setLoanAmount(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-8 text-white outline-none focus:border-primary transition-all font-black text-lg"
+                  className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-black text-lg"
                 />
               </div>
               <div className="relative group/field">
-                 <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Repayment Tenure (Months)</span>
+                 <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Repayment Tenure (Months)</span>
                  <input
                   type="number"
                   placeholder="Duration"
                   value={durationMonths}
                   onChange={(e) => setDurationMonths(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-8 text-white outline-none focus:border-primary transition-all font-bold"
+                  className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold"
                 />
               </div>
               <div className="relative group/field">
-                 <span className="absolute top-2 left-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Allocation Purpose</span>
+                 <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Allocation Purpose</span>
                  <textarea
                   placeholder="Describe your requirement..."
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 pt-8 text-white outline-none focus:border-primary transition-all font-medium h-32 resize-none"
+                  className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-medium h-32 resize-none"
                 />
               </div>
 
               {/* Sureties Management */}
               <div className="pt-6 space-y-4">
                 <div className="flex justify-between items-center px-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Guarantors (Min. 2)</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-tertiary-text">Guarantors (Min. 2)</label>
                   {sureties.length < 5 && (
-                    <button onClick={addSurety} className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">
+                    <button onClick={addSurety} className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-widest hover:text-primary-text transition-colors">
                       <FaPlus className="h-3 w-3" /> Add Surety
                     </button>
                   )}
@@ -257,12 +243,12 @@ export default function Loans() {
                             placeholder="Mobile Number"
                             value={surety.phone}
                             onChange={(e) => handleSuretyChange(index, e.target.value)}
-                            className={`w-full bg-white/3 border ${surety.error ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-3 px-4 text-xs text-white outline-none focus:border-primary transition-all font-bold group-hover/surety:bg-white/5`}
+                            className={`w-full bg-surface-lighter border ${surety.error ? 'border-red-500/50' : 'border-border'} rounded-xl py-3 px-4 text-xs text-primary-text outline-none focus:border-primary transition-all font-bold`}
                           />
                           {surety.found && (
-                             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                                <div className="w-1 h-1 bg-emerald-500 rounded-full" />
-                               <span className="text-[8px] font-black text-emerald-400 uppercase tracking-tighter">Verified</span>
+                               <span className="text-[8px] font-black text-emerald-500 uppercase tracking-tighter">Verified</span>
                              </div>
                           )}
                         </div>
@@ -272,7 +258,7 @@ export default function Loans() {
                       </div>
                       
                       {surety.name && (
-                         <p className={`mt-2 text-[10px] font-black uppercase tracking-widest px-2 ${surety.found ? 'text-emerald-400' : 'text-red-400'}`}>{surety.name}</p>
+                         <p className={`mt-2 text-[10px] font-black uppercase tracking-widest px-2 ${surety.found ? 'text-emerald-500' : 'text-red-500'}`}>{surety.name}</p>
                       )}
                       {surety.error && (
                          <p className="mt-2 text-[10px] text-red-500 px-2 font-bold italic">! {surety.error}</p>
@@ -280,14 +266,14 @@ export default function Loans() {
                     </div>
                   ))}
                   {sureties.length === 0 && (
-                    <p className="text-center py-10 text-white/10 text-[10px] font-black uppercase tracking-[0.3em] border border-dashed border-white/10 rounded-2xl">Requirement: 2 Sureties</p>
+                    <p className="text-center py-10 text-tertiary-text text-[10px] font-black uppercase tracking-[0.3em] border border-dashed border-border rounded-2xl">Requirement: 2 Sureties</p>
                   )}
                 </div>
               </div>
 
               <button 
                 onClick={handleApplyLoan} 
-                className="w-full btn-primary py-5 rounded-2xl flex items-center justify-center gap-4 text-xs font-black tracking-[0.4em] uppercase transition-all duration-500 hover:tracking-[0.6em] shadow-[0_0_30px_rgba(59,130,246,0.1)] group"
+                className="w-full btn-primary py-5 rounded-2xl flex items-center justify-center gap-4 text-xs font-black tracking-[0.4em] uppercase transition-all duration-500 hover:tracking-[0.6em] shadow-none border-none group"
               >
                 Assemble Credit Request
               </button>
@@ -297,41 +283,41 @@ export default function Loans() {
 
         {/* Loan History / Records */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="card-premium p-0 overflow-hidden">
-            <div className="p-8 border-b border-white/5 flex items-center justify-between">
+          <div className="card-premium p-0 overflow-hidden bg-surface">
+            <div className="p-8 border-b border-border flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-black tracking-tighter">Ledger Archive</h2>
-                <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mt-1">Repayment Progression</p>
+                <h2 className="text-2xl font-black text-primary-text tracking-tighter">Ledger Archive</h2>
+                <p className="text-[10px] font-black text-tertiary-text uppercase tracking-[0.4em] mt-1">Repayment Progression</p>
               </div>
             </div>
             <div className="overflow-x-auto min-h-[400px]">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-white/5 bg-white/2">
-                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest">Protocol Date</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest">Classification</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest">Integrity</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Value (NGN)</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Outstanding</th>
+                  <tr className="border-b border-border bg-surface">
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Protocol Date</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Classification</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Integrity</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Value (NGN)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Outstanding</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-border">
                   {(loans || []).map((item) => (
-                    <tr key={item._id} className="group hover:bg-white/3 transition-colors">
+                    <tr key={item._id} className="group hover:bg-surface-lighter transition-colors">
                       <td className="px-8 py-6">
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-white/80">{formatDate(item.startDate || item.createdAt)}</span>
+                          <span className="text-xs font-bold text-secondary-text">{formatDate(item.startDate || item.createdAt)}</span>
                           {item.renewedFrom && (
                             <span className="text-[9px] font-black text-primary uppercase tracking-tighter mt-1">↩ Renewed Cycle</span>
                           )}
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="text-xs font-medium text-white/70 max-w-[150px] truncate">{item.purpose}</p>
+                        <p className="text-xs font-medium text-secondary-text max-w-[150px] truncate">{item.purpose}</p>
                       </td>
                       <td className="px-8 py-6">
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                          ['approved', 'active', 'completed'].includes(item.status) ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                          ['approved', 'active', 'completed'].includes(item.status) ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
                           item.status === 'renewed' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' :
                           item.status === 'pending' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' :
                           'bg-red-500/10 border-red-500/20 text-red-500'
@@ -343,11 +329,11 @@ export default function Loans() {
                            {item.status}
                         </span>
                       </td>
-                      <td className="px-8 py-6 text-right font-black text-white shadow-glow-sm">
+                      <td className="px-8 py-6 text-right font-black text-primary-text shadow-glow-sm">
                          {formatCurrency(item.amount)}
                       </td>
                       <td className="px-8 py-6 text-right">
-                         <span className={`text-sm font-black ${item.remainingAmount > 0 ? 'text-red-400' : 'text-emerald-400 opacity-20'}`}>
+                         <span className={`text-sm font-black ${item.remainingAmount > 0 ? 'text-red-500' : 'text-emerald-500 opacity-20'}`}>
                            {item.status !== 'pending' ? formatCurrency(item.remainingAmount || 0) : '—'}
                          </span>
                       </td>
@@ -355,8 +341,8 @@ export default function Loans() {
                   ))}
                   {(loans || []).length === 0 && (
                      <tr>
-                       <td colSpan={5} className="py-20 text-center bg-white/2">
-                          <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em] italic">No active or historical credit records</p>
+                       <td colSpan={5} className="py-20 text-center bg-surface">
+                          <p className="text-tertiary-text text-[10px] font-black uppercase tracking-[0.4em] italic">No active or historical credit records</p>
                        </td>
                      </tr>
                   )}

@@ -16,14 +16,19 @@ module.exports = {
         },
         secondary: {
           DEFAULT: 'var(--secondary-color)',
-          dark: '#047857', // You might want to variable-ize these too if they change significantly
+          dark: '#047857',
           light: '#34d399',
         },
         accent: 'var(--accent-color)',
-        background: 'rgb(var(--background-rgb))', // Using the RGB var for compatibility with opacity modifiers if needed, or just standard var
+        background: 'rgb(var(--background-rgb))',
+        foreground: 'var(--text-primary)',
         surface: 'var(--surface-color)',
-        'surface-lighter': 'var(--surface-hover)', // Mapping to existing hover or new var
-        border: 'var(--border-color)', // Added explicit border color
+        'surface-lighter': 'var(--surface-hover)',
+        border: 'var(--border-color)',
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-tertiary': 'var(--text-tertiary)',
+        'text-muted': 'var(--text-muted)',
         neutral: {
           50: '#f8f9fa',
           100: '#e9ecef',
