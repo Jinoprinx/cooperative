@@ -189,7 +189,7 @@ export default function Members() {
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right whitespace-nowrap">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="flex justify-end gap-2 transition-opacity duration-300">
                       {isMainAdmin && (
                         <>
                           <button
