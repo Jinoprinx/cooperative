@@ -113,6 +113,17 @@ export default function AdminLayout({
                   </Link>
                 );
               })}
+
+              <div className="pt-4 mt-4 border-t border-border/50">
+                <Link
+                  href="/dashboard"
+                  onClick={() => setSidebarOpen(false)}
+                  className="group flex items-center rounded-2xl px-4 py-3.5 text-sm font-black bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-500 shadow-lg shadow-primary/5"
+                >
+                  <FaUserCircle className="mr-3 h-5 w-5" />
+                  Member Hub
+                </Link>
+              </div>
               
               <div className="pt-4 mt-4 border-t border-border">
                 <button
@@ -167,6 +178,16 @@ export default function AdminLayout({
                   </Link>
                 );
               })}
+
+              <div className="pt-6 mt-6 border-t border-border/50">
+                <Link
+                  href="/dashboard"
+                  className="group flex items-center rounded-2xl px-5 py-4 text-sm font-black bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-500 shadow-xl shadow-primary/5 hover:scale-[1.02] active:scale-95"
+                >
+                  <FaUserCircle className="mr-4 h-5 w-5" />
+                  Member Hub
+                </Link>
+              </div>
             </nav>
 
             <div className="mt-auto pt-6 border-t border-border">

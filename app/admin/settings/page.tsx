@@ -28,6 +28,7 @@ export default function SettingsPage() {
             loanRules: {
                 maxApprovalAmount: 500000,
                 interestRate: 5,
+                deductInterestAtSource: true,
             },
             registrationOpen: true,
         }
@@ -47,6 +48,7 @@ export default function SettingsPage() {
                     loanRules: {
                         maxApprovalAmount: tenant.settings?.loanRules?.maxApprovalAmount || 500000,
                         interestRate: tenant.settings?.loanRules?.interestRate || 5,
+                        deductInterestAtSource: tenant.settings?.loanRules?.deductInterestAtSource ?? true,
                     },
                     registrationOpen: tenant.settings?.registrationOpen ?? true,
                 }
@@ -193,40 +195,52 @@ export default function SettingsPage() {
                         <div className="grid gap-6 sm:grid-cols-2">
                             <div className="space-y-4">
                                 <label className="text-[10px] font-black text-tertiary-text uppercase tracking-widest ml-1">Dominant Hue</label>
-                                <div className="flex items-center gap-3 bg-surface p-2 rounded-2xl border border-border hover:bg-surface-lighter transition-all">
-                                    <input
-                                        type="color"
-                                        name="primaryColor"
-                                        value={formData.branding.primaryColor}
-                                        onChange={handleBrandingChange}
-                                        className="h-12 w-12 rounded-xl cursor-pointer bg-transparent border-none overflow-hidden"
-                                    />
-                                    <input
-                                        type="text"
-                                        name="primaryColor"
-                                        value={formData.branding.primaryColor}
-                                        onChange={handleBrandingChange}
-                                        className="flex-1 bg-transparent text-xs font-mono font-bold text-primary-text outline-none uppercase"
-                                    />
+                                <div className="flex items-center gap-4 bg-surface p-4 rounded-3xl border border-border hover:border-primary/30 transition-all group/hue">
+                                    <div className="h-16 w-16 flex-shrink-0 bg-background rounded-2xl p-1 border border-border group-hover/hue:border-primary/50 transition-colors">
+                                        <input
+                                            type="color"
+                                            name="primaryColor"
+                                            value={formData.branding.primaryColor}
+                                            onChange={handleBrandingChange}
+                                            className="color-cube-input"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col flex-1">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                name="primaryColor"
+                                                value={formData.branding.primaryColor}
+                                                onChange={handleBrandingChange}
+                                                className="w-full bg-surface-lighter border border-border rounded-xl px-3 py-2 text-sm font-mono font-bold text-primary-text outline-none focus:border-primary transition-all uppercase tracking-tight"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="space-y-4">
                                 <label className="text-[10px] font-black text-tertiary-text uppercase tracking-widest ml-1">Accent Calibration</label>
-                                <div className="flex items-center gap-3 bg-surface p-2 rounded-2xl border border-border hover:bg-surface-lighter transition-all">
-                                    <input
-                                        type="color"
-                                        name="accentColor"
-                                        value={formData.branding.accentColor}
-                                        onChange={handleBrandingChange}
-                                        className="h-12 w-12 rounded-xl cursor-pointer bg-transparent border-none overflow-hidden"
-                                    />
-                                    <input
-                                        type="text"
-                                        name="accentColor"
-                                        value={formData.branding.accentColor}
-                                        onChange={handleBrandingChange}
-                                        className="flex-1 bg-transparent text-xs font-mono font-bold text-primary-text outline-none uppercase"
-                                    />
+                                <div className="flex items-center gap-4 bg-surface p-4 rounded-3xl border border-border hover:border-amber-500/30 transition-all group/accent">
+                                    <div className="h-16 w-16 flex-shrink-0 bg-background rounded-2xl p-1 border border-border group-hover/accent:border-amber-500/50 transition-colors">
+                                        <input
+                                            type="color"
+                                            name="accentColor"
+                                            value={formData.branding.accentColor}
+                                            onChange={handleBrandingChange}
+                                            className="color-cube-input"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col flex-1">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                name="accentColor"
+                                                value={formData.branding.accentColor}
+                                                onChange={handleBrandingChange}
+                                                className="w-full bg-surface-lighter border border-border rounded-xl px-3 py-2 text-sm font-mono font-bold text-primary-text outline-none focus:border-amber-500 transition-all uppercase tracking-tight"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="sm:col-span-2 space-y-4 mt-4">
@@ -283,6 +297,32 @@ export default function SettingsPage() {
                                     onChange={handleLoanRulesChange}
                                     className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-black text-2xl tracking-tighter"
                                 />
+                            </div>
+
+                            <div className="flex items-center justify-between gap-4 bg-surface p-6 rounded-2xl border border-border group hover:bg-surface-lighter transition-all">
+                                <div className="flex flex-col">
+                                    <label htmlFor="deductInterestAtSource" className="text-xs font-black uppercase tracking-widest text-primary hover:text-primary-text transition-colors cursor-pointer">
+                                        Deduct Interest At Source
+                                    </label>
+                                    <span className="text-[9px] text-tertiary-text font-bold uppercase tracking-tight mt-1 group-hover:text-primary/70">
+                                        {formData.settings.loanRules.deductInterestAtSource ? "Interest is subtracted from disbursement" : "Interest is added to total repayment"}
+                                    </span>
+                                </div>
+                                <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out bg-border rounded-full cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        id="deductInterestAtSource"
+                                        checked={formData.settings.loanRules.deductInterestAtSource}
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            settings: { 
+                                                ...formData.settings, 
+                                                loanRules: { ...formData.settings.loanRules, deductInterestAtSource: e.target.checked }
+                                            }
+                                        })}
+                                        className="absolute w-6 h-6 rounded-full appearance-none cursor-pointer checked:bg-primary border-none left-0 checked:left-6 transition-all duration-300"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

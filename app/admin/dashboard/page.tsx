@@ -18,6 +18,10 @@ import { useAuth } from '@/app/context/AuthContext';
 import axios from 'axios';
 import { Stats, Member, Loan } from '@/app/types';
 import { RecentMember, PendingLoan, PendingPayment } from './types';
+import PayNowButton from '@/app/components/PayNowButton';
+import { FaHandHoldingUsd } from 'react-icons/fa';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'react-hot-toast'; // Assuming react-hot-toast is available or similar
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -50,6 +54,20 @@ export default function AdminDashboard() {
   const [initialDepositAmount, setInitialDepositAmount] = useState('');
   const [initialLoanBalance, setInitialLoanBalance] = useState('');
   const [approvingRegistration, setApprovingRegistration] = useState(false);
+
+  const searchParams = useSearchParams();
+  const paymentStatus = searchParams.get('payment');
+
+  useEffect(() => {
+    if (paymentStatus === 'success') {
+      toast.success('Subscription payment successful!', {
+        duration: 5000,
+        position: 'top-center',
+      });
+      // Optionally clean up the URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [paymentStatus]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,9 +161,27 @@ export default function AdminDashboard() {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(amount);
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  const handlePaySubscription = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/billing/initialize`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.checkoutUrl) {
+        window.location.href = response.data.checkoutUrl;
+      }
+    } catch (err: any) {
+      console.error('Payment Error:', err);
+      setError(err.response?.data?.message || 'Failed to initialize payment');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleApprovePayment = async (paymentId: string) => {
@@ -507,6 +543,49 @@ export default function AdminDashboard() {
             <FaArrowUp className="rotate-45 h-2 w-2" />
           </Link>
         </div>
+
+        {/* Billing & Reserve (Main Admin Only) */}
+        {isMainAdmin && stats?.billing && (
+          <div className="card-premium group relative overflow-hidden border-primary/20 bg-primary/5 lg:col-span-1">
+            <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <span className="text-primary text-[8px] font-black uppercase tracking-[0.2em] mb-1 block">Cooperation Tier</span>
+                <h3 className="text-xl font-black text-primary-text tracking-tighter uppercase">{stats.billing.tier}</h3>
+              </div>
+              <div className="bg-primary/10 text-primary text-[8px] font-black px-2 py-1 rounded-md border border-primary/20 uppercase tracking-widest">
+                {stats.billing.subscriptionStatus}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mt-6">
+              <div className="space-y-1">
+                <span className="text-tertiary-text text-[9px] font-black uppercase tracking-tighter">Year-End Rebate</span>
+                <p className="text-lg font-black text-emerald-500 tracking-tighter">{formatCurrency(stats.billing.rebateReserve)}</p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-tertiary-text text-[9px] font-black uppercase tracking-tighter">Platform Dues</span>
+                <p className="text-lg font-black text-primary-text tracking-tighter">{formatCurrency(stats.billing.platformDues ?? stats.billing.platformBalance)}</p>
+              </div>
+            </div>
+            <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
+                <span className="text-[9px] text-tertiary-text font-bold uppercase">
+                  {stats.billing.subscriptionStatus === 'grace_period' 
+                    ? 'Grace ends in 3 days' 
+                    : stats.billing.nextBillingDate 
+                      ? `Next: ${formatDate(stats.billing.nextBillingDate)}`
+                      : 'No active subscription'}
+                </span>
+                <button 
+                  onClick={handlePaySubscription}
+                  disabled={loading}
+                  className="text-[9px] font-black text-primary uppercase tracking-widest hover:text-primary-text transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Processing...' : 'Pay Bills'}
+                </button>
+             </div>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">

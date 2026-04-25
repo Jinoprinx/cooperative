@@ -29,7 +29,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, loading, logout, isAuthenticated } = useAuth();
+  const { user, loading, logout, isAuthenticated, isAdmin } = useAuth();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -122,6 +122,19 @@ export default function DashboardLayout({
                     </Link>
                   );
                 })}
+
+                {isAdmin && (
+                  <div className="pt-4 mt-4 border-t border-border/50">
+                    <Link
+                      href="/admin/dashboard"
+                      onClick={() => setSidebarOpen(false)}
+                      className="group flex items-center rounded-2xl px-5 py-4 text-sm font-black bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-500 shadow-lg shadow-primary/5"
+                    >
+                      <FaUserShield className="mr-4 h-5 w-5" />
+                      Switch to Admin
+                    </Link>
+                  </div>
+                )}
               </div>
               <div className="px-4 pt-6 border-t border-border">
                 <button
@@ -153,7 +166,7 @@ export default function DashboardLayout({
             </Link>
           </div>
           
-          <nav className="flex-1 space-y-2">
+          <nav className="flex-1 space-y-2 overflow-y-auto">
             <div className="px-5 mb-4 text-[10px] font-black text-tertiary-text uppercase tracking-[0.4em]">Navigator</div>
             {navigation.map((item) => {
               const isActive = pathname === item.href;
@@ -172,6 +185,18 @@ export default function DashboardLayout({
                 </Link>
               );
             })}
+
+            {isAdmin && (
+              <div className="pt-6 mt-6 border-t border-border/50">
+                <Link
+                  href="/admin/dashboard"
+                  className="group flex items-center rounded-2xl px-6 py-4 text-sm font-black bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-500 shadow-xl shadow-primary/5 hover:scale-[1.02] active:scale-95"
+                >
+                  <FaUserShield className="mr-4 h-5 w-5" />
+                  Admin Control
+                </Link>
+              </div>
+            )}
           </nav>
 
           <div className="pt-8 border-t border-border">

@@ -238,3 +238,31 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.2);
 }
+
+/* Premium Color Input Styling */
+.color-cube-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent;
+  border: none !important;
+  cursor: pointer;
+  padding: 0 !important;
+  display: block;
+}
+
+.color-cube-input::-webkit-color-swatch-wrapper {
+  padding: 0 !important;
+}
+
+.color-cube-input::-webkit-color-swatch {
+  border: none !important;
+  border-radius: 0.75rem; /* Matches rounded-xl */
+}
+
+.color-cube-input::-moz-color-swatch {
+  border: none !important;
+  border-radius: 0.75rem;
+}

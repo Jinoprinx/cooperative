@@ -45,6 +45,8 @@ export type Transaction = {
   receiptUrl?: string;
   remainingAmount?: number;
   rejectionReason?: string;
+  platformFee?: number;
+  rebateAmount?: number;
 };
 
 export type Loan = {
@@ -91,6 +93,14 @@ export type Stats = {
   activeLoans: number;
   totalLoanAmount: number;
   pendingLoans: number;
+  billing?: {
+    tier: string;
+    rebateReserve: number;
+    platformBalance: number;
+    platformDues?: number;
+    subscriptionStatus: string;
+    nextBillingDate?: string;
+  };
 };
 
 export type TransactionSummary = {
