@@ -14,6 +14,7 @@ interface TenantSettings {
     loanRules?: {
         maxApprovalAmount: number;
         interestRate: number;
+        deductInterestAtSource?: boolean;
     };
     registrationOpen: boolean;
 }
