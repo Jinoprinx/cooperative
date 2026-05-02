@@ -10,7 +10,7 @@ interface User {
   lastName: string;
   email: string;
   phoneNumber?: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'super-admin';
   isMainAdmin?: boolean;
   hasPin?: boolean;
   accountNumber: string;
@@ -111,7 +111,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('user', JSON.stringify(user));
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      const redirectPath = user.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+      const redirectPath = 
+        user.role === 'super-admin' ? '/super-admin/dashboard' : 
+        user.role === 'admin' ? '/admin/dashboard' : 
+        '/dashboard';
       router.push(redirectPath);
     } catch (error) {
       if (axios.isAxiosError(error)) {
