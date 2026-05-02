@@ -6,7 +6,7 @@ export type User = {
   phoneNumber: string;
   accountNumber: string;
   accountBalance: number;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'super-admin';
   profileImage?: string;
   status: 'pending' | 'active' | 'rejected';
   isManual?: boolean;
@@ -21,7 +21,7 @@ export type Member = {
   joinDate: string;
   accountBalance: number;
   phoneNumber: string;
-  role?: 'member' | 'admin';
+  role?: 'member' | 'admin' | 'super-admin';
   status: 'pending' | 'active' | 'rejected';
   isManual?: boolean;
 };
