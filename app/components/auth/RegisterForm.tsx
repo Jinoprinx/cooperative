@@ -67,7 +67,11 @@ export default function RegisterForm() {
         tenantId: tenant?.id || tenant?._id,
       });
 
-      router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
+      if (data.superAdminKey) {
+        router.push(`/auth/login?message=${encodeURIComponent('Super Admin account activated. Please sign in.')}`);
+      } else {
+        router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to register. Please try again.');
     } finally {
