@@ -18,8 +18,8 @@ const registerSchema = z.object({
   phoneNumber: z.string().min(7, 'Invalid number'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(8, 'Confirm password is required'),
-  coopName: z.string().min(3, 'Cooperative name must be at least 3 characters').optional(),
-  subdomain: z.string().min(3, 'Subdomain must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Subdomain can only contain lowercase letters, numbers, and hyphens').optional(),
+  coopName: z.string().optional(),
+  subdomain: z.string().optional(),
   superAdminKey: z.string().optional(),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
