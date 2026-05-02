@@ -12,10 +12,12 @@ import * as ImagePicker from 'expo-image-picker';
 import api from '../../lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Dashboard() {
   const { user, refetch: refetchUser } = useUser();
   const { transactions, activeLoan, isLoading, refetch: refetchDashboard } = useDashboardData();
+  const { primaryColor } = useTheme();
   const [isPayModalVisible, setIsPayModalVisible] = useState(false);
   const [payType, setPayType] = useState<'deposit' | 'loan_repayment'>('deposit');
   const [amount, setAmount] = useState('');
@@ -99,31 +101,41 @@ export default function Dashboard() {
         {/* Welcome Header */}
         <View className="flex-row justify-between items-center mb-8">
           <View>
-            <Text className="text-white font-black text-3xl tracking-tighter">
+            <Text className="text-foreground font-black text-3xl tracking-tighter">
               Welcome, {user?.firstName}
             </Text>
-            <Text className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">
+            <Text className="text-foreground/40 text-xs font-bold uppercase tracking-widest mt-1">
               Have a productive day!
             </Text>
           </View>
-          <TouchableOpacity 
-            onPress={() => router.push('/(member)/profile')}
-            className="w-14 h-14 bg-surface border-2 border-primary/20 rounded-2xl items-center justify-center overflow-hidden"
-          >
-            {user?.profileImage ? (
-              <Image source={{ uri: user.profileImage }} className="w-full h-full" />
-            ) : (
-              <MaterialCommunityIcons name="account" size={30} color="rgba(255,255,255,0.1)" />
+          <View className="flex-row items-center">
+            {user?.role === 'admin' && (
+              <TouchableOpacity 
+                onPress={() => router.push('/(admin)')}
+                className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-2xl items-center justify-center mr-2"
+              >
+                <MaterialCommunityIcons name="shield-account-outline" size={24} color={primaryColor} />
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => router.push('/(member)/profile')}
+              className="w-14 h-14 bg-surface border-2 border-primary/20 rounded-2xl items-center justify-center overflow-hidden"
+            >
+              {user?.profileImage ? (
+                <Image source={{ uri: user.profileImage }} className="w-full h-full" />
+              ) : (
+                <MaterialCommunityIcons name="account" size={30} color="rgba(var(--foreground), 0.35)" />
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Account Balance Header */}
         <View className="mb-8">
-          <Text className="text-white/40 text-xs font-bold uppercase tracking-[0.3em] mb-2">
+          <Text className="text-foreground/45 text-xs font-bold uppercase tracking-[0.3em] mb-2">
             Your Treasury
           </Text>
-          <Text className="text-5xl font-black text-white tracking-tighter">
+          <Text className="text-5xl font-black text-foreground tracking-tighter">
             {formatCurrency(user?.accountBalance || 0)}
           </Text>
           <View className="flex-row items-center mt-3">
@@ -133,7 +145,7 @@ export default function Dashboard() {
                 +12.5%
               </Text>
             </View>
-            <Text className="text-white/20 text-[10px] font-black uppercase tracking-widest ml-3">
+            <Text className="text-foreground/45 text-[10px] font-black uppercase tracking-widest ml-3">
               Monthly Growth
             </Text>
           </View>
@@ -142,7 +154,7 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <View className="flex-row justify-between mb-8">
           {[
-            { icon: 'plus-circle', label: 'Deposit', color: '#3b82f6', onPress: () => { setPayType('deposit'); setIsPayModalVisible(true); } },
+            { icon: 'plus-circle', label: 'Deposit', color: primaryColor, onPress: () => { setPayType('deposit'); setIsPayModalVisible(true); } },
             { icon: 'hand-coin', label: 'Repay Loan', color: '#10b981', onPress: () => { setPayType('loan_repayment'); setIsPayModalVisible(true); } },
             { icon: 'history', label: 'Activity', color: '#6b7280', onPress: () => router.push('/(member)/transactions') },
             { icon: 'qrcode-scan', label: 'Scan Pay', color: '#f59e0b', onPress: () => router.push('/(member)/coming-soon') },
@@ -151,7 +163,7 @@ export default function Dashboard() {
               <View className="w-16 h-16 bg-surface border border-border rounded-3xl items-center justify-center mb-2 shadow-sm">
                 <MaterialCommunityIcons name={action.icon as any} size={28} color={action.color} />
               </View>
-              <Text className="text-white/50 text-[10px] font-bold uppercase tracking-widest">{action.label}</Text>
+              <Text className="text-foreground/60 text-[10px] font-bold uppercase tracking-widest">{action.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -161,15 +173,15 @@ export default function Dashboard() {
           <Card className="mb-8 bg-primary/5 border-primary/20">
             <View className="flex-row justify-between items-center mb-6">
               <View>
-                <Text className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">Active Loan</Text>
-                <Text className="text-3xl font-black text-white">{formatCurrency(activeLoan.remainingAmount)}</Text>
+                <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-1">Active Loan</Text>
+                <Text className="text-3xl font-black text-foreground">{formatCurrency(activeLoan.remainingAmount)}</Text>
               </View>
               <View className="w-12 h-12 bg-primary/20 rounded-2xl items-center justify-center border border-primary/30">
-                <MaterialCommunityIcons name="bank" size={24} color="#3b82f6" />
+                <MaterialCommunityIcons name="bank" size={24} color={primaryColor} />
               </View>
             </View>
             
-            <View className="h-2 w-full bg-white/5 rounded-full overflow-hidden mb-3">
+            <View className="h-2 w-full bg-foreground/5 rounded-full overflow-hidden mb-3">
               <View 
                 className="h-full bg-primary rounded-full" 
                 style={{ width: `${getLoanProgress(activeLoan.amountPaid, activeLoan.totalRepayment)}%` }}
@@ -177,10 +189,10 @@ export default function Dashboard() {
             </View>
             
             <View className="flex-row justify-between">
-              <Text className="text-white/30 text-[10px] font-bold">
+              <Text className="text-foreground/45 text-[10px] font-bold">
                 {formatCurrency(activeLoan.amountPaid)} Paid
               </Text>
-              <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest">
+              <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest">
                 Due: {formatDate(activeLoan.nextPaymentDate)}
               </Text>
             </View>
@@ -189,7 +201,7 @@ export default function Dashboard() {
 
         {/* Recent Activity */}
         <View className="mb-6 flex-row justify-between items-end">
-          <Text className="text-2xl font-black text-white tracking-tight">Recent Activity</Text>
+          <Text className="text-2xl font-black text-foreground tracking-tight">Recent Activity</Text>
           <TouchableOpacity onPress={() => router.push('/(member)/transactions')}>
             <Text className="text-primary font-bold text-xs">View All</Text>
           </TouchableOpacity>
@@ -202,7 +214,7 @@ export default function Dashboard() {
               className="bg-surface border border-border rounded-3xl p-5 flex-row items-center justify-between"
             >
               <View className="flex-row items-center">
-                <View className="w-12 h-12 bg-white/5 rounded-2xl items-center justify-center mr-4">
+                <View className="w-12 h-12 bg-foreground/5 rounded-2xl items-center justify-center mr-4">
                   <MaterialCommunityIcons 
                     name={tx.type === 'deposit' ? 'arrow-down' : 'arrow-up'} 
                     size={20} 
@@ -210,8 +222,8 @@ export default function Dashboard() {
                   />
                 </View>
                 <View>
-                  <Text className="text-white font-bold text-base" numberOfLines={1}>{tx.description}</Text>
-                  <Text className="text-white/30 text-xs font-medium">{formatDate(tx.date)}</Text>
+                  <Text className="text-foreground font-bold text-base" numberOfLines={1}>{tx.description}</Text>
+                  <Text className="text-foreground/45 text-xs font-medium">{formatDate(tx.date)}</Text>
                 </View>
               </View>
               <View className="items-end">
@@ -233,8 +245,8 @@ export default function Dashboard() {
           
           {transactions.length === 0 && (
             <View className="py-12 items-center">
-              <MaterialCommunityIcons name="note-text-outline" size={48} color="rgba(255,255,255,0.1)" />
-              <Text className="text-white/30 mt-4 font-medium">No recent transactions</Text>
+              <MaterialCommunityIcons name="note-text-outline" size={48} color="rgba(var(--foreground), 0.35)" />
+              <Text className="text-foreground/45 mt-4 font-medium">No recent transactions</Text>
             </View>
           )}
         </View>
@@ -248,11 +260,11 @@ export default function Dashboard() {
         onRequestClose={() => setIsPayModalVisible(false)}
       >
         <View className="flex-1 justify-end bg-black/60">
-          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-white/10">
-            <View className="w-12 h-1.5 bg-white/10 rounded-full self-center mb-8" />
+          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border">
+            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
             
-            <Text className="text-white font-black text-2xl mb-2 capitalize">{payType.replace('_', ' ')}</Text>
-            <Text className="text-white/40 mb-8 font-medium">Upload your proof of payment to credit your account.</Text>
+            <Text className="text-foreground font-black text-2xl mb-2 capitalize">{payType.replace('_', ' ')}</Text>
+            <Text className="text-foreground/50 mb-8 font-medium">Upload your proof of payment to credit your account.</Text>
 
             <Input 
               label="Amount Paid (₦)"
@@ -271,17 +283,18 @@ export default function Dashboard() {
 
             <TouchableOpacity 
               onPress={pickImage}
-              className="w-full h-40 bg-white/5 border-2 border-dashed border-white/10 rounded-3xl items-center justify-center mb-8 overflow-hidden"
+              className="w-full h-40 bg-foreground/5 border-2 border-dashed border-foreground/10 rounded-3xl items-center justify-center mb-8 overflow-hidden"
             >
               {receipt ? (
                 <Image source={{ uri: receipt.uri }} className="w-full h-full" resizeMode="cover" />
               ) : (
                 <View className="items-center">
-                  <MaterialCommunityIcons name="cloud-upload-outline" size={32} color="rgba(255,255,255,0.3)" />
-                  <Text className="text-white/30 font-bold mt-2">Tap to Select Receipt</Text>
+                  <MaterialCommunityIcons name="cloud-upload-outline" size={32} color="rgba(var(--foreground), 0.5)" />
+                  <Text className="text-foreground/45 font-bold mt-2">Tap to Select Receipt</Text>
                 </View>
               )}
             </TouchableOpacity>
+
 
             <View className="flex-row space-x-4">
               <Button 

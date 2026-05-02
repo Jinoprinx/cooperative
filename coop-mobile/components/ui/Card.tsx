@@ -14,7 +14,7 @@ export const Card: React.FC<CardProps> = ({ title, children, className = '', ...
       {...props}
     >
       {title && (
-        <Text className="text-white/40 text-xs font-bold uppercase tracking-widest mb-4">
+        <Text className="text-foreground/40 text-xs font-bold uppercase tracking-widest mb-4">
           {title}
         </Text>
       )}

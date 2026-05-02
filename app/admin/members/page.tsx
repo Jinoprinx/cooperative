@@ -187,6 +187,11 @@ export default function Members() {
                       <div className={`w-1 h-1 rounded-full ${member.role === 'admin' ? 'bg-purple-400 animate-pulse' : 'bg-white/20'}`} />
                       {member.role || 'member'}
                     </span>
+                    {member.isManual && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-amber-500/10 border-amber-500/20 text-amber-500 ml-2">
+                        Manual
+                      </span>
+                    )}
                   </td>
                   <td className="px-8 py-6 text-right whitespace-nowrap">
                     <div className="flex justify-end gap-2 transition-opacity duration-300">
@@ -227,8 +232,8 @@ export default function Members() {
           <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowAddModal(false)} />
           <div className="relative glass-card p-12 rounded-[3.5rem] border border-border w-full max-w-xl shadow-2xl animate-float">
             <div className="mb-10 text-center">
-               <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-2">New Enrollment</h3>
-               <p className="text-tertiary-text text-xs font-bold uppercase tracking-widest">Onboard a member into the platform</p>
+               <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-2">Enroll Manual Member</h3>
+               <p className="text-tertiary-text text-xs font-bold uppercase tracking-widest">For members who cannot manage their accounts digitally. Default password: <span className="text-primary">password123</span></p>
             </div>
             
             <form onSubmit={handleAddMember} className="space-y-4">

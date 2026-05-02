@@ -8,7 +8,10 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function Login() {
+  const { primaryColor } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -57,18 +60,18 @@ export default function Login() {
             }}
             className="flex-row items-center mb-12 pt-2"
           >
-            <MaterialCommunityIcons name="chevron-left" size={24} color="#3b82f6" />
+            <MaterialCommunityIcons name="chevron-left" size={24} color={primaryColor} />
             <Text className="text-primary font-bold ml-1">Change Cooperative</Text>
           </TouchableOpacity>
 
           <View className="mb-12">
-            <Text className="text-white/30 text-xs font-bold uppercase tracking-[0.3em] mb-4">
+            <Text className="text-foreground/30 text-xs font-bold uppercase tracking-[0.3em] mb-4">
               {tenant?.name || 'Cooperative'}
             </Text>
-            <Text className="text-5xl font-bold text-white tracking-tighter mb-4">
+            <Text className="text-5xl font-bold text-foreground tracking-tighter mb-4">
               Welcome{"\n"}Back
             </Text>
-            <Text className="text-white/50 text-lg font-medium leading-relaxed">
+            <Text className="text-foreground/50 text-lg font-medium leading-relaxed">
               Login to access your cooperative account.
             </Text>
           </View>
@@ -112,7 +115,7 @@ export default function Login() {
           />
 
           <View className="flex-row justify-center items-center mt-auto pb-4">
-            <Text className="text-white/40 font-medium">Don't have an account? </Text>
+            <Text className="text-foreground/40 font-medium">Don't have an account? </Text>
             <Link href="/(auth)/register" asChild>
               <TouchableOpacity>
                 <Text className="text-primary font-bold shadow-sm shadow-primary/20 text-glow">Join now</Text>
@@ -122,8 +125,8 @@ export default function Login() {
 
           <Link href="/" asChild>
              <TouchableOpacity className="pb-12 pt-4 flex-row justify-center items-center">
-               <Text className="text-white/40 font-bold uppercase tracking-widest text-xs">Skip to Homepage</Text>
-               <MaterialCommunityIcons name="arrow-right" size={14} color="rgba(255,255,255,0.4)" style={{ marginLeft: 4 }} />
+               <Text className="text-foreground/40 font-bold uppercase tracking-widest text-xs">Skip to Homepage</Text>
+               <MaterialCommunityIcons name="arrow-right" size={14} color="rgba(var(--foreground), 0.4)" style={{ marginLeft: 4 }} />
              </TouchableOpacity>
           </Link>
         </ScrollView>

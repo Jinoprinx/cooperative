@@ -39,8 +39,8 @@ export const Button: React.FC<ButtonProps> = ({
   const textStyles = {
     primary: "text-white font-bold",
     secondary: "text-white font-bold",
-    outline: "text-white font-semibold",
-    ghost: "text-white/60 font-semibold",
+    outline: "text-foreground font-semibold",
+    ghost: "text-foreground/60 font-semibold",
   };
 
   const textSize = {

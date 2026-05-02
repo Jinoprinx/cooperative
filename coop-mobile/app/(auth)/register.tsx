@@ -8,7 +8,10 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function Register() {
+  const { primaryColor } = useTheme();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -21,6 +24,7 @@ export default function Register() {
     subdomain: '',
     superAdminKey: '',
   });
+// ... state ...
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -105,7 +109,7 @@ export default function Register() {
           {tenant ? (
             <Link href="/(auth)/login" asChild>
               <TouchableOpacity className="flex-row items-center mb-8 pt-2">
-                <MaterialCommunityIcons name="chevron-left" size={24} color="#3b82f6" />
+                <MaterialCommunityIcons name="chevron-left" size={24} color={primaryColor} />
                 <Text className="text-primary font-bold ml-1">Back to Login</Text>
               </TouchableOpacity>
             </Link>
@@ -114,14 +118,14 @@ export default function Register() {
               onPress={() => router.push('/')} 
               className="flex-row items-center mb-8 pt-2"
             >
-              <MaterialCommunityIcons name="chevron-left" size={24} color="#3b82f6" />
+              <MaterialCommunityIcons name="chevron-left" size={24} color={primaryColor} />
               <Text className="text-primary font-bold ml-1">Back to Home</Text>
             </TouchableOpacity>
           )}
 
           <View className="mb-8">
             {tenant ? (
-              <Text className="text-white/30 text-xs font-bold uppercase tracking-[0.3em] mb-4">
+              <Text className="text-foreground/30 text-xs font-bold uppercase tracking-[0.3em] mb-4">
                 Join {tenant.name}
               </Text>
             ) : (
@@ -129,10 +133,10 @@ export default function Register() {
                 New Cooperative
               </Text>
             )}
-            <Text className="text-4xl font-bold text-white tracking-tighter mb-4">
+            <Text className="text-4xl font-bold text-foreground tracking-tighter mb-4">
               {tenant ? 'Member Registration' : 'Register Society'}
             </Text>
-            <Text className="text-white/50 text-sm font-medium leading-relaxed">
+            <Text className="text-foreground/50 text-sm font-medium leading-relaxed">
               {tenant 
                 ? 'Create your account to start saving and borrowing with your cooperative.' 
                 : 'Fill in these details to register your cooperative and become the super admin.'}
@@ -143,8 +147,8 @@ export default function Register() {
           {!tenant && (
             <View className="bg-surface border border-border p-5 rounded-3xl mb-8 space-y-4">
               <View className="flex-row items-center mb-2">
-                <MaterialCommunityIcons name="domain" size={20} color="#3b82f6" />
-                <Text className="text-white font-bold ml-2">Cooperative Details</Text>
+                <MaterialCommunityIcons name="domain" size={20} color={primaryColor} />
+                <Text className="text-foreground font-bold ml-2">Cooperative Details</Text>
               </View>
               
               <Input
@@ -161,7 +165,7 @@ export default function Register() {
                 onChangeText={(v) => updateForm('subdomain', v.toLowerCase())}
                 autoCapitalize="none"
               />
-              <Text className="text-[10px] text-white/40 ml-1 -mt-2">
+              <Text className="text-[10px] text-foreground/40 ml-1 -mt-2">
                 Your portal will be: {formData.subdomain || 'subdomain'}.coopapp.com
               </Text>
 
@@ -179,8 +183,8 @@ export default function Register() {
           <View className="space-y-4 mb-8">
             {!tenant && (
                <View className="flex-row items-center mb-2 pt-2">
-                 <MaterialCommunityIcons name="account" size={20} color="#3b82f6" />
-                 <Text className="text-white font-bold ml-2">Admin Details</Text>
+                 <MaterialCommunityIcons name="account" size={20} color={primaryColor} />
+                 <Text className="text-foreground font-bold ml-2">Admin Details</Text>
                </View>
             )}
             
@@ -212,7 +216,7 @@ export default function Register() {
             />
 
             <View className="mb-4">
-              <Text className="text-white/60 text-xs font-bold uppercase tracking-widest mb-2 px-1">
+              <Text className="text-foreground/60 text-xs font-bold uppercase tracking-widest mb-2 px-1">
                 Phone Number
               </Text>
               <View className="flex-row">
@@ -234,7 +238,7 @@ export default function Register() {
                   }}
                   className="bg-surface border border-border rounded-2xl px-4 h-14 justify-center items-center mr-3 min-w-[80px]"
                 >
-                  <Text className="text-white text-base font-bold">{formData.countryCode}</Text>
+                  <Text className="text-foreground text-base font-bold">{formData.countryCode}</Text>
                 </TouchableOpacity>
                 <Input
                   placeholder="803 123 4567"

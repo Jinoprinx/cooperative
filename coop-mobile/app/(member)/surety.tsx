@@ -22,9 +22,13 @@ interface SuretyRequest {
   };
 }
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function Surety() {
   const { suretyRequests, isLoading, refetch } = useDashboardData();
+  const { primaryColor } = useTheme();
   const [selectedRequest, setSelectedRequest] = useState<SuretyRequest | null>(null);
+// ... logic ...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isRejecting, setIsRejecting] = useState(false);
@@ -70,13 +74,13 @@ export default function Surety() {
     <SafeAreaView className="flex-1 bg-background" edges={['left', 'right']}>
       <ScrollView 
         contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#3b82f6" />}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={primaryColor} />}
       >
         <View className="mb-8">
-          <Text className="text-white/40 text-xs font-bold uppercase tracking-[0.3em] mb-2">
+          <Text className="text-foreground/40 text-xs font-bold uppercase tracking-[0.3em] mb-2">
             Pending Requests
           </Text>
-          <Text className="text-white text-base font-medium">
+          <Text className="text-foreground text-base font-medium">
             You have {suretyRequests?.length || 0} active surety requests that require your attention.
           </Text>
         </View>
@@ -89,41 +93,41 @@ export default function Surety() {
           >
             <View className="flex-row justify-between items-start mb-4">
               <View className="flex-1">
-                <Text className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">Requester</Text>
-                <Text className="text-white font-black text-xl">
+                <Text className="text-foreground/40 text-[10px] font-black uppercase tracking-widest mb-1">Requester</Text>
+                <Text className="text-foreground font-black text-xl">
                   {request.user?.firstName} {request.user?.lastName}
                 </Text>
               </View>
               <View className="w-12 h-12 bg-primary/10 rounded-2xl items-center justify-center border border-primary/20">
-                <MaterialCommunityIcons name="shield-account" size={24} color="#3b82f6" />
+                <MaterialCommunityIcons name="shield-account" size={24} color={primaryColor} />
               </View>
             </View>
 
             <View className="flex-row justify-between items-end mb-4">
               <View>
-                <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Loan Amount</Text>
-                <Text className="text-white font-bold text-lg">{formatCurrency(request.amount)}</Text>
+                <Text className="text-foreground/30 text-[10px] font-bold uppercase tracking-widest mb-1">Loan Amount</Text>
+                <Text className="text-foreground font-bold text-lg">{formatCurrency(request.amount)}</Text>
               </View>
               <View className="items-end">
-                <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Duration</Text>
-                <Text className="text-white font-bold">{request.durationMonths} Months</Text>
+                <Text className="text-foreground/30 text-[10px] font-bold uppercase tracking-widest mb-1">Duration</Text>
+                <Text className="text-foreground font-bold">{request.durationMonths} Months</Text>
               </View>
             </View>
 
-            <View className="pt-4 border-t border-white/5">
-              <Text className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-2">Purpose</Text>
-              <Text className="text-white/60 text-sm italic" numberOfLines={2}>"{request.purpose}"</Text>
+            <View className="pt-4 border-t border-border/50">
+              <Text className="text-foreground/40 text-[10px] font-bold uppercase tracking-widest mb-2">Purpose</Text>
+              <Text className="text-foreground/60 text-sm italic" numberOfLines={2}>"{request.purpose}"</Text>
             </View>
           </TouchableOpacity>
         ))}
 
         {(!suretyRequests || suretyRequests.length === 0) && (
           <View className="py-20 items-center">
-            <View className="w-20 h-20 bg-white/5 rounded-[2.5rem] items-center justify-center mb-6">
-              <MaterialCommunityIcons name="shield-check-outline" size={40} color="rgba(255,255,255,0.1)" />
+            <View className="w-20 h-20 bg-foreground/5 rounded-[2.5rem] items-center justify-center mb-6">
+              <MaterialCommunityIcons name="shield-check-outline" size={40} color="rgba(var(--foreground), 0.1)" />
             </View>
-            <Text className="text-white font-black text-xl mb-2">All Clear!</Text>
-            <Text className="text-white/30 text-center px-10">You don't have any pending surety requests at the moment.</Text>
+            <Text className="text-foreground font-black text-xl mb-2">All Clear!</Text>
+            <Text className="text-foreground/30 text-center px-10">You don't have any pending surety requests at the moment.</Text>
           </View>
         )}
       </ScrollView>
@@ -136,11 +140,11 @@ export default function Surety() {
         onRequestClose={() => setIsModalVisible(false)}
       >
         <View className="flex-1 justify-end bg-black/60">
-          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-white/10">
-            <View className="w-12 h-1.5 bg-white/10 rounded-full self-center mb-8" />
+          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border">
+            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
             
-            <Text className="text-white font-black text-2xl mb-2">Surety Request</Text>
-            <Text className="text-white/40 mb-8 font-medium">
+            <Text className="text-foreground font-black text-2xl mb-2">Surety Request</Text>
+            <Text className="text-foreground/40 mb-8 font-medium">
               By approving, you agree to stand as a surety for {selectedRequest?.user?.firstName}'s loan of {formatCurrency(selectedRequest?.amount || 0)}.
             </Text>
 

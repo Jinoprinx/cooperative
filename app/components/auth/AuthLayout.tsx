@@ -46,7 +46,7 @@ export default function AuthLayout({
           <div className="text-center mb-10">
             <Link href="/" className="inline-flex items-center space-x-3 mb-10 group/logo">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-                <span className="text-primary-foreground font-black -rotate-[12deg] italic text-2xl tracking-tighter">
+                <span className="text-white font-black -rotate-[12deg] italic text-2xl tracking-tighter">
                   {tenant ? tenant.name[0] : 'C'}
                 </span>
               </div>

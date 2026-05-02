@@ -1,14 +1,9 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { useAuth } from '../context/AuthContext';
-import { useTenant } from '../context/TenantContext';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Index() {
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
   const { tenant, tenantDetails, isLoading: isTenantLoading, clearTenant } = useTenant();
+  const { primaryColor } = useTheme();
   const router = useRouter();
 
   console.log('Index Render:', { isAuthLoading, isTenantLoading, isAuthenticated, hasTenant: !!tenant });
@@ -20,7 +15,7 @@ export default function Index() {
   if (isAuthLoading || isTenantLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#3b82f6" />
+        <ActivityIndicator size="large" color={primaryColor} />
       </View>
     );
   }
@@ -28,7 +23,7 @@ export default function Index() {
   // If a tenant is selected, show the Tenant Landing View
   if (tenant) {
     return (
-      <SafeAreaView className="flex-1 bg-background" style={{ backgroundColor: '#050505' }}>
+      <SafeAreaView className="flex-1 bg-background">
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
           <View className="flex-1 px-6 pt-12 pb-8">
             <View className="items-center mb-12 mt-8">
@@ -38,16 +33,16 @@ export default function Index() {
                 </Text>
               </View>
               
-              <Text className="text-5xl font-black text-white tracking-tighter text-center mb-4 leading-none">
+              <Text className="text-5xl font-black text-foreground tracking-tighter text-center mb-4 leading-none">
                 {tenant.name}
               </Text>
-              <Text className="text-white/40 font-bold uppercase tracking-[0.2em] text-center text-xs">
+              <Text className="text-foreground/40 font-bold uppercase tracking-[0.2em] text-center text-xs">
                 Official Cooperative Portal
               </Text>
             </View>
 
-            <View className="bg-surface border border-white/5 p-8 rounded-[2.5rem] mb-12">
-               <Text className="text-white/60 text-center leading-relaxed font-medium text-lg mb-8">
+            <View className="bg-surface border border-border p-8 rounded-[2.5rem] mb-12">
+               <Text className="text-foreground/60 text-center leading-relaxed font-medium text-lg mb-8">
                  Access your contributions, loans, and membership records in one secure place.
                </Text>
 
@@ -73,23 +68,23 @@ export default function Index() {
                         onPress={() => router.push('/(auth)/register')}
                         className="bg-surface border border-border py-5 rounded-2xl items-center"
                       >
-                        <Text className="text-white font-bold text-lg">Join Cooperative</Text>
+                        <Text className="text-foreground font-bold text-lg">Join Cooperative</Text>
                       </TouchableOpacity>
                     </>
                   )}
                </View>
             </View>
 
-            <View className="mt-auto pt-10 border-t border-white/5">
+            <View className="mt-auto pt-10 border-t border-border/50">
               <TouchableOpacity 
                 onPress={handleVisitMainSite}
                 className="py-4 items-center flex-row justify-center"
               >
-                <View className="w-8 h-[1px] bg-white/10 mr-4" />
-                <Text className="text-white/30 font-black tracking-[0.3em] uppercase text-[10px]">
+                <View className="w-8 h-[1px] bg-foreground/10 mr-4" />
+                <Text className="text-foreground/30 font-black tracking-[0.3em] uppercase text-[10px]">
                   Switch Cooperative
                 </Text>
-                <View className="w-8 h-[1px] bg-white/10 ml-4" />
+                <View className="w-8 h-[1px] bg-foreground/10 ml-4" />
               </TouchableOpacity>
             </View>
           </View>
@@ -99,12 +94,12 @@ export default function Index() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ backgroundColor: '#050505' }}>
+    <SafeAreaView className="flex-1 bg-background">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
         <View className="flex-1 px-6 pt-12 pb-8">
           
           {/* Debug Marker */}
-          <View style={{ height: 2, backgroundColor: '#3b82f6', width: '100%', marginBottom: 10 }} />
+          <View style={{ height: 2, backgroundColor: primaryColor, width: '100%', marginBottom: 10 }} />
           
           {/* Hero Section */}
           <View className="mb-12 mt-8">
@@ -115,14 +110,14 @@ export default function Index() {
               </Text>
             </View>
 
-            <Text className="text-6xl font-black text-white tracking-tighter leading-[1.1] mb-2">
+            <Text className="text-6xl font-black text-foreground tracking-tighter leading-[1.1] mb-2">
               Future of
             </Text>
             <Text className="text-6xl font-black text-primary tracking-tighter leading-[1.1] mb-6">
               Cooperative Management
             </Text>
 
-            <Text className="text-white/50 text-base font-medium leading-relaxed mb-10 max-w-[90%]">
+            <Text className="text-foreground/50 text-base font-medium leading-relaxed mb-10 max-w-[90%]">
               Streamline your society with our intelligent, secure, and fully automated financial ecosystem.
             </Text>
 
@@ -147,43 +142,43 @@ export default function Index() {
                 }}
                 className="bg-surface border border-border py-4 rounded-2xl items-center"
               >
-                <Text className="text-white font-bold text-base">Register Cooperative</Text>
+                <Text className="text-foreground font-bold text-base">Register Cooperative</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Features Section */}
           <View className="flex-1 mt-6">
-            <Text className="text-white font-bold text-xl mb-6 tracking-tight">Why Choose CoopApp?</Text>
+            <Text className="text-foreground font-bold text-xl mb-6 tracking-tight">Why Choose CoopApp?</Text>
             
             <View className="space-y-4">
-              <View className="bg-surface border border-white/5 p-5 rounded-3xl flex-row items-center">
+              <View className="bg-surface border border-border p-5 rounded-3xl flex-row items-center">
                 <View className="w-12 h-12 bg-blue-500/20 rounded-2xl items-center justify-center mr-4">
                   <MaterialCommunityIcons name="card-account-details-outline" size={24} color="#60a5fa" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-white font-bold text-base mb-1">Digital Identity</Text>
-                  <Text className="text-white/40 text-xs leading-relaxed">Secure, paperless profiles and automated KYC verification.</Text>
+                  <Text className="text-foreground font-bold text-base mb-1">Digital Identity</Text>
+                  <Text className="text-foreground/40 text-xs leading-relaxed">Secure, paperless profiles and automated KYC verification.</Text>
                 </View>
               </View>
 
-              <View className="bg-surface border border-white/5 p-5 rounded-3xl flex-row items-center">
+              <View className="bg-surface border border-border p-5 rounded-3xl flex-row items-center">
                 <View className="w-12 h-12 bg-emerald-500/20 rounded-2xl items-center justify-center mr-4">
                   <MaterialCommunityIcons name="book-open-outline" size={24} color="#34d399" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-white font-bold text-base mb-1">Automated Ledger</Text>
-                  <Text className="text-white/40 text-xs leading-relaxed">Eliminate manual bookkeeping with real-time digital tracking.</Text>
+                  <Text className="text-foreground font-bold text-base mb-1">Automated Ledger</Text>
+                  <Text className="text-foreground/40 text-xs leading-relaxed">Eliminate manual bookkeeping with real-time digital tracking.</Text>
                 </View>
               </View>
 
-              <View className="bg-surface border border-white/5 p-5 rounded-3xl flex-row items-center">
+              <View className="bg-surface border border-border p-5 rounded-3xl flex-row items-center">
                 <View className="w-12 h-12 bg-amber-500/20 rounded-2xl items-center justify-center mr-4">
                   <MaterialCommunityIcons name="handshake-outline" size={24} color="#fbbf24" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-white font-bold text-base mb-1">Paperless Lending</Text>
-                  <Text className="text-white/40 text-xs leading-relaxed">Accelerate approvals with document-free loan applications.</Text>
+                  <Text className="text-foreground font-bold text-base mb-1">Paperless Lending</Text>
+                  <Text className="text-foreground/40 text-xs leading-relaxed">Accelerate approvals with document-free loan applications.</Text>
                 </View>
               </View>
             </View>

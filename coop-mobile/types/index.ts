@@ -11,6 +11,12 @@ export interface User {
   isVerified: boolean;
   profileImage?: string;
   tenantId?: string;
+  isMainAdmin?: boolean;
+  hasPin?: boolean;
+  isManual?: boolean;
+  status?: 'pending' | 'active' | 'rejected';
+  subdomain?: string;
+  tenantName?: string;
 }
 
 export interface Transaction {
@@ -52,6 +58,14 @@ export interface Tenant {
     logoUrl?: string;
     primaryColor?: string;
   };
+  settings?: {
+    loanRules?: {
+      maxApprovalAmount?: number;
+      interestRate?: number;
+      deductInterestAtSource?: boolean;
+    };
+    registrationOpen?: boolean;
+  };
 }
 
 export interface DashboardSummary {
@@ -71,4 +85,13 @@ export interface AdminStats {
   activeMembers: number;
   activeLoans: number;
   totalLoanAmount: number;
+  pendingPayments: number;
+  billing?: {
+    tier: string;
+    rebateReserve: number;
+    platformBalance: number;
+    platformDues?: number;
+    subscriptionStatus: string;
+    nextBillingDate?: string;
+  };
 }

@@ -1,18 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAuth } from '../../context/AuthContext';
 import { useTenant } from '../../context/TenantContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function AdminLayout() {
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { tenant, isLoading: isTenantLoading } = useTenant();
+  const { colorScheme, primaryColor } = useTheme();
 
-  if (isAuthLoading || isTenantLoading) {
+  const tabColors = useMemo(() => ({
+    headerBg: colorScheme === 'dark' ? '#050505' : '#ffffff',
+    headerText: colorScheme === 'dark' ? '#fff' : '#050505',
+    tabBarBg: colorScheme === 'dark' ? '#0a0a0a' : '#f9f9f9',
+    tabBarBorder: colorScheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+    inactiveText: colorScheme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+  }), [colorScheme]);
+
+  if (isTenantLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#3b82f6" />
+        <ActivityIndicator size="large" color={primaryColor} />
       </View>
     );
   }
@@ -22,26 +30,26 @@ export default function AdminLayout() {
       screenOptions={{
         headerShown: true,
         headerStyle: {
-          backgroundColor: '#050505',
+          backgroundColor: tabColors.headerBg,
           borderBottomWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
         },
         headerTitleStyle: {
-          color: '#fff',
+          color: tabColors.headerText,
           fontWeight: 'bold',
           fontSize: 20,
         },
         tabBarStyle: {
-          backgroundColor: '#0a0a0a',
+          backgroundColor: tabColors.tabBarBg,
           borderTopWidth: 1,
-          borderTopColor: 'rgba(255,255,255,0.05)',
+          borderTopColor: tabColors.tabBarBorder,
           height: 90,
           paddingBottom: 30,
           paddingTop: 10,
         },
-        tabBarActiveTintColor: '#3b82f6',
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.3)',
+        tabBarActiveTintColor: primaryColor,
+        tabBarInactiveTintColor: tabColors.inactiveText,
       }}
     >
       <Tabs.Screen
@@ -92,6 +100,13 @@ export default function AdminLayout() {
             <MaterialCommunityIcons name="account" size={size} color={color} />
           ),
           headerTitle: 'Admin Profile',
+        }}
+      />
+      <Tabs.Screen
+        name="member-ledger"
+        options={{
+          href: null,
+          headerShown: false,
         }}
       />
     </Tabs>

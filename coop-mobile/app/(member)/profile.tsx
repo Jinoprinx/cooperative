@@ -10,12 +10,15 @@ import * as ImagePicker from 'expo-image-picker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function Profile() {
   const { logout, refreshUser } = useAuth();
   const { user, refetch: refetchUser } = useUser();
   const { tenant } = useTenant();
+  const { primaryColor } = useTheme();
   const queryClient = useQueryClient();
-
+// ... logic ...
   useEffect(() => {
     refreshUser();
   }, []);
@@ -95,11 +98,11 @@ export default function Profile() {
           <View className="relative">
             <View className="w-28 h-28 bg-surface border-4 border-primary/20 rounded-[2.5rem] items-center justify-center shadow-xl shadow-primary/10 overflow-hidden">
               {uploadMutation.isPending ? (
-                <ActivityIndicator color="#3b82f6" />
+                <ActivityIndicator color={primaryColor} />
               ) : user?.profileImage ? (
                 <Image source={{ uri: user.profileImage }} className="w-full h-full" />
               ) : (
-                <MaterialCommunityIcons name="account" size={60} color="rgba(255,255,255,0.1)" />
+                <MaterialCommunityIcons name="account" size={60} color="rgba(var(--foreground), 0.35)" />
               )}
             </View>
             <TouchableOpacity 
@@ -111,10 +114,10 @@ export default function Profile() {
             </TouchableOpacity>
           </View>
           
-          <Text className="text-3xl font-black text-white mt-6 tracking-tighter">
+          <Text className="text-3xl font-black text-foreground mt-6 tracking-tighter">
             {user?.firstName} {user?.lastName}
           </Text>
-          <Text className="text-white/40 font-bold uppercase tracking-[0.2em] mt-1">
+          <Text className="text-foreground/50 font-bold uppercase tracking-[0.2em] mt-1">
             Active Member
           </Text>
         </View>
@@ -126,37 +129,37 @@ export default function Profile() {
               <MaterialCommunityIcons name="office-building" size={24} color="white" />
             </View>
             <View>
-              <Text className="text-white/30 text-[9px] font-black uppercase tracking-widest mb-1">Your Cooperative</Text>
-              <Text className="text-white font-bold text-lg">{tenant?.name || 'Cooperative'}</Text>
+              <Text className="text-foreground/45 text-[9px] font-black uppercase tracking-widest mb-1">Your Cooperative</Text>
+              <Text className="text-foreground font-bold text-lg">{tenant?.name || 'Cooperative'}</Text>
             </View>
           </View>
-          <MaterialCommunityIcons name="check-decagram" size={24} color="#3b82f6" />
+          <MaterialCommunityIcons name="check-decagram" size={24} color={primaryColor} />
         </View>
 
         {/* Account Info */}
         <Card title="Account Details" className="mb-8">
           <View className="space-y-6">
             <View className="flex-row items-center">
-              <MaterialCommunityIcons name="identifier" size={20} color="rgba(255,255,255,0.2)" className="mr-4" />
+              <MaterialCommunityIcons name="identifier" size={20} color="rgba(var(--foreground), 0.45)" className="mr-4" />
               <View>
-                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Account Number</Text>
-                <Text className="text-white font-bold text-base mt-0.5">{user?.accountNumber || 'Pending Verification'}</Text>
+                <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest">Account Number</Text>
+                <Text className="text-foreground font-bold text-base mt-0.5">{user?.accountNumber || 'Pending Verification'}</Text>
               </View>
             </View>
             
             <View className="flex-row items-center">
-              <MaterialCommunityIcons name="email-outline" size={20} color="rgba(255,255,255,0.2)" className="mr-4" />
+              <MaterialCommunityIcons name="email-outline" size={20} color="rgba(var(--foreground), 0.45)" className="mr-4" />
               <View>
-                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Email Address</Text>
-                <Text className="text-white font-bold text-base mt-0.5">{user?.email}</Text>
+                <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest">Email Address</Text>
+                <Text className="text-foreground font-bold text-base mt-0.5">{user?.email}</Text>
               </View>
             </View>
 
             <View className="flex-row items-center">
-              <MaterialCommunityIcons name="phone-outline" size={20} color="rgba(255,255,255,0.2)" className="mr-4" />
+              <MaterialCommunityIcons name="phone-outline" size={20} color="rgba(var(--foreground), 0.45)" className="mr-4" />
               <View>
-                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Phone Number</Text>
-                <Text className="text-white font-bold text-base mt-0.5">{user?.phoneNumber || 'Not provided'}</Text>
+                <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest">Phone Number</Text>
+                <Text className="text-foreground font-bold text-base mt-0.5">{user?.phoneNumber || 'Not provided'}</Text>
               </View>
             </View>
           </View>
@@ -170,12 +173,12 @@ export default function Profile() {
               className="bg-surface border border-border p-5 rounded-3xl flex-row items-center justify-between"
             >
               <View className="flex-row items-center">
-                <View className="w-10 h-10 bg-white/5 rounded-xl items-center justify-center mr-4">
+                <View className="w-10 h-10 bg-foreground/5 rounded-xl items-center justify-center mr-4">
                   <MaterialCommunityIcons name={item.icon as any} size={20} color={item.color} />
                 </View>
-                <Text className="text-white font-bold">{item.label}</Text>
+                <Text className="text-foreground font-bold">{item.label}</Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="rgba(255,255,255,0.1)" />
+              <MaterialCommunityIcons name="chevron-right" size={24} color="rgba(var(--foreground), 0.35)" />
             </TouchableOpacity>
           ))}
         </View>
@@ -188,7 +191,7 @@ export default function Profile() {
           <Text className="text-red-500 font-bold text-lg">Sign Out</Text>
         </TouchableOpacity>
 
-        <Text className="text-white/10 text-center text-xs font-bold uppercase tracking-[0.3em]">
+        <Text className="text-foreground/30 text-center text-xs font-bold uppercase tracking-[0.3em]">
           Coopapp Mobile v1.0.0
         </Text>
       </ScrollView>

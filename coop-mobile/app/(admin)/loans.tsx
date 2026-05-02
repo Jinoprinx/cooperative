@@ -31,10 +31,13 @@ interface ExtendedLoan extends Loan {
   }>;
 }
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function AdminLoans() {
   const [activeTab, setActiveTab] = useState<Tab>('active');
   const [selectedLoan, setSelectedLoan] = useState<ExtendedLoan | null>(null);
   const [isDetailsVisible, setIsDetailsVisible] = useState(false);
+  const { primaryColor } = useTheme();
 
   const { initialTab } = useLocalSearchParams<{ initialTab: Tab }>();
 
@@ -98,7 +101,7 @@ export default function AdminLoans() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': case 'approved': return '#3b82f6';
+      case 'active': case 'approved': return primaryColor;
       case 'completed': return '#10b981';
       case 'rejected': return '#ef4444';
       case 'pending': return '#f59e0b';
@@ -114,14 +117,14 @@ export default function AdminLoans() {
             onPress={() => setActiveTab('active')}
             className={`flex-1 py-3 rounded-xl items-center ${activeTab === 'active' ? 'bg-primary' : ''}`}
           >
-            <Text className={`font-bold ${activeTab === 'active' ? 'text-white' : 'text-white/40'}`}>Registry</Text>
+            <Text className={`font-bold ${activeTab === 'active' ? 'text-white' : 'text-foreground/40'}`}>Registry</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             onPress={() => setActiveTab('pending')}
             className={`flex-1 py-3 rounded-xl items-center ${activeTab === 'pending' ? 'bg-primary' : ''}`}
           >
             <View className="flex-row items-center">
-              <Text className={`font-bold ${activeTab === 'pending' ? 'text-white' : 'text-white/40'}`}>Requests</Text>
+              <Text className={`font-bold ${activeTab === 'pending' ? 'text-white' : 'text-foreground/40'}`}>Requests</Text>
               {pendingLoans && pendingLoans.length > 0 && (
                 <View className="ml-2 bg-amber-500 px-2 py-0.5 rounded-full">
                   <Text className="text-white text-[10px] font-black">{pendingLoans.length}</Text>
@@ -134,7 +137,7 @@ export default function AdminLoans() {
 
       <ScrollView 
         contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} tintColor="#3b82f6" />}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} tintColor={primaryColor} />}
       >
         {currentData?.map((loan) => (
           <TouchableOpacity 
@@ -144,10 +147,10 @@ export default function AdminLoans() {
           >
             <View className="flex-row justify-between items-start mb-4">
               <View className="flex-1">
-                <Text className="text-white font-bold text-lg" numberOfLines={1}>
+                <Text className="text-foreground font-bold text-lg" numberOfLines={1}>
                   {loan.user?.firstName} {loan.user?.lastName}
                 </Text>
-                <Text className="text-white/30 text-xs font-medium">Applied: {formatDate(loan.createdAt)}</Text>
+                <Text className="text-foreground/50 text-xs font-medium">Applied: {formatDate(loan.createdAt)}</Text>
               </View>
               <View 
                 className="px-3 py-1 rounded-full border"
@@ -164,28 +167,28 @@ export default function AdminLoans() {
 
             <View className="flex-row justify-between items-end">
               <View>
-                <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">
+                <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">
                   {loan.status === 'pending' ? 'Requested Amount' : 'Remaining Balance'}
                 </Text>
-                <Text className="text-white font-black text-2xl">
+                <Text className="text-foreground font-black text-2xl">
                   {formatCurrency(loan.status === 'pending' ? loan.amount : loan.remainingAmount)}
                 </Text>
               </View>
               <View className="items-end">
-                <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Duration</Text>
-                <Text className="text-white font-bold">{loan.durationMonths} Months</Text>
+                <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Duration</Text>
+                <Text className="text-foreground font-bold">{loan.durationMonths} Months</Text>
               </View>
             </View>
 
             {['active', 'approved'].includes(loan.status) && (
-              <View className="mt-4 pt-4 border-t border-white/5">
-                <View className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden mb-2">
+              <View className="mt-4 pt-4 border-t border-border/50">
+                <View className="h-1.5 w-full bg-foreground/5 rounded-full overflow-hidden mb-2">
                   <View 
                     className="h-full bg-primary rounded-full" 
                     style={{ width: `${getLoanProgress(loan.amountPaid, loan.totalRepayment)}%` }}
                   />
                 </View>
-                <Text className="text-white/20 text-[10px] font-bold text-right uppercase">
+                <Text className="text-foreground/40 text-[10px] font-bold text-right uppercase">
                   {Math.round(getLoanProgress(loan.amountPaid, loan.totalRepayment))}% Paid
                 </Text>
               </View>
@@ -195,8 +198,8 @@ export default function AdminLoans() {
 
         {currentData?.length === 0 && (
           <View className="py-20 items-center">
-            <MaterialCommunityIcons name="bank-off-outline" size={64} color="rgba(255,255,255,0.1)" />
-            <Text className="text-white/30 mt-4 font-medium">No loans found</Text>
+            <MaterialCommunityIcons name="bank-off-outline" size={64} color="rgba(var(--foreground), 0.35)" />
+            <Text className="text-foreground/45 mt-4 font-medium">No loans found</Text>
           </View>
         )}
       </ScrollView>
@@ -209,14 +212,14 @@ export default function AdminLoans() {
         onRequestClose={() => setIsDetailsVisible(false)}
       >
         <View className="flex-1 justify-end bg-black/60">
-          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-white/10 max-h-[90%]">
-            <View className="w-12 h-1.5 bg-white/10 rounded-full self-center mb-8" />
+          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border max-h-[90%]">
+            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
             
             <ScrollView showsVerticalScrollIndicator={false}>
               <View className="flex-row justify-between items-center mb-6">
                 <View>
-                  <Text className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">Loan Details</Text>
-                  <Text className="text-white font-black text-2xl">{selectedLoan?.user?.firstName} {selectedLoan?.user?.lastName}</Text>
+                  <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-1">Loan Details</Text>
+                  <Text className="text-foreground font-black text-2xl">{selectedLoan?.user?.firstName} {selectedLoan?.user?.lastName}</Text>
                 </View>
                 <View 
                   className="px-3 py-1 rounded-full border"
@@ -231,41 +234,41 @@ export default function AdminLoans() {
                 </View>
               </View>
 
-              <Card className="mb-6 bg-white/5 p-6 rounded-[2rem]">
+              <Card className="mb-6 bg-foreground/5 p-6 rounded-[2rem]">
                 <View className="flex-row justify-between mb-4">
                   <View>
-                    <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Principal</Text>
-                    <Text className="text-white font-bold text-lg">{formatCurrency(selectedLoan?.amount || 0)}</Text>
+                    <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Principal</Text>
+                    <Text className="text-foreground font-bold text-lg">{formatCurrency(selectedLoan?.amount || 0)}</Text>
                   </View>
                   <View className="items-end">
-                    <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Interest Rate</Text>
-                    <Text className="text-white font-bold text-lg">{selectedLoan?.interestRate || 0}%</Text>
+                    <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Interest Rate</Text>
+                    <Text className="text-foreground font-bold text-lg">{selectedLoan?.interestRate || 0}%</Text>
                   </View>
                 </View>
                 <View className="flex-row justify-between">
                   <View>
-                    <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Total Repayment</Text>
-                    <Text className="text-white font-bold text-lg">{formatCurrency(selectedLoan?.totalRepayment || 0)}</Text>
+                    <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Total Repayment</Text>
+                    <Text className="text-foreground font-bold text-lg">{formatCurrency(selectedLoan?.totalRepayment || 0)}</Text>
                   </View>
                   <View className="items-end">
-                    <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-1">Monthly Pay</Text>
-                    <Text className="text-white font-bold text-lg">{formatCurrency(selectedLoan?.monthlyPayment || 0)}</Text>
+                    <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Monthly Pay</Text>
+                    <Text className="text-foreground font-bold text-lg">{formatCurrency(selectedLoan?.monthlyPayment || 0)}</Text>
                   </View>
                 </View>
               </Card>
 
-              <Text className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-3 ml-1">Loan Purpose</Text>
-              <View className="bg-white/5 p-5 rounded-3xl mb-6">
-                <Text className="text-white font-medium italic">"{selectedLoan?.purpose}"</Text>
+              <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-3 ml-1">Loan Purpose</Text>
+              <View className="bg-foreground/5 p-5 rounded-3xl mb-6">
+                <Text className="text-foreground font-medium italic">"{selectedLoan?.purpose}"</Text>
               </View>
 
-              <Text className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-3 ml-1">Sureties Status</Text>
+              <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-3 ml-1">Sureties Status</Text>
               <View className="space-y-3 mb-8">
                 {selectedLoan?.sureties.map((surety, idx) => (
-                  <View key={idx} className="bg-white/5 p-4 rounded-2xl flex-row items-center justify-between">
+                  <View key={idx} className="bg-foreground/5 p-4 rounded-2xl flex-row items-center justify-between">
                     <View>
-                      <Text className="text-white font-bold">{surety.user.firstName} {surety.user.lastName}</Text>
-                      <Text className="text-white/30 text-[10px]">{surety.user.phoneNumber}</Text>
+                      <Text className="text-foreground font-bold">{surety.user.firstName} {surety.user.lastName}</Text>
+                      <Text className="text-foreground/30 text-[10px]">{surety.user.phoneNumber}</Text>
                     </View>
                     <View className="flex-row items-center">
                       <MaterialCommunityIcons 

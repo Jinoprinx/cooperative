@@ -9,7 +9,10 @@ import { Button } from '../components/ui/Button';
 import { Tenant } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { useTheme } from '../context/ThemeContext';
+
 export default function TenantSelect() {
+  const { primaryColor } = useTheme();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Tenant[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -18,12 +21,13 @@ export default function TenantSelect() {
   const { tenant, isLoading: isTenantLoading, setActiveTenant, searchTenants, clearTenant } = useTenant();
   const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
+  const scrollViewRef = React.useRef<ScrollView>(null);
 
   // Show loading indicator during state transitions
   if (isAuthLoading || isTenantLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#3b82f6" />
+        <ActivityIndicator size="large" color={primaryColor} />
       </View>
     );
   }
@@ -42,6 +46,13 @@ export default function TenantSelect() {
     try {
       const dbResults = await searchTenants(query);
       setResults(dbResults);
+      
+      // Auto-scroll to results after a short delay to allow UI to render
+      if (dbResults.length > 0) {
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
     } catch (err: any) {
       setResults([]);
       const msg = err?.message || '';
@@ -65,12 +76,15 @@ export default function TenantSelect() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView contentContainerStyle={{ padding: 24, paddingTop: 60 }}>
+      <ScrollView 
+        ref={scrollViewRef}
+        contentContainerStyle={{ padding: 24, paddingTop: 60 }}
+      >
         <TouchableOpacity 
           onPress={() => router.push('/')} 
           className="flex-row items-center mb-8 pt-2"
         >
-          <MaterialCommunityIcons name="chevron-left" size={24} color="#3b82f6" />
+          <MaterialCommunityIcons name="chevron-left" size={24} color={primaryColor} />
           <Text className="text-primary font-bold ml-1">Back to Home</Text>
         </TouchableOpacity>
 
@@ -78,10 +92,10 @@ export default function TenantSelect() {
           <View className="w-16 h-16 bg-primary rounded-3xl items-center justify-center mb-6 shadow-xl shadow-primary/30">
             <MaterialCommunityIcons name="office-building" size={32} color="white" />
           </View>
-          <Text className="text-4xl font-bold text-white tracking-tighter mb-4">
+          <Text className="text-4xl font-bold text-foreground tracking-tighter mb-4">
             Find your{"\n"}Cooperative
           </Text>
-          <Text className="text-white/50 text-lg font-medium leading-relaxed">
+          <Text className="text-foreground/50 text-lg font-medium leading-relaxed">
             Enter the unique name or subdomain of your society to access your portal.
           </Text>
         </View>
@@ -103,7 +117,7 @@ export default function TenantSelect() {
 
         <View className="flex-row items-center justify-center my-6 opacity-60">
           <View className="h-[1px] bg-border flex-1" />
-          <Text className="text-xs font-bold uppercase tracking-widest text-white/50 mx-4">OR</Text>
+          <Text className="text-xs font-bold uppercase tracking-widest text-foreground/50 mx-4">OR</Text>
           <View className="h-[1px] bg-border flex-1" />
         </View>
 
@@ -119,7 +133,7 @@ export default function TenantSelect() {
 
         {results.length > 0 && (
           <View className="space-y-4">
-            <Text className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">
+            <Text className="text-foreground/30 text-xs font-bold uppercase tracking-widest mb-2">
               Search Results
             </Text>
             {results.map((tenant) => (
@@ -130,19 +144,19 @@ export default function TenantSelect() {
                 className="bg-surface border border-border rounded-3xl p-6 flex-row items-center justify-between shadow-sm"
               >
                 <View className="flex-row items-center">
-                  <View className="w-12 h-12 bg-white/5 rounded-2xl items-center justify-center mr-4">
+                  <View className="w-12 h-12 bg-foreground/5 rounded-2xl items-center justify-center mr-4">
                     <Text className="text-primary font-black text-xl">
                       {tenant.name.charAt(0).toUpperCase()}
                     </Text>
                   </View>
                   <View>
-                    <Text className="text-white font-bold text-lg">{tenant.name}</Text>
-                    <Text className="text-white/30 text-sm font-medium">
+                    <Text className="text-foreground font-bold text-lg">{tenant.name}</Text>
+                    <Text className="text-foreground/30 text-sm font-medium">
                       {tenant.subdomain}.cooperatives.io
                     </Text>
                   </View>
                 </View>
-                <MaterialCommunityIcons name="chevron-right" size={24} color="rgba(255,255,255,0.2)" />
+                <MaterialCommunityIcons name="chevron-right" size={24} color="rgba(var(--foreground), 0.2)" />
               </TouchableOpacity>
             ))}
           </View>
@@ -159,11 +173,11 @@ export default function TenantSelect() {
 
         {hasSearched && !searchError && results.length === 0 && (
           <View className="items-center py-8">
-            <MaterialCommunityIcons name="magnify-close" size={48} color="rgba(255,255,255,0.15)" />
-            <Text className="text-white/40 text-base font-medium mt-4">
+            <MaterialCommunityIcons name="magnify-close" size={48} color="rgba(var(--foreground), 0.15)" />
+            <Text className="text-foreground/40 text-base font-medium mt-4">
               No cooperatives found for "{query}"
             </Text>
-            <Text className="text-white/20 text-sm mt-1">
+            <Text className="text-foreground/20 text-sm mt-1">
               Try a different name or check the spelling
             </Text>
           </View>

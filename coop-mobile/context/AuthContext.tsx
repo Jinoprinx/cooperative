@@ -33,6 +33,8 @@ interface AuthState {
 
 interface AuthContextType extends AuthState {
   isAuthenticated: boolean;
+  isAdmin: boolean;
+  isMainAdmin: boolean;
   login: (email: string, password: string, tenantId?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -191,11 +193,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const isAdmin = isAuthenticated && (authState.user?.role === 'admin' || authState.user?.role === 'super-admin');
+  const isMainAdmin = isAdmin && !!authState.user?.isMainAdmin;
+
   return (
     <AuthContext.Provider
       value={{
         ...authState,
         isAuthenticated,
+        isAdmin,
+        isMainAdmin,
         login,
         logout,
         refreshUser,

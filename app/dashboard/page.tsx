@@ -1,12 +1,14 @@
 'use client';
 
-import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle, FaBell, FaTimes } from 'react-icons/fa';
+import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle, FaBell, FaTimes, FaShieldAlt, FaKey } from 'react-icons/fa';
 import Link from 'next/link';
 import { useUser } from '@/app/hooks/useUser';
 import { useDashboardData } from '@/app/hooks/useDashboardData';
+import { useAuth } from '@/app/context/AuthContext';
 import PayNowButton from '../components/PayNowButton';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Notification {
   _id: string;
@@ -18,8 +20,16 @@ interface Notification {
 export default function Dashboard() {
   const { user, loading: userLoading, error: userError } = useUser();
   const { transactions, activeLoan, summary, loading: dataLoading, error: dataError } = useDashboardData();
+  const { updateUser, logout } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifLoading, setNotifLoading] = useState(true);
+
+  // Take over account states
+  const [showTakeoverModal, setShowTakeoverModal] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [takeoverLoading, setTakeoverLoading] = useState(false);
+  const [takeoverError, setTakeoverError] = useState('');
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -51,12 +61,43 @@ export default function Dashboard() {
     }
   };
 
+  const handleTakeover = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTakeoverError('');
+    if (newPassword !== confirmPassword) {
+      setTakeoverError('Passwords do not match');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setTakeoverError('Password must be at least 8 characters');
+      return;
+    }
+
+    setTakeoverLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/auth/take-over`, {
+        password: newPassword
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Success! Logout and redirect to login
+      alert('Account taken over successfully! Please log in with your new password.');
+      logout();
+    } catch (err: any) {
+      setTakeoverError(err.response?.data?.message || 'Failed to take over account');
+    } finally {
+      setTakeoverLoading(false);
+    }
+  };
+
   const loading = userLoading || dataLoading;
   const error = userError || dataError;
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="flex h-64 items-center justify-center bg-surface">
         <div className="text-center">
           <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-202 border-t-primary animate-spin"></div>
           <p className="text-tertiary-text">Loading dashboard...</p>
@@ -67,7 +108,7 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="flex h-64 items-center justify-center bg-surface">
         <p className="text-red-500 font-bold">{error}</p>
       </div>
     );
@@ -90,6 +131,32 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-10 pb-20">
+      {/* Manual Member Banner */}
+      {user?.isManual && (
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="relative group overflow-hidden cursor-pointer"
+          onClick={() => setShowTakeoverModal(true)}
+        >
+           <div className="absolute inset-0 bg-amber-500/10 blur-xl group-hover:bg-amber-500/20 transition-all" />
+           <div className="relative flex items-center justify-between p-6 glass-card border border-amber-500/20 rounded-[2rem] border-l-4 border-l-amber-500 bg-surface/50 backdrop-blur-md">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-500">
+                <FaShieldAlt className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-black text-primary-text uppercase tracking-tight">Manual Mode Enabled</p>
+                <p className="text-[10px] font-bold text-tertiary-text uppercase tracking-widest mt-0.5">Your account is currently managed by administrators. <span className="text-amber-500">Take control now</span></p>
+              </div>
+            </div>
+            <button className="px-6 py-2 bg-amber-500 text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-amber-400 transition-colors">
+              Initialize Takeover
+            </button>
+           </div>
+        </motion.div>
+      )}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Personal Ledger</span>
@@ -102,7 +169,7 @@ export default function Dashboard() {
             <span className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Status</span>
             <span className="text-emerald-500 text-xs font-bold flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Active Member
+              {user?.isManual ? 'Manual Access' : 'Active Member'}
             </span>
           </div>
         </div>
@@ -147,7 +214,7 @@ export default function Dashboard() {
           <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
           <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Savings Balance</p>
+              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">{user?.isManual ? 'Current Balance' : 'Savings Balance'}</p>
               <h3 className="text-3xl font-black text-primary-text tracking-tighter shadow-glow-sm">{formatCurrency(user?.accountBalance || 0)}</h3>
             </div>
             <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
@@ -333,6 +400,20 @@ export default function Dashboard() {
                     <p className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Verify Details</p>
                   </div>
                </Link>
+               {user?.isManual && (
+                  <button 
+                  onClick={() => setShowTakeoverModal(true)}
+                  className="w-full flex items-center gap-4 p-4 bg-amber-500/10 rounded-3xl border border-amber-500/30 hover:border-amber-500 group transition-all duration-300"
+                  >
+                     <div className="w-10 h-10 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                       <FaShieldAlt className="h-5 w-5" />
+                     </div>
+                     <div className="flex-1 text-left">
+                       <p className="text-sm font-bold text-primary-text leading-none mb-1">Take Over Account</p>
+                       <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Set Security Key</p>
+                     </div>
+                  </button>
+               )}
             </div>
           </div>
 
@@ -343,6 +424,78 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Takeover Modal */}
+      <AnimatePresence>
+        {showTakeoverModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-surface">
+             <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               className="absolute inset-0 bg-black/80 backdrop-blur-3xl" 
+               onClick={() => setShowTakeoverModal(false)} 
+             />
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0, y: 20 }}
+               animate={{ scale: 1, opacity: 1, y: 0 }}
+               exit={{ scale: 0.9, opacity: 0, y: 20 }}
+               className="relative glass-card p-12 rounded-[3.5rem] border border-border w-full max-w-xl shadow-2xl bg-surface"
+             >
+                <div className="mb-10 text-center">
+                   <div className="w-20 h-20 rounded-3xl bg-amber-500/10 flex items-center justify-center text-amber-500 mx-auto mb-6 border border-amber-500/20 animate-float">
+                      <FaKey className="text-3xl" />
+                   </div>
+                   <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-2">Initialize Security Hub</h3>
+                   <p className="text-tertiary-text text-xs font-bold uppercase tracking-widest">Transition from Manual to Automatic Control</p>
+                </div>
+
+                {takeoverError && (
+                  <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                    <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">{takeoverError}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleTakeover} className="space-y-6">
+                  <div className="space-y-2 relative group-field">
+                    <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] z-10">New Security Vector (Password)</span>
+                    <input
+                      type="password"
+                      required
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full bg-surface-lighter border border-border rounded-2xl p-6 pt-10 text-primary-text text-sm outline-none focus:border-primary transition-all font-black tracking-[0.3em]"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  <div className="space-y-2 relative group-field">
+                    <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] z-10">Verify Vector</span>
+                    <input
+                      type="password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full bg-surface-lighter border border-border rounded-2xl p-6 pt-10 text-primary-text text-sm outline-none focus:border-primary transition-all font-black tracking-[0.3em]"
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  <p className="text-[9px] text-tertiary-text font-bold text-center px-4">
+                    NOTE: Once you take over, administrators will no longer be able to upload documents or manage your account directly.
+                  </p>
+
+                  <button 
+                   type="submit" 
+                   disabled={takeoverLoading}
+                   className="w-full btn-primary bg-amber-500 hover:bg-amber-400 text-black py-5 rounded-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_50px_rgba(245,158,11,0.2)] mt-4 disabled:opacity-50"
+                  >
+                    {takeoverLoading ? 'Recalibrating Protocols...' : 'Authorize Independence'}
+                  </button>
+                </form>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

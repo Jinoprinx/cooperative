@@ -4,6 +4,15 @@
 
 @layer base {
   :root {
+    --background: 255 255 255;
+    --foreground: 5 5 5;
+    --primary: 59 130 246;
+    --secondary: 16 185 129;
+    --surface: 245 245 245;
+    --border: 0 0 0 / 0.08;
+  }
+
+  .dark {
     --background: 5 5 5;
     --foreground: 255 255 255;
     --primary: 59 130 246;

@@ -10,6 +10,7 @@ interface TenantContextType {
   setActiveTenant: (tenant: { subdomain: string; name: string }) => Promise<void>;
   clearTenant: () => Promise<void>;
   searchTenants: (query: string) => Promise<Tenant[]>;
+  refreshTenantDetails: () => Promise<void>;
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
@@ -19,6 +20,16 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const [tenantDetails, setTenantDetails] = useState<Tenant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const refreshTenantDetails = async () => {
+    if (!tenant?.subdomain) return;
+    try {
+      const res = await api.get(`/tenants/resolve?subdomain=${tenant.subdomain}`);
+      setTenantDetails(res.data);
+    } catch (e) {
+      console.warn('Could not refresh tenant details', e);
+    }
+  };
+// ... existing load logic ...
   useEffect(() => {
     const load = async () => {
       try {
@@ -66,7 +77,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
   return (
     <TenantContext.Provider
-      value={{ tenant, tenantDetails, isLoading, setActiveTenant, clearTenant, searchTenants }}
+      value={{ tenant, tenantDetails, isLoading, setActiveTenant, clearTenant, searchTenants, refreshTenantDetails }}
     >
       {children}
     </TenantContext.Provider>

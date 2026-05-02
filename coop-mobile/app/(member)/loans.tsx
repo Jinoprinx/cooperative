@@ -19,13 +19,15 @@ interface SuretyEntry {
   error?: string;
 }
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function Loans() {
   const { activeLoan, isLoading: isDashLoading, refetch } = useDashboardData();
   const { user: currentUser } = useAuth();
+  const { primaryColor } = useTheme();
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false);
-  
-  // Application Form State
+// ... existing state ...
   const [amount, setAmount] = useState('');
   const [duration, setDuration] = useState('12');
   const [purpose, setPurpose] = useState('');
@@ -180,21 +182,21 @@ export default function Loans() {
       <ScrollView 
         contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#3b82f6" />
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={primaryColor} />
         }
       >
         <View className="mb-8 flex-row justify-between items-end">
           <View>
-            <Text className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mb-1">
+            <Text className="text-foreground/40 text-[10px] font-black uppercase tracking-[0.3em] mb-1">
               Credit & Lending
             </Text>
-            <Text className="text-4xl font-black text-white tracking-tighter">My Loans</Text>
+            <Text className="text-4xl font-black text-foreground tracking-tighter">My Loans</Text>
           </View>
           <TouchableOpacity 
             onPress={() => setIsHistoryModalVisible(true)}
-            className="bg-white/5 p-3 rounded-2xl border border-white/5"
+            className="bg-foreground/5 p-3 rounded-2xl border border-foreground/5"
           >
-            <MaterialCommunityIcons name="history" size={24} color="rgba(255,255,255,0.6)" />
+            <MaterialCommunityIcons name="history" size={24} color="rgba(var(--foreground), 0.6)" />
           </TouchableOpacity>
         </View>
 
@@ -203,15 +205,15 @@ export default function Loans() {
             <Card className="bg-primary/5 border-primary/20 p-8">
               <View className="flex-row justify-between items-start mb-8">
                 <View>
-                  <Text className="text-white/30 text-[10px] font-black uppercase tracking-widest mb-2">Total Outstanding</Text>
-                  <Text className="text-5xl font-black text-white tracking-tighter">{formatCurrency(activeLoan.remainingAmount)}</Text>
+                  <Text className="text-foreground/30 text-[10px] font-black uppercase tracking-widest mb-2">Total Outstanding</Text>
+                  <Text className="text-5xl font-black text-foreground tracking-tighter">{formatCurrency(activeLoan.remainingAmount)}</Text>
                 </View>
                 <View className="w-14 h-14 bg-primary/20 rounded-2xl items-center justify-center border border-primary/30">
-                  <MaterialCommunityIcons name="bank" size={28} color="#3b82f6" />
+                  <MaterialCommunityIcons name="bank" size={28} color={primaryColor} />
                 </View>
               </View>
 
-              <View className="h-2 w-full bg-white/5 rounded-full overflow-hidden mb-4">
+              <View className="h-2 w-full bg-foreground/5 rounded-full overflow-hidden mb-4">
                 <View 
                   className="h-full bg-primary rounded-full" 
                   style={{ width: `${getLoanProgress(activeLoan.amountPaid, activeLoan.totalRepayment)}%` }}
@@ -219,31 +221,31 @@ export default function Loans() {
               </View>
 
               <View className="flex-row justify-between mb-8">
-                <Text className="text-white/40 text-[10px] font-black uppercase">Progress</Text>
-                <Text className="text-white/40 text-[10px] font-black uppercase">
+                <Text className="text-foreground/40 text-[10px] font-black uppercase">Progress</Text>
+                <Text className="text-foreground/40 text-[10px] font-black uppercase">
                   {getLoanProgress(activeLoan.amountPaid, activeLoan.totalRepayment).toFixed(0)}%
                 </Text>
               </View>
 
               <View className="space-y-4">
-                <View className="flex-row justify-between items-center bg-white/5 p-5 rounded-3xl">
+                <View className="flex-row justify-between items-center bg-foreground/5 p-5 rounded-3xl">
                   <View>
-                    <Text className="text-white/20 text-[10px] font-black uppercase tracking-widest mb-1">Monthly Installment</Text>
-                    <Text className="text-white font-bold text-lg">{formatCurrency(activeLoan.monthlyPayment)}</Text>
+                    <Text className="text-foreground/20 text-[10px] font-black uppercase tracking-widest mb-1">Monthly Installment</Text>
+                    <Text className="text-foreground font-bold text-lg">{formatCurrency(activeLoan.monthlyPayment)}</Text>
                   </View>
                   <View className="items-end">
-                    <Text className="text-white/20 text-[10px] font-black uppercase tracking-widest mb-1">Next Due Date</Text>
+                    <Text className="text-foreground/20 text-[10px] font-black uppercase tracking-widest mb-1">Next Due Date</Text>
                     <Text className="text-primary font-black text-lg">{formatDate(activeLoan.nextPaymentDate)}</Text>
                   </View>
                 </View>
 
-                <View className="flex-row justify-between items-center bg-white/5 p-5 rounded-3xl">
+                <View className="flex-row justify-between items-center bg-foreground/5 p-5 rounded-3xl">
                   <View>
-                    <Text className="text-white/20 text-[10px] font-black uppercase tracking-widest mb-1">Principal Amount</Text>
-                    <Text className="text-white/60 font-bold">{formatCurrency(activeLoan.amount)}</Text>
+                    <Text className="text-foreground/20 text-[10px] font-black uppercase tracking-widest mb-1">Principal Amount</Text>
+                    <Text className="text-foreground/60 font-bold">{formatCurrency(activeLoan.amount)}</Text>
                   </View>
                   <View className="items-end">
-                    <Text className="text-white/20 text-[10px] font-black uppercase tracking-widest mb-1">Amount Paid</Text>
+                    <Text className="text-foreground/20 text-[10px] font-black uppercase tracking-widest mb-1">Amount Paid</Text>
                     <Text className="text-emerald-500 font-bold">{formatCurrency(activeLoan.amountPaid)}</Text>
                   </View>
                 </View>
@@ -261,10 +263,10 @@ export default function Loans() {
           <View>
             <Card className="items-center py-16 mb-8 bg-surface border-border">
               <View className="w-24 h-24 bg-primary/10 rounded-[2.5rem] items-center justify-center mb-8 border border-primary/20">
-                <MaterialCommunityIcons name="rocket-launch-outline" size={48} color="#3b82f6" />
+                <MaterialCommunityIcons name="rocket-launch-outline" size={48} color={primaryColor} />
               </View>
-              <Text className="text-3xl font-black text-white text-center mb-4 tracking-tight">Need a Boost?</Text>
-              <Text className="text-white/40 text-center px-10 leading-relaxed mb-10 text-base">
+              <Text className="text-3xl font-black text-foreground text-center mb-4 tracking-tight">Need a Boost?</Text>
+              <Text className="text-foreground/40 text-center px-10 leading-relaxed mb-10 text-base">
                 Get instant access to credit with transparent terms and no hidden fees.
               </Text>
               <Button 
@@ -274,19 +276,19 @@ export default function Loans() {
               />
             </Card>
 
-            <Text className="text-white/30 text-[10px] font-black uppercase tracking-[0.3em] mb-6 ml-2">Why use Coop Loans?</Text>
+            <Text className="text-foreground/30 text-[10px] font-black uppercase tracking-[0.3em] mb-6 ml-2">Why use Coop Loans?</Text>
             {[
               { icon: 'flash', title: 'Swift Disbursement', desc: 'Funds land in your account shortly after approval.' },
               { icon: 'shield-check', title: 'Fair Rates', desc: 'We offer the most competitive interest rates in the market.' },
               { icon: 'account-group', title: 'Community Built', desc: 'Our loans are powered by our collective strength.' },
             ].map((item, i) => (
               <View key={i} className="flex-row items-center bg-surface border border-border p-6 rounded-[2rem] mb-4">
-                <View className="w-12 h-12 bg-white/5 rounded-2xl items-center justify-center mr-5">
-                  <MaterialCommunityIcons name={item.icon as any} size={24} color="#3b82f6" />
+                <View className="w-12 h-12 bg-foreground/5 rounded-2xl items-center justify-center mr-5">
+                  <MaterialCommunityIcons name={item.icon as any} size={24} color={primaryColor} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-white font-bold text-lg">{item.title}</Text>
-                  <Text className="text-white/40 text-sm mt-0.5 leading-relaxed">{item.desc}</Text>
+                  <Text className="text-foreground font-bold text-lg">{item.title}</Text>
+                  <Text className="text-foreground/40 text-sm mt-0.5 leading-relaxed">{item.desc}</Text>
                 </View>
               </View>
             ))}
@@ -302,12 +304,12 @@ export default function Loans() {
         onRequestClose={() => setIsApplyModalVisible(false)}
       >
         <View className="flex-1 justify-end bg-black/60">
-          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-white/10 max-h-[90%]">
-            <View className="w-12 h-1.5 bg-white/10 rounded-full self-center mb-8" />
+          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border max-h-[90%]">
+            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
             
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Text className="text-white font-black text-3xl mb-2 tracking-tight">Apply for Loan</Text>
-              <Text className="text-white/40 mb-8 font-medium">Please fill in the details below to submit your request.</Text>
+              <Text className="text-foreground font-black text-3xl mb-2 tracking-tight">Apply for Loan</Text>
+              <Text className="text-foreground/40 mb-8 font-medium">Please fill in the details below to submit your request.</Text>
 
               <Input 
                 label="Amount (₦)"
@@ -335,7 +337,7 @@ export default function Loans() {
               {/* Sureties Section */}
               <View className="mb-6">
                 <View className="flex-row justify-between items-center mb-4">
-                  <Text className="text-white/60 text-xs font-bold uppercase tracking-widest">Sureties (Phone Numbers)</Text>
+                  <Text className="text-foreground/60 text-xs font-bold uppercase tracking-widest">Sureties (Phone Numbers)</Text>
                   {sureties.length < 5 && (
                     <TouchableOpacity onPress={addSurety} className="bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20">
                       <Text className="text-primary text-[10px] font-black uppercase">+ Add More</Text>
@@ -369,8 +371,8 @@ export default function Loans() {
                     {/* Loading indicator */}
                     {surety.searching && (
                       <View className="flex-row items-center mt-2 ml-1">
-                        <ActivityIndicator size="small" color="#3b82f6" />
-                        <Text className="text-white/40 text-xs ml-2 font-medium">Searching member...</Text>
+                        <ActivityIndicator size="small" color={primaryColor} />
+                        <Text className="text-foreground/40 text-xs ml-2 font-medium">Searching member...</Text>
                       </View>
                     )}
 
@@ -391,7 +393,7 @@ export default function Loans() {
                     )}
                   </View>
                 ))}
-                <Text className="text-[10px] text-white/30 mt-1 italic">Note: Each surety will receive a request to approve your loan.</Text>
+                <Text className="text-[10px] text-foreground/30 mt-1 italic">Note: Each surety will receive a request to approve your loan.</Text>
               </View>
 
               <View className="flex-row space-x-4 mt-4">
@@ -421,25 +423,25 @@ export default function Loans() {
         onRequestClose={() => setIsHistoryModalVisible(false)}
       >
         <View className="flex-1 justify-end bg-black/60">
-          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-white/10 h-[80%]">
-            <View className="w-12 h-1.5 bg-white/10 rounded-full self-center mb-8" />
+          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border h-[80%]">
+            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
             
             <View className="flex-row justify-between items-center mb-6">
-              <Text className="text-white font-black text-2xl tracking-tight">Loan History</Text>
+              <Text className="text-foreground font-black text-2xl tracking-tight">Loan History</Text>
               <TouchableOpacity onPress={() => setIsHistoryModalVisible(false)}>
-                <MaterialCommunityIcons name="close" size={24} color="white" />
+                <MaterialCommunityIcons name="close" size={24} color={primaryColor} />
               </TouchableOpacity>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
               {historyData?.history?.map((item: any, idx: number) => (
-                <View key={idx} className="bg-white/5 p-5 rounded-3xl mb-4 border border-white/5">
+                <View key={idx} className="bg-foreground/5 p-5 rounded-3xl mb-4 border border-border">
                   <View className="flex-row justify-between items-start mb-3">
                     <View>
-                      <Text className="text-white font-bold text-lg">
+                      <Text className="text-foreground font-bold text-lg">
                         {item.type ? item.description : `₦${item.amount.toLocaleString()} Loan`}
                       </Text>
-                      <Text className="text-white/30 text-xs font-medium">{formatDate(item.date || item.createdAt)}</Text>
+                      <Text className="text-foreground/30 text-xs font-medium">{formatDate(item.date || item.createdAt)}</Text>
                     </View>
                     <View className={`px-3 py-1 rounded-full ${item.status === 'completed' ? 'bg-emerald-500/10' : 'bg-primary/10'}`}>
                       <Text className={`text-[10px] font-black uppercase tracking-widest ${item.status === 'completed' ? 'text-emerald-500' : 'text-primary'}`}>
@@ -447,7 +449,7 @@ export default function Loans() {
                       </Text>
                     </View>
                   </View>
-                  <Text className="text-white font-black text-xl">
+                  <Text className="text-foreground font-black text-xl">
                     {item.type === 'loan_repayment' ? '-' : '+'} {formatCurrency(item.amount)}
                   </Text>
                 </View>
@@ -455,8 +457,8 @@ export default function Loans() {
 
               {(!historyData?.history || historyData.history.length === 0) && (
                 <View className="py-20 items-center">
-                  <MaterialCommunityIcons name="history" size={48} color="rgba(255,255,255,0.1)" />
-                  <Text className="text-white/30 mt-4 font-medium">No history recorded yet.</Text>
+                  <MaterialCommunityIcons name="history" size={48} color="rgba(var(--foreground), 0.1)" />
+                  <Text className="text-foreground/30 mt-4 font-medium">No history recorded yet.</Text>
                 </View>
               )}
             </ScrollView>

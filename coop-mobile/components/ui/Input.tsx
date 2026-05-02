@@ -18,14 +18,14 @@ export const Input: React.FC<InputProps> = ({
   return (
     <View className={`space-y-2 mb-4 ${containerClassName}`}>
       {label && (
-        <Text className="text-white/60 text-xs font-bold uppercase tracking-widest mb-2">
+        <Text className="text-foreground/60 text-xs font-bold uppercase tracking-widest mb-2">
           {label}
         </Text>
       )}
       <View className={`bg-surface border ${error ? 'border-red-500' : 'border-border'} rounded-2xl px-4 h-14 justify-center`}>
         <TextInput
-          className={`text-white text-base ${className}`}
-          placeholderTextColor="rgba(255,255,255,0.3)"
+          className={`text-foreground text-base ${className}`}
+          placeholderTextColor="rgba(var(--foreground), 0.35)"
           {...props}
         />
       </View>

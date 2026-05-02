@@ -28,13 +28,14 @@ export async function middleware(request: NextRequest) {
         }
     } else if (hostnameWithoutPort.endsWith('.vercel.app')) {
         // Handle Vercel deployments
-        // coopa.vercel.app -> parts.length = 3 (Main Site)
-        // tenant.coopa.vercel.app -> parts.length = 4 (Tenant)
         if (parts.length > 3) {
             subdomain = parts[0];
         }
+    } else if (hostnameWithoutPort === 'cooperatives.io' || hostnameWithoutPort === 'www.cooperatives.io') {
+        // Explicitly handle the main production domain
+        subdomain = '';
     } else if (parts.length > 2) {
-        // Handle production domains (e.g., coopa.yourdomain.com)
+        // Handle production subdomains (e.g., tenant.cooperatives.io)
         subdomain = parts[0];
     }
 

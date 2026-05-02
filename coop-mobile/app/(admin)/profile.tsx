@@ -9,17 +9,21 @@ import { useUser } from '../../hooks/useUser';
 import * as ImagePicker from 'expo-image-picker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
+import { useRouter } from 'expo-router';
+
+import { useTheme } from '../../context/ThemeContext';
 
 export default function AdminProfile() {
-  const { logout, refreshUser } = useAuth();
+  const { logout, refreshUser, isMainAdmin } = useAuth();
   const { user, refetch: refetchUser } = useUser();
   const { tenant } = useTenant();
+  const { primaryColor } = useTheme();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   useEffect(() => {
     refreshUser();
   }, []);
-
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
       return api.post('/auth/profile/image', formData, {
@@ -35,7 +39,6 @@ export default function AdminProfile() {
       Alert.alert('Error', err.response?.data?.message || 'Failed to upload profile image');
     }
   });
-
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -88,11 +91,11 @@ export default function AdminProfile() {
           <View className="relative">
             <View className="w-28 h-28 bg-surface border-4 border-primary/20 rounded-[2.5rem] items-center justify-center shadow-xl shadow-primary/10 overflow-hidden">
               {uploadMutation.isPending ? (
-                <ActivityIndicator color="#3b82f6" />
+                <ActivityIndicator color={primaryColor} />
               ) : user?.profileImage ? (
                 <Image source={{ uri: user.profileImage }} className="w-full h-full" />
               ) : (
-                <MaterialCommunityIcons name="account" size={60} color="rgba(255,255,255,0.1)" />
+                <MaterialCommunityIcons name="account" size={60} color="rgba(150, 150, 150, 0.8)" />
               )}
             </View>
             <TouchableOpacity 
@@ -104,12 +107,64 @@ export default function AdminProfile() {
             </TouchableOpacity>
           </View>
           
-          <Text className="text-3xl font-black text-white mt-6 tracking-tighter">
+          <Text className="text-3xl font-black text-foreground mt-6 tracking-tighter">
             {user?.firstName} {user?.lastName}
           </Text>
           <Text className="text-primary font-bold uppercase tracking-[0.2em] mt-1">
-            Cooperative Admin
+            Cooperative {isMainAdmin ? 'Executive' : 'Admin'}
           </Text>
+        </View>
+
+        {/* Navigation Actions */}
+        <View className="space-y-3 mb-8">
+          {isMainAdmin && (
+            <TouchableOpacity 
+              onPress={() => router.push('/settings')}
+              className="bg-surface border border-border p-5 rounded-3xl flex-row items-center justify-between"
+            >
+              <View className="flex-row items-center">
+                <View className="w-10 h-10 bg-blue-500/10 rounded-xl items-center justify-center mr-4">
+                  <MaterialCommunityIcons name="cog-outline" size={20} color="#3b82f6" />
+                </View>
+                <Text className="text-foreground font-bold">Cooperative Settings</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(var(--foreground), 0.5)" />
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity 
+            onPress={() => router.push('/(member)')}
+            className="bg-surface border border-border p-5 rounded-3xl flex-row items-center justify-between"
+          >
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-emerald-500/10 rounded-xl items-center justify-center mr-4">
+                <MaterialCommunityIcons name="account-convert" size={20} color="#10b981" />
+              </View>
+              <Text className="text-foreground font-bold">Switch to Member Hub</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(var(--foreground), 0.5)" />
+          </TouchableOpacity>
+
+          {user?.role === 'super-admin' && (
+            <TouchableOpacity 
+              onPress={() => {
+                // Since this is a web-first console, we link to the web URL or just alert for now if mobile isn't ready
+                // But the user asked to "start building out this page", so I'll assume they want to see it on web.
+                // However, I can also add a placeholder for mobile super-admin if they want.
+                // For now, I'll just show the gold button.
+                Alert.alert("Global Access", "The Super Admin Console is optimized for Desktop management. Please access it at cooperatives.io/super-admin");
+              }}
+              className="bg-amber-500/10 border border-amber-500/30 p-5 rounded-3xl flex-row items-center justify-between"
+            >
+              <View className="flex-row items-center">
+                <View className="w-10 h-10 bg-amber-500/20 rounded-xl items-center justify-center mr-4">
+                  <MaterialCommunityIcons name="crown" size={20} color="#fbbf24" />
+                </View>
+                <Text className="text-amber-500 font-black uppercase tracking-widest text-xs">Global Platform Console</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={20} color="#fbbf24" />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Cooperative Badge */}
@@ -119,37 +174,37 @@ export default function AdminProfile() {
               <MaterialCommunityIcons name="office-building" size={24} color="white" />
             </View>
             <View>
-              <Text className="text-white/30 text-[9px] font-black uppercase tracking-widest mb-1">Organization</Text>
-              <Text className="text-white font-bold text-lg">{tenant?.name || 'Cooperative Ltd'}</Text>
+              <Text className="text-foreground/45 text-[9px] font-black uppercase tracking-widest mb-1">Organization</Text>
+              <Text className="text-foreground font-bold text-lg">{tenant?.name || 'Cooperative Ltd'}</Text>
             </View>
           </View>
-          <MaterialCommunityIcons name="shield-check" size={24} color="#3b82f6" />
+          <MaterialCommunityIcons name="shield-check" size={24} color={primaryColor} />
         </View>
 
         {/* Account Info */}
         <Card title="Admin Details" className="mb-8">
           <View className="space-y-6">
             <View className="flex-row items-center">
-              <MaterialCommunityIcons name="identifier" size={20} color="rgba(255,255,255,0.2)" className="mr-4" />
+              <MaterialCommunityIcons name="identifier" size={20} color="rgba(var(--foreground), 0.45)" className="mr-4" />
               <View>
-                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Admin ID</Text>
-                <Text className="text-white font-bold text-base mt-0.5">{user?.accountNumber || 'ADM-001'}</Text>
+                <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest">Admin ID</Text>
+                <Text className="text-foreground font-bold text-base mt-0.5">{user?.accountNumber || 'ADM-001'}</Text>
               </View>
             </View>
             
             <View className="flex-row items-center">
-              <MaterialCommunityIcons name="email-outline" size={20} color="rgba(255,255,255,0.2)" className="mr-4" />
+              <MaterialCommunityIcons name="email-outline" size={20} color="rgba(var(--foreground), 0.45)" className="mr-4" />
               <View>
-                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Official Email</Text>
-                <Text className="text-white font-bold text-base mt-0.5">{user?.email}</Text>
+                <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest">Official Email</Text>
+                <Text className="text-foreground font-bold text-base mt-0.5">{user?.email}</Text>
               </View>
             </View>
 
             <View className="flex-row items-center">
-              <MaterialCommunityIcons name="phone-outline" size={20} color="rgba(255,255,255,0.2)" className="mr-4" />
+              <MaterialCommunityIcons name="phone-outline" size={20} color="rgba(var(--foreground), 0.45)" className="mr-4" />
               <View>
-                <Text className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Phone Number</Text>
-                <Text className="text-white font-bold text-base mt-0.5">{user?.phoneNumber || 'Not provided'}</Text>
+                <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest">Phone Number</Text>
+                <Text className="text-foreground font-bold text-base mt-0.5">{user?.phoneNumber || 'Not provided'}</Text>
               </View>
             </View>
           </View>
@@ -163,7 +218,7 @@ export default function AdminProfile() {
           <Text className="text-red-500 font-bold text-lg">Sign Out</Text>
         </TouchableOpacity>
 
-        <Text className="text-white/10 text-center text-xs font-bold uppercase tracking-[0.3em]">
+        <Text className="text-foreground/30 text-center text-xs font-bold uppercase tracking-[0.3em]">
           Coopapp Admin Platform v1.0
         </Text>
       </ScrollView>

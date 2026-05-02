@@ -9,6 +9,7 @@ export type User = {
   role: 'user' | 'admin';
   profileImage?: string;
   status: 'pending' | 'active' | 'rejected';
+  isManual?: boolean;
 };
 
 export type Member = {
@@ -22,6 +23,7 @@ export type Member = {
   phoneNumber: string;
   role?: 'member' | 'admin';
   status: 'pending' | 'active' | 'rejected';
+  isManual?: boolean;
 };
 
 export type Transaction = {
