@@ -102,6 +102,9 @@ export type Stats = {
     platformDues?: number;
     subscriptionStatus: string;
     nextBillingDate?: string;
+    memberMonthlyRate?: number;
+    memberCount?: number;
+    freeThreshold?: number;
   };
 };
 

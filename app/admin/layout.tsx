@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import axios from 'axios';
 import {
   FaHome,
   FaUsers,
@@ -28,6 +29,8 @@ export default function AdminLayout({
   const router = useRouter();
   const { user, loading, logout } = useAuth();
   const { tenant } = useTenant();
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
@@ -35,11 +38,33 @@ export default function AdminLayout({
     }
   }, [loading, user, router]);
 
+  // Subscription suspension guard
+  // Check billing status after the user is confirmed as admin.
+  // The /admin/suspended page is excluded to prevent an infinite loop.
+  useEffect(() => {
+    if (loading || !user || user.role !== 'admin') return;
+    if (pathname === '/admin/suspended') return; // Already on the payment wall
+
+    const checkSubscription = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data.billing?.subscriptionStatus === 'suspended') {
+          router.push('/admin/suspended');
+        }
+      } catch {
+        // If stats fetch fails, don't block access — backend will enforce via 402
+      }
+    };
+
+    checkSubscription();
+  }, [loading, user, pathname, router]);
+
   const handleSignOut = () => {
     logout();
   };
-  const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);

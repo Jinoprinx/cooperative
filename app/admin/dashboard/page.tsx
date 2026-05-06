@@ -550,15 +550,49 @@ export default function AdminDashboard() {
             <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
             <div className="flex items-center justify-between mb-4">
               <div>
-                <span className="text-primary text-[8px] font-black uppercase tracking-[0.2em] mb-1 block">Cooperation Tier</span>
-                <h3 className="text-xl font-black text-primary-text tracking-tighter uppercase">{stats.billing.tier}</h3>
+                <span className="text-primary text-[8px] font-black uppercase tracking-[0.2em] mb-1 block">Billing Model</span>
+                <h3 className="text-xl font-black text-primary-text tracking-tighter">
+                  {stats.billing.tier === 'free' ? 'Free Plan' : 'Per Member'}
+                </h3>
               </div>
-              <div className="bg-primary/10 text-primary text-[8px] font-black px-2 py-1 rounded-md border border-primary/20 uppercase tracking-widest">
-                {stats.billing.subscriptionStatus}
+              <div className={`text-[8px] font-black px-2 py-1 rounded-md border uppercase tracking-widest ${
+                stats.billing.subscriptionStatus === 'active'
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : stats.billing.subscriptionStatus === 'grace_period'
+                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                  : 'bg-red-500/10 text-red-400 border-red-500/20'
+              }`}>
+                {stats.billing.subscriptionStatus.replace('_', ' ')}
               </div>
             </div>
-            
-            <div className="grid grid-cols-2 gap-4 mt-6">
+
+            {/* Per-member rate breakdown */}
+            {stats.billing.tier !== 'free' ? (
+              <div className="bg-surface rounded-2xl border border-border p-3 mb-4">
+                <p className="text-tertiary-text text-[9px] font-black uppercase tracking-widest mb-1">Monthly Bill</p>
+                <p className="text-primary-text font-black text-sm">
+                  ₦{(stats.billing.memberMonthlyRate ?? 300).toLocaleString()}
+                  <span className="text-tertiary-text font-bold"> × </span>
+                  {stats.billing.memberCount ?? stats.billing.memberCount ?? 0}
+                  <span className="text-tertiary-text font-bold"> members = </span>
+                  <span className="text-primary">
+                    {formatCurrency((stats.billing.memberMonthlyRate ?? 300) * (stats.billing.memberCount ?? 0))}
+                  </span>
+                </p>
+              </div>
+            ) : (
+              <div className="bg-emerald-500/5 rounded-2xl border border-emerald-500/20 p-3 mb-4">
+                <p className="text-emerald-400 text-[9px] font-black uppercase tracking-widest mb-1">Free Tier</p>
+                <p className="text-emerald-400 font-black text-sm">
+                  {stats.billing.memberCount ?? 0} / {stats.billing.freeThreshold ?? 30} members
+                </p>
+                <p className="text-tertiary-text text-[9px] mt-0.5">
+                  Free up to {stats.billing.freeThreshold ?? 30} members
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <span className="text-tertiary-text text-[9px] font-black uppercase tracking-tighter">Year-End Rebate</span>
                 <p className="text-lg font-black text-emerald-500 tracking-tighter">{formatCurrency(stats.billing.rebateReserve)}</p>
@@ -576,14 +610,16 @@ export default function AdminDashboard() {
                       ? `Next: ${formatDate(stats.billing.nextBillingDate)}`
                       : 'No active subscription'}
                 </span>
-                <button 
-                  onClick={handlePaySubscription}
-                  disabled={loading}
-                  className="text-[9px] font-black text-primary uppercase tracking-widest hover:text-primary-text transition-colors disabled:opacity-50"
-                >
-                  {loading ? 'Processing...' : 'Pay Bills'}
-                </button>
-             </div>
+                {stats.billing.tier !== 'free' && (
+                  <button 
+                    onClick={handlePaySubscription}
+                    disabled={loading}
+                    className="text-[9px] font-black text-primary uppercase tracking-widest hover:text-primary-text transition-colors disabled:opacity-50"
+                  >
+                    {loading ? 'Processing...' : 'Pay Bills'}
+                  </button>
+                )}
+           </div>
           </div>
         )}
       </div>
