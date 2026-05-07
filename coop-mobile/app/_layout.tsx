@@ -11,6 +11,9 @@ import "../global.css";
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 
 import Animated from 'react-native-reanimated';
+import { AppState } from 'react-native';
+import { LockScreen } from '../components/LockScreen';
+import { NetworkBanner } from '../components/NetworkBanner';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -18,9 +21,10 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 function RootNav() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, isAppLocked, isBiometricEnabled, unlockApp } = useAuth();
   const { colorScheme, themeVars } = useTheme();
   const lastActivity = useRef(Date.now());
+  const appState = useRef(AppState.currentState);
 
   const resetTimer = useCallback(() => {
     lastActivity.current = Date.now();
@@ -52,6 +56,30 @@ function RootNav() {
 
     return () => clearInterval(checkInterval);
   }, [isAuthenticated, logout]);
+
+  // App State Listener (Re-lock on background)
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        // App has come to the foreground
+        if (isAuthenticated && isBiometricEnabled) {
+          unlockApp(); // Show biometric prompt on return
+        }
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isAuthenticated, isBiometricEnabled, unlockApp]);
+
+  if (isAuthenticated && isAppLocked) {
+    return <LockScreen />;
+  }
 
   // Adding a key to the Stack forces the entire navigation state to reset 
   // when the authentication state changes. This is the most reliable way 
@@ -99,6 +127,7 @@ export default function RootLayout() {
       <TenantProvider>
         <AuthProvider>
           <ThemeProvider>
+            <NetworkBanner />
             <RootNav />
             <ThemeStatusBar />
           </ThemeProvider>

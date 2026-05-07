@@ -13,8 +13,10 @@ import api from '../../lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
+import { usePrivacy } from '../../hooks/usePrivacy';
 
 export default function Dashboard() {
+  usePrivacy();
   const { user, refetch: refetchUser } = useUser();
   const { transactions, activeLoan, isLoading, refetch: refetchDashboard } = useDashboardData();
   const { primaryColor } = useTheme();

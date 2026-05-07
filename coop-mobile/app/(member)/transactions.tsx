@@ -6,8 +6,10 @@ import { formatCurrency, formatDate, getTransactionColor, getTransactionPrefix, 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { useTheme } from '../../context/ThemeContext';
+import { usePrivacy } from '../../hooks/usePrivacy';
 
 export default function Transactions() {
+  usePrivacy();
   const { transactions, isLoading, refetch } = useDashboardData();
   const { primaryColor } = useTheme();
   const [filter, setFilter] = useState<'all' | 'deposit' | 'withdrawal' | 'loan_repayment'>('all');

@@ -20,8 +20,10 @@ interface SuretyEntry {
 }
 
 import { useTheme } from '../../context/ThemeContext';
+import { usePrivacy } from '../../hooks/usePrivacy';
 
 export default function Loans() {
+  usePrivacy();
   const { activeLoan, isLoading: isDashLoading, refetch } = useDashboardData();
   const { user: currentUser } = useAuth();
   const { primaryColor } = useTheme();

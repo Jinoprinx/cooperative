@@ -2,8 +2,10 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 const TOKEN_KEY = 'coopapp_token';
+const REFRESH_TOKEN_KEY = 'coopapp_refresh_token';
 const USER_KEY = 'coopapp_user';
 const TENANT_KEY = 'coopapp_tenant';
+const BIOMETRIC_KEY = 'coopapp_biometric_enabled';
 
 const setItem = async (key: string, value: string) => {
   if (Platform.OS === 'web') {
@@ -60,6 +62,17 @@ export const storage = {
     await removeItem(TOKEN_KEY);
   },
 
+  // Refresh Token
+  async getRefreshToken(): Promise<string | null> {
+    return getItem(REFRESH_TOKEN_KEY);
+  },
+  async setRefreshToken(token: string): Promise<void> {
+    await setItem(REFRESH_TOKEN_KEY, token);
+  },
+  async removeRefreshToken(): Promise<void> {
+    await removeItem(REFRESH_TOKEN_KEY);
+  },
+
   // User
   async getUser(): Promise<any | null> {
     const raw = await getItem(USER_KEY);
@@ -84,10 +97,20 @@ export const storage = {
     await removeItem(TENANT_KEY);
   },
 
+  // Biometrics
+  async getBiometricEnabled(): Promise<boolean> {
+    const val = await getItem(BIOMETRIC_KEY);
+    return val === 'true';
+  },
+  async setBiometricEnabled(enabled: boolean): Promise<void> {
+    await setItem(BIOMETRIC_KEY, enabled ? 'true' : 'false');
+  },
+
   // Clear all auth session data
   async clearAll(): Promise<void> {
     await Promise.all([
       removeItem(TOKEN_KEY),
+      removeItem(REFRESH_TOKEN_KEY),
       removeItem(USER_KEY),
       // We keep TENANT_KEY so the user stays in their cooperative's context after logout
     ]);

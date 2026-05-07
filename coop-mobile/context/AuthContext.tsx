@@ -5,6 +5,7 @@ import { User } from '../types';
 import api from '../lib/api';
 import { useRouter, useSegments } from 'expo-router';
 import { useTenant } from './TenantContext';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 // Essential user fields to persist in SecureStore (2048 byte limit on Android)
 const STORED_USER_FIELDS = [
@@ -29,15 +30,17 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
+  isBiometricEnabled: boolean;
+  isAppLocked: boolean;
 }
 
 interface AuthContextType extends AuthState {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isMainAdmin: boolean;
-  login: (email: string, password: string, tenantId?: string) => Promise<void>;
-  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  setBiometrics: (enabled: boolean) => Promise<void>;
+  unlockApp: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -92,20 +95,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user: null,
     token: null,
     isLoading: true,
+    isBiometricEnabled: false,
+    isAppLocked: false,
   });
 
   // Load persisted session on mount
   useEffect(() => {
-    const loadSession = async () => {
-      try {
-        const [storedToken, storedUser] = await Promise.all([
+        const [storedToken, storedRefreshToken, storedUser, biometricEnabled] = await Promise.all([
           storage.getToken(),
+          storage.getRefreshToken(),
           storage.getUser(),
+          storage.getBiometricEnabled(),
         ]);
         if (storedToken && storedUser) {
           setAuthState({
             token: storedToken,
             user: storedUser,
+            isBiometricEnabled: !!biometricEnabled,
+            isAppLocked: !!biometricEnabled, // Lock app if biometrics are enabled
             isLoading: false,
           });
         } else {
@@ -127,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (tenantId) payload.tenantId = tenantId;
     
     const res = await api.post('/auth/login', payload);
-    const { token: newToken, user: rawUser } = res.data;
+    const { token: newToken, refreshToken, user: rawUser } = res.data;
     
     // Normalize API field names to match the app's User type
     const newUser = {
@@ -136,7 +143,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profileImageUrl: rawUser.profileImage || rawUser.profileImageUrl,
     };
     
-    await storage.setToken(newToken);
+    await Promise.all([
+      storage.setToken(newToken),
+      storage.setRefreshToken(refreshToken)
+    ]);
+    
     try {
       await storage.setUser(trimUserForStorage(newUser));
     } catch (e) {
@@ -191,6 +202,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Refresh user error', e);
       }
     }
+  };
+
+  const setBiometrics = async (enabled: boolean) => {
+    await storage.setBiometricEnabled(enabled);
+    setAuthState(prev => ({ ...prev, isBiometricEnabled: enabled }));
+  };
+
+  const unlockApp = async (): Promise<boolean> => {
+    if (!authState.isBiometricEnabled) {
+      setAuthState(prev => ({ ...prev, isAppLocked: false }));
+      return true;
+    }
+
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!hasHardware || !isEnrolled) {
+      setAuthState(prev => ({ ...prev, isAppLocked: false }));
+      return true;
+    }
+
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: 'Authenticate to access your Cooperative',
+      fallbackLabel: 'Use Passcode',
+      disableDeviceFallback: false,
+    });
+
+    if (result.success) {
+      setAuthState(prev => ({ ...prev, isAppLocked: false }));
+      return true;
+    }
+    return false;
   };
 
   const isAdmin = isAuthenticated && (authState.user?.role === 'admin' || authState.user?.role === 'super-admin');
