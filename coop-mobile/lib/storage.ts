@@ -7,17 +7,25 @@ const USER_KEY = 'coopapp_user';
 const TENANT_KEY = 'coopapp_tenant';
 const BIOMETRIC_KEY = 'coopapp_biometric_enabled';
 
-const setItem = async (key: string, value: string) => {
+const setItem = async (key: string, value: string | null | undefined) => {
+  if (value === null || value === undefined) {
+    await removeItem(key);
+    return;
+  }
+
+  // Ensure value is a string (e.g. if a number is passed accidentally)
+  const stringValue = String(value);
+
   if (Platform.OS === 'web') {
     try {
       if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(key, value);
+        localStorage.setItem(key, stringValue);
       }
     } catch (e) {
       console.error('Local storage set error:', e);
     }
   } else {
-    await SecureStore.setItemAsync(key, value);
+    await SecureStore.setItemAsync(key, stringValue);
   }
 };
 
@@ -55,7 +63,7 @@ export const storage = {
   async getToken(): Promise<string | null> {
     return getItem(TOKEN_KEY);
   },
-  async setToken(token: string): Promise<void> {
+  async setToken(token: string | null | undefined): Promise<void> {
     await setItem(TOKEN_KEY, token);
   },
   async removeToken(): Promise<void> {
@@ -66,7 +74,7 @@ export const storage = {
   async getRefreshToken(): Promise<string | null> {
     return getItem(REFRESH_TOKEN_KEY);
   },
-  async setRefreshToken(token: string): Promise<void> {
+  async setRefreshToken(token: string | null | undefined): Promise<void> {
     await setItem(REFRESH_TOKEN_KEY, token);
   },
   async removeRefreshToken(): Promise<void> {

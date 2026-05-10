@@ -53,6 +53,10 @@ api.interceptors.response.use(
         });
 
         const { token: newAccessToken, refreshToken: newRefreshToken } = res.data;
+        
+        if (!newAccessToken) {
+          throw new Error('Refresh response missing access token');
+        }
 
         // Save new tokens
         await Promise.all([
@@ -63,8 +67,10 @@ api.interceptors.response.use(
         // Update authorization header and retry
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
-      } catch (refreshError) {
-        console.error('Silent refresh failed:', refreshError);
+      } catch (refreshError: any) {
+        if (refreshError.message !== 'No refresh token available') {
+          console.error('Silent refresh failed:', refreshError);
+        }
         await storage.clearAll();
         // The app will react to the missing token in SecureStore
         return Promise.reject(error);

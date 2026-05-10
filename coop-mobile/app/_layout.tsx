@@ -14,6 +14,19 @@ import Animated from 'react-native-reanimated';
 import { AppState } from 'react-native';
 import { LockScreen } from '../components/LockScreen';
 import { NetworkBanner } from '../components/NetworkBanner';
+import * as Sentry from '@sentry/react-native';
+import Constants from 'expo-constants';
+
+// Sentry Initialization for Mobile
+const sentryDsn = Constants.expoConfig?.extra?.sentryDsn || process.env.EXPO_PUBLIC_SENTRY_DSN;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    debug: false,
+    environment: __DEV__ ? 'development' : 'production',
+    tracesSampleRate: 1.0,
+  });
+}
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -121,7 +134,7 @@ function RootNav() {
   );
 }
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <TenantProvider>
@@ -135,7 +148,7 @@ export default function RootLayout() {
       </TenantProvider>
     </QueryClientProvider>
   );
-}
+});
 
 function ThemeStatusBar() {
   const { colorScheme } = useTheme();

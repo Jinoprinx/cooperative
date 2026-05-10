@@ -6,6 +6,7 @@ import api from '../lib/api';
 import { useRouter, useSegments } from 'expo-router';
 import { useTenant } from './TenantContext';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as Sentry from '@sentry/react-native';
 
 // Essential user fields to persist in SecureStore (2048 byte limit on Android)
 const STORED_USER_FIELDS = [
@@ -101,6 +102,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Load persisted session on mount
   useEffect(() => {
+    const loadSession = async () => {
+      try {
         const [storedToken, storedRefreshToken, storedUser, biometricEnabled] = await Promise.all([
           storage.getToken(),
           storage.getRefreshToken(),
@@ -115,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isAppLocked: !!biometricEnabled, // Lock app if biometrics are enabled
             isLoading: false,
           });
+          Sentry.setUser({ id: storedUser._id, email: storedUser.email });
         } else {
           setAuthState(prev => ({ ...prev, isLoading: false }));
         }
@@ -159,6 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: newUser,
       isLoading: false,
     });
+    Sentry.setUser({ id: newUser._id, email: newUser.email });
   };
 
   const logout = async () => {
@@ -170,6 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: null,
         isLoading: false,
       });
+      Sentry.setUser(null);
       console.log('Logout state cleared');
     } catch (error) {
       console.error('Logout error:', error);
