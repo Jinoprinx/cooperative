@@ -69,3 +69,4 @@ out/
 # MongoDB-related (if applicable)
 *.mongo
 *.dump
+.vercel
