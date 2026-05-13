@@ -12,7 +12,9 @@
       "backgroundColor": "#050505"
     },
     "scheme": "coopapp",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.coopapp.mobile"
@@ -37,7 +39,8 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 200
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

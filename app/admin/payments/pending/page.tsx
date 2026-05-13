@@ -16,10 +16,15 @@ interface Transaction {
   description: string;
   receiptUrl: string;
   date: string;
+  isProxyPayment?: boolean;
+  initiatedBy?: {
+    firstName: string;
+    lastName: string;
+  };
 }
 
 export default function PendingPaymentsPage() {
-  const { user } = useAuth();
+  const { user, isMainAdmin } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,31 +51,39 @@ export default function PendingPaymentsPage() {
     }
   }, [user]);
 
-  const handleApprove = async (transactionId: string) => {
+  const handleApprove = async (transaction: Transaction) => {
+    if (transaction.isProxyPayment && !isMainAdmin) {
+      setError('Only the main admin can approve payments made on behalf of manual members.');
+      return;
+    }
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transactions/approve/${transactionId}`, {}, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transactions/approve/${transaction._id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setTransactions(transactions.filter(t => t._id !== transactionId));
-    } catch (err) {
-      setError('Failed to approve payment.');
+      setTransactions(transactions.filter(t => t._id !== transaction._id));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to approve payment.');
     }
   };
 
-  const handleReject = async (transactionId: string) => {
+  const handleReject = async (transaction: Transaction) => {
+    if (transaction.isProxyPayment && !isMainAdmin) {
+      setError('Only the main admin can reject payments made on behalf of manual members.');
+      return;
+    }
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transactions/reject/${transactionId}`, {}, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transactions/reject/${transaction._id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setTransactions(transactions.filter(t => t._id !== transactionId));
-    } catch (err) {
-      setError('Failed to reject payment.');
+      setTransactions(transactions.filter(t => t._id !== transaction._id));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to reject payment.');
     }
   };
 
@@ -117,6 +130,7 @@ export default function PendingPaymentsPage() {
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Protocol Date</th>
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Account Holder</th>
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Description</th>
+                {isMainAdmin && <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Initiated By</th>}
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Value (NGN)</th>
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Actions</th>
               </tr>
@@ -135,36 +149,52 @@ export default function PendingPaymentsPage() {
                   </td>
                   <td className="px-8 py-6">
                     <p className="text-xs font-medium text-secondary-text max-w-[150px] truncate">{transaction.description}</p>
+                    {transaction.isProxyPayment && (
+                      <span className="inline-block mt-1 text-[8px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">Proxy</span>
+                    )}
                   </td>
+                  {isMainAdmin && (
+                    <td className="px-8 py-6">
+                      {transaction.initiatedBy ? (
+                        <span className="text-xs font-bold text-purple-400">{transaction.initiatedBy.firstName} {transaction.initiatedBy.lastName}</span>
+                      ) : (
+                        <span className="text-xs text-tertiary-text">—</span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-8 py-6 text-right">
                      <span className="text-lg font-black tracking-tighter text-emerald-500 shadow-glow-sm">
                        {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(transaction.amount)}
                      </span>
                   </td>
                   <td className="px-8 py-6 text-right whitespace-nowrap">
-                    <div className="flex justify-end gap-3 items-center">
-                       <button 
-                         onClick={() => handleViewReceipt(transaction._id)}
-                         className="text-[10px] font-black text-primary hover:text-white uppercase tracking-widest px-4 py-2 bg-primary/10 border border-primary/20 rounded-xl transition-all"
-                       >
-                         Doc
-                       </button>
-                       <div className="flex gap-2 p-1 bg-surface rounded-xl border border-border">
-                          <button onClick={() => handleApprove(transaction._id)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all">
-                             <div className="w-2.5 h-2.5 border-b-2 border-r-2 border-current rotate-45 mb-1" />
-                          </button>
-                          <button onClick={() => handleReject(transaction._id)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all relative">
-                             <div className="w-3 h-0.5 bg-current rotate-45 absolute" />
-                             <div className="w-3 h-0.5 bg-current -rotate-45 absolute" />
-                          </button>
-                       </div>
-                    </div>
+                    {transaction.isProxyPayment && !isMainAdmin ? (
+                      <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20">Main Admin Only</span>
+                    ) : (
+                      <div className="flex justify-end gap-3 items-center">
+                         <button 
+                           onClick={() => handleViewReceipt(transaction._id)}
+                           className="text-[10px] font-black text-primary hover:text-white uppercase tracking-widest px-4 py-2 bg-primary/10 border border-primary/20 rounded-xl transition-all"
+                         >
+                           Doc
+                         </button>
+                         <div className="flex gap-2 p-1 bg-surface rounded-xl border border-border">
+                            <button onClick={() => handleApprove(transaction)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all">
+                               <div className="w-2.5 h-2.5 border-b-2 border-r-2 border-current rotate-45 mb-1" />
+                            </button>
+                            <button onClick={() => handleReject(transaction)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all relative">
+                               <div className="w-3 h-0.5 bg-current rotate-45 absolute" />
+                               <div className="w-3 h-0.5 bg-current -rotate-45 absolute" />
+                            </button>
+                         </div>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
               {transactions.length === 0 && (
                 <tr>
-                   <td colSpan={5} className="py-24 text-center bg-surface">
+                   <td colSpan={isMainAdmin ? 6 : 5} className="py-24 text-center bg-surface">
                       <p className="text-tertiary-text text-[10px] font-black uppercase tracking-[0.4em] italic">No pending inbound protocols</p>
                    </td>
                 </tr>

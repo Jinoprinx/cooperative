@@ -23,9 +23,21 @@ interface ExtendedTransaction extends Transaction {
   };
   receiptUrl?: string;
   rejectionReason?: string;
+  isProxyPayment?: boolean;
+  initiatedBy?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+  approvedBy?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState<Tab>('pending');
@@ -34,6 +46,7 @@ export default function AdminPayments() {
   const [isRejectModalVisible, setIsRejectModalVisible] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const { primaryColor } = useTheme();
+  const { isMainAdmin } = useAuth();
 
   const { initialTab } = useLocalSearchParams<{ initialTab: Tab }>();
 
@@ -186,13 +199,35 @@ export default function AdminPayments() {
 
             <View className="flex-row justify-between items-center">
               <Text className="text-foreground font-black text-2xl">{formatCurrency(tx.amount)}</Text>
-              {tx.receiptUrl && (
-                <View className="bg-primary/10 px-3 py-1.5 rounded-xl flex-row items-center">
-                  <MaterialCommunityIcons name="file-image-outline" size={14} color={primaryColor} />
-                  <Text className="text-primary text-[10px] font-bold ml-1.5">Receipt</Text>
-                </View>
-              )}
+              <View className="flex-row items-center">
+                {tx.receiptUrl && (
+                  <View className="bg-primary/10 px-3 py-1.5 rounded-xl flex-row items-center mr-2">
+                    <MaterialCommunityIcons name="file-image-outline" size={14} color={primaryColor} />
+                    <Text className="text-primary text-[10px] font-bold ml-1.5">Receipt</Text>
+                  </View>
+                )}
+                {tx.isProxyPayment && (
+                  <View className="bg-amber-500/10 px-3 py-1.5 rounded-xl flex-row items-center">
+                    <MaterialCommunityIcons name="account-arrow-right" size={14} color="#f59e0b" />
+                    <Text className="text-amber-500 text-[10px] font-bold ml-1.5">Proxy</Text>
+                  </View>
+                )}
+              </View>
             </View>
+
+            {/* Audit: Initiated By (main admin only) */}
+            {isMainAdmin && tx.initiatedBy && (
+              <View className="mt-3 bg-purple-500/10 border border-purple-500/20 px-3 py-2 rounded-xl flex-row items-center">
+                <MaterialCommunityIcons name="account-edit" size={12} color="#a855f7" />
+                <Text className="text-purple-400 text-[10px] font-bold ml-1.5">Initiated by: {tx.initiatedBy.firstName} {tx.initiatedBy.lastName}</Text>
+              </View>
+            )}
+            {isMainAdmin && tx.approvedBy && tx.status !== 'pending' && (
+              <View className="mt-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl flex-row items-center">
+                <MaterialCommunityIcons name="check-decagram" size={12} color="#10b981" />
+                <Text className="text-emerald-500 text-[10px] font-bold ml-1.5">{tx.status === 'rejected' ? 'Rejected' : 'Approved'} by: {tx.approvedBy.firstName} {tx.approvedBy.lastName}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         ))}
 
@@ -263,19 +298,52 @@ export default function AdminPayments() {
               )}
 
               {selectedTx?.status === 'pending' && (
-                <View className="flex-row space-x-4">
-                  <Button 
-                    title="Reject" 
-                    variant="outline"
-                    className="flex-1 border-rose-500/30"
-                    onPress={handleRejectPress}
-                  />
-                  <Button 
-                    title="Approve & Credit" 
-                    className="flex-1"
-                    isLoading={approveMutation.isPending}
-                    onPress={() => approveMutation.mutate(selectedTx!._id)}
-                  />
+                <>
+                  {/* Proxy payment: only main admin can approve/reject */}
+                  {selectedTx?.isProxyPayment && !isMainAdmin ? (
+                    <View className="bg-amber-500/10 border border-amber-500/20 p-5 rounded-3xl flex-row items-center">
+                      <MaterialCommunityIcons name="lock-outline" size={24} color="#f59e0b" />
+                      <View className="ml-4 flex-1">
+                        <Text className="text-amber-500 font-bold">Requires Main Admin</Text>
+                        <Text className="text-amber-500/60 text-xs">Only the main admin can approve or reject payments made on behalf of manual members.</Text>
+                      </View>
+                    </View>
+                  ) : (
+                    <View className="flex-row space-x-4">
+                      <Button 
+                        title="Reject" 
+                        variant="outline"
+                        className="flex-1 border-rose-500/30"
+                        onPress={handleRejectPress}
+                      />
+                      <Button 
+                        title="Approve & Credit" 
+                        className="flex-1"
+                        isLoading={approveMutation.isPending}
+                        onPress={() => approveMutation.mutate(selectedTx!._id)}
+                      />
+                    </View>
+                  )}
+                </>
+              )}
+
+              {/* Audit info in modal (main admin only) */}
+              {isMainAdmin && selectedTx?.initiatedBy && (
+                <View className="mt-6 bg-purple-500/10 border border-purple-500/20 p-4 rounded-3xl flex-row items-center">
+                  <MaterialCommunityIcons name="account-edit" size={20} color="#a855f7" />
+                  <View className="ml-3">
+                    <Text className="text-purple-400 text-[10px] font-bold uppercase tracking-widest">Initiated By</Text>
+                    <Text className="text-purple-300 font-bold">{selectedTx.initiatedBy.firstName} {selectedTx.initiatedBy.lastName}</Text>
+                  </View>
+                </View>
+              )}
+              {isMainAdmin && selectedTx?.approvedBy && selectedTx?.status !== 'pending' && (
+                <View className="mt-3 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-3xl flex-row items-center">
+                  <MaterialCommunityIcons name="check-decagram" size={20} color="#10b981" />
+                  <View className="ml-3">
+                    <Text className="text-emerald-500 text-[10px] font-bold uppercase tracking-widest">{selectedTx.status === 'rejected' ? 'Rejected By' : 'Approved By'}</Text>
+                    <Text className="text-emerald-400 font-bold">{selectedTx.approvedBy.firstName} {selectedTx.approvedBy.lastName}</Text>
+                  </View>
                 </View>
               )}
 

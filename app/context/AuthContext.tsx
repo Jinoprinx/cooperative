@@ -21,6 +21,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (credential: string, password: string, tenantId?: string) => Promise<void>;
+  handleGoogleAuthSuccess: (token: string, user: any) => void;
   register: (firstName: string, lastName: string, email: string, password: string, phoneNumber: string, tenantId?: string) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
@@ -125,6 +126,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const handleGoogleAuthSuccess = (token: string, user: any) => {
+      // Subdomain redirection logic
+      const currentHost = window.location.hostname; // e.g., 'localhost' or 'coopa.localhost'
+
+      let mainDomain = 'localhost';
+      const parts = currentHost.split('.');
+
+      if (currentHost.endsWith('localhost')) {
+        mainDomain = 'localhost';
+      } else if (currentHost.endsWith('.vercel.app')) {
+        mainDomain = parts.slice(-3).join('.');
+      } else {
+        mainDomain = parts.slice(-2).join('.');
+      }
+      const targetSubdomain = user.subdomain;
+
+      if (targetSubdomain && !currentHost.startsWith(`${targetSubdomain}.`)) {
+        // Redirect to subdomain with token and user data
+        const protocol = window.location.protocol;
+        const port = window.location.port ? `:${window.location.port}` : '';
+        const encodedUser = encodeURIComponent(JSON.stringify(user));
+        const redirectUrl = `${protocol}//${targetSubdomain}.${mainDomain}${port}/admin/dashboard?token=${token}&user=${encodedUser}`;
+
+        window.location.href = redirectUrl;
+        return; // Stop execution here as we are redirecting
+      }
+
+      setToken(token);
+      setUser(user);
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      const redirectPath = 
+        user.role === 'super-admin' ? '/super-admin/dashboard' : 
+        user.role === 'admin' ? '/admin/dashboard' : 
+        '/dashboard';
+      router.push(redirectPath);
+  };
+
   const register = async (firstName: string, lastName: string, email: string, password: string, phoneNumber: string, tenantId?: string) => {
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
@@ -197,7 +238,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [isAuthenticated]);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated, isAdmin, isMainAdmin, loading, updateUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        handleGoogleAuthSuccess,
+        register,
+        logout,
+        updateUser,
+        isAuthenticated: !!token,
+        isAdmin: user?.role === 'admin' || user?.role === 'super-admin',
+        isMainAdmin: user?.isMainAdmin || false,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

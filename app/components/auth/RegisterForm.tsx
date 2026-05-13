@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaCircleNotch } from 'react-icons/fa';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { GoogleLogin } from '@react-oauth/google';
 import { useTenant } from '@/app/context/TenantContext';
 
 const registerSchema = z.object({
@@ -21,6 +22,8 @@ const registerSchema = z.object({
   coopName: z.string().optional(),
   subdomain: z.string().optional(),
   superAdminKey: z.string().optional(),
+  referredByName: z.string().optional(),
+  referredByPhone: z.string().optional(),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -34,6 +37,12 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [baseDomain, setBaseDomain] = useState('');
+
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [googleIdToken, setGoogleIdToken] = useState('');
+  const [googlePhone, setGooglePhone] = useState('');
+  const [googleRefName, setGoogleRefName] = useState('');
+  const [googleRefPhone, setGoogleRefPhone] = useState('');
 
   useEffect(() => {
     setBaseDomain(window.location.host);
@@ -55,7 +64,7 @@ export default function RegisterForm() {
     setError('');
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register${tenant ? '/member' : ''}`, {
+      const payload: any = {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
@@ -65,7 +74,16 @@ export default function RegisterForm() {
         subdomain: data.subdomain,
         superAdminKey: data.superAdminKey,
         tenantId: tenant?.id || tenant?._id,
-      });
+      };
+
+      if (data.referredByName || data.referredByPhone) {
+        payload.referredBy = {
+          name: data.referredByName,
+          phoneNumber: data.referredByPhone,
+        };
+      }
+
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register${tenant ? '/member' : ''}`, payload);
 
       if (data.superAdminKey) {
         router.push(`/auth/login?message=${encodeURIComponent('Super Admin account activated. Please sign in.')}`);
@@ -74,6 +92,41 @@ export default function RegisterForm() {
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to register. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = (credentialResponse: any) => {
+    setGoogleIdToken(credentialResponse.credential);
+    setShowCompletionModal(true);
+  };
+
+  const submitGoogleSignup = async () => {
+    if (!googlePhone) {
+      setError('Phone number is required');
+      setShowCompletionModal(false);
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const payload: any = {
+        idToken: googleIdToken,
+        tenantId: tenant?.id || tenant?._id,
+        phoneNumber: googlePhone,
+      };
+      if (googleRefName || googleRefPhone) {
+        payload.referredBy = {
+          name: googleRefName,
+          phoneNumber: googleRefPhone,
+        };
+      }
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google/register`, payload);
+      router.push(`/auth/login?message=${encodeURIComponent(response.data.message)}`);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Google registration failed');
+      setShowCompletionModal(false);
     } finally {
       setLoading(false);
     }
@@ -248,6 +301,74 @@ export default function RegisterForm() {
           </div>
         )}
       </button>
+
+      {tenant && (
+        <div className="space-y-4 mt-6">
+          <div className="flex items-center gap-4">
+            <div className="h-px bg-border flex-1"></div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-tertiary-text">OR</span>
+            <div className="h-px bg-border flex-1"></div>
+          </div>
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Sign In failed')}
+              theme="filled_black"
+              shape="pill"
+              text="signup_with"
+            />
+          </div>
+        </div>
+      )}
+
+      {showCompletionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="bg-surface border border-border p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
+            <h3 className="text-2xl font-black mb-2 text-primary-text">Complete Profile</h3>
+            <p className="text-xs text-tertiary-text mb-6">Just one more step to finish your cooperative account.</p>
+            
+            <div className="space-y-4">
+              <div className="space-y-2 relative group/field">
+                <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] z-10">Phone Number</span>
+                <input
+                  type="tel"
+                  value={googlePhone}
+                  onChange={e => setGooglePhone(e.target.value)}
+                  className="w-full bg-background border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text"
+                  placeholder="08031234567"
+                />
+              </div>
+
+              <div className="space-y-2 relative group/field">
+                <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] z-10">Referred By Name (Optional)</span>
+                <input
+                  type="text"
+                  value={googleRefName}
+                  onChange={e => setGoogleRefName(e.target.value)}
+                  className="w-full bg-background border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text"
+                  placeholder="Name"
+                />
+              </div>
+
+              <div className="space-y-2 relative group/field">
+                <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] z-10">Referred By Phone (Optional)</span>
+                <input
+                  type="tel"
+                  value={googleRefPhone}
+                  onChange={e => setGoogleRefPhone(e.target.value)}
+                  className="w-full bg-background border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text"
+                  placeholder="Phone"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowCompletionModal(false)} className="flex-1 py-4 rounded-2xl border border-border font-black text-[11px] uppercase tracking-widest text-tertiary-text hover:text-white transition-colors">Cancel</button>
+                <button type="button" onClick={submitGoogleSignup} disabled={loading} className="flex-1 py-4 rounded-2xl bg-primary font-black text-[11px] uppercase tracking-widest text-white hover:bg-primary/90 transition-colors">Complete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

@@ -23,4 +23,13 @@ export interface PendingPayment {
   description: string;
   createdAt: string;
   status: string;
+  isProxyPayment?: boolean;
+  initiatedBy?: {
+    firstName: string;
+    lastName: string;
+  };
+  approvedBy?: {
+    firstName: string;
+    lastName: string;
+  };
 }

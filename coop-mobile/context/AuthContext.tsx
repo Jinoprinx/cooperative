@@ -42,6 +42,7 @@ interface AuthContextType extends AuthState {
   refreshUser: () => Promise<void>;
   setBiometrics: (enabled: boolean) => Promise<void>;
   unlockApp: () => Promise<boolean>;
+  handleGoogleAuthSuccess: (token: string, refreshToken: string, user: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -166,6 +167,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     Sentry.setUser({ id: newUser._id, email: newUser.email });
   };
 
+  const handleGoogleAuthSuccess = async (token: string, refreshToken: string, user: any) => {
+    const newUser = {
+      ...user,
+      _id: user._id || user.id,
+      profileImageUrl: user.profileImage || user.profileImageUrl,
+    };
+    
+    await Promise.all([
+      storage.setToken(token),
+      storage.setRefreshToken(refreshToken)
+    ]);
+    
+    try {
+      await storage.setUser(trimUserForStorage(newUser));
+    } catch (e) {
+      console.error('[handleGoogleAuthSuccess] Failed to persist user:', e);
+    }
+    
+    setAuthState({
+      token,
+      user: newUser,
+      isLoading: false,
+    });
+    Sentry.setUser({ id: newUser._id, email: newUser.email });
+  };
+
   const logout = async () => {
     try {
       console.log('Logout starting...');
@@ -253,6 +280,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin,
         isMainAdmin,
         login,
+        handleGoogleAuthSuccess,
         logout,
         refreshUser,
       }}

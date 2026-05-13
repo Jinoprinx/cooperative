@@ -12,7 +12,8 @@ import {
   FaUserPlus,
   FaLock,
   FaLockOpen,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaUserShield
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 import axios from 'axios';
@@ -193,8 +194,8 @@ export default function AdminDashboard() {
       }
 
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/payments/${paymentId}/approve`,
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions/approve/${paymentId}`,
         {},
         config
       );
@@ -220,8 +221,8 @@ export default function AdminDashboard() {
       }
 
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/payments/${selectedPaymentId}/reject`,
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions/reject/${selectedPaymentId}`,
         { rejectionReason },
         config
       );
@@ -730,25 +731,48 @@ export default function AdminDashboard() {
             {pendingPayments.map((payment) => (
               <div key={payment._id} className="card-premium bg-surface border-border hover:border-emerald-500/30 transition-all duration-500 group">
                 <div className="flex justify-between items-start mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
-                    <FaMoneyBillWave className="h-6 w-6" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                      <FaMoneyBillWave className="h-6 w-6" />
+                    </div>
+                    {payment.isProxyPayment && (
+                      <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20">Proxy</span>
+                    )}
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest block mb-1">Amount</span>
                     <p className="text-xl font-black text-emerald-500 leading-none">{formatCurrency(payment.amount)}</p>
                   </div>
                 </div>
-                <div className="mb-6">
+                <div className="mb-4">
                   <p className="text-primary-text font-bold text-sm truncate">{payment.user?.firstName} {payment.user?.lastName}</p>
                   <p className="text-tertiary-text text-xs font-medium line-clamp-1">{payment.description}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex-1 btn-secondary text-[10px] py-2 px-0">View Receipt</a>
-                  <button onClick={() => handleApprovePayment(payment._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-emerald-600 hover:bg-emerald-500 shadow-none border-none">Approve</button>
-                  <button onClick={() => openRejectModal(payment._id)} className="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 transition-colors">
-                    <FaExclamationTriangle className="h-4 w-4" />
-                  </button>
-                </div>
+                {/* Audit: Initiated By (main admin only) */}
+                {isMainAdmin && payment.initiatedBy && (
+                  <div className="mb-4 flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 px-3 py-2 rounded-xl">
+                    <FaUserShield className="h-3 w-3 text-purple-400" />
+                    <span className="text-[10px] font-bold text-purple-400">Initiated by: {payment.initiatedBy.firstName} {payment.initiatedBy.lastName}</span>
+                  </div>
+                )}
+                {/* Actions: Gated for proxy payments */}
+                {payment.isProxyPayment && !isMainAdmin ? (
+                  <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 px-4 py-3 rounded-2xl">
+                    <FaLock className="h-4 w-4 text-amber-500" />
+                    <div>
+                      <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">Requires Main Admin</p>
+                      <p className="text-amber-500/60 text-[9px]">Only the main admin can approve proxy payments.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex-1 btn-secondary text-[10px] py-2 px-0">View Receipt</a>
+                    <button onClick={() => handleApprovePayment(payment._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-emerald-600 hover:bg-emerald-500 shadow-none border-none">Approve</button>
+                    <button onClick={() => openRejectModal(payment._id)} className="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 transition-colors">
+                      <FaExclamationTriangle className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import { useTenant } from '@/app/context/TenantContext';
 
@@ -23,7 +24,8 @@ export default function AuthLayout({
   const { tenant } = useTenant();
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+      <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#3b82f615,transparent)]" />
@@ -91,5 +93,6 @@ export default function AuthLayout({
         </div>
       </motion.div>
     </div>
+    </GoogleOAuthProvider>
   );
 }

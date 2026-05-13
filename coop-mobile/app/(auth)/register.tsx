@@ -7,6 +7,10 @@ import { useTenant } from '../../context/TenantContext';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+
+WebBrowser.maybeCompleteAuthSession();
 
 import { useTheme } from '../../context/ThemeContext';
 
@@ -23,10 +27,67 @@ export default function Register() {
     coopName: '',
     subdomain: '',
     superAdminKey: '',
+    referredByName: '',
+    referredByPhone: '',
   });
 // ... state ...
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [googleIdToken, setGoogleIdToken] = useState('');
+  const [googlePhone, setGooglePhone] = useState('');
+  const [googleRefName, setGoogleRefName] = useState('');
+  const [googleRefPhone, setGoogleRefPhone] = useState('');
+
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+  });
+
+  React.useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      handleGoogleSuccess(id_token);
+    }
+  }, [response]);
+
+  const handleGoogleSuccess = (idToken: string) => {
+    setGoogleIdToken(idToken);
+    setShowCompletionModal(true);
+  };
+
+  const submitGoogleSignup = async () => {
+    if (!googlePhone || googlePhone.trim().length < 7) {
+      setError('A valid phone number is required');
+      setShowCompletionModal(false);
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    try {
+      const payload: any = {
+        idToken: googleIdToken,
+        tenantId: tenantDetails ? (tenantDetails as any).id || (tenantDetails as any)._id : null,
+        phoneNumber: googlePhone,
+      };
+      if (googleRefName || googleRefPhone) {
+        payload.referredBy = {
+          name: googleRefName,
+          phoneNumber: googleRefPhone,
+        };
+      }
+      const res = await api.post('/auth/google/register', payload);
+      router.replace('/(auth)/login');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Google Sign Up failed');
+      setShowCompletionModal(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const { tenant, tenantDetails } = useTenant();
   const router = useRouter();
@@ -73,7 +134,7 @@ export default function Register() {
     try {
       // Differentiate endpoint and payload based on whether we are joining or creating
       const endpoint = tenant ? '/auth/register/member' : '/auth/register';
-      const payload = {
+      const payload: any = {
         firstName,
         lastName,
         email,
@@ -84,6 +145,13 @@ export default function Register() {
         // Include coop specific fields if registering a new one
         ...(!tenant && { coopName, subdomain, superAdminKey })
       };
+
+      if (tenant && (formData.referredByName || formData.referredByPhone)) {
+        payload.referredBy = {
+          name: formData.referredByName,
+          phoneNumber: formData.referredByPhone,
+        };
+      }
 
       await api.post(endpoint, payload);
       
@@ -265,6 +333,30 @@ export default function Register() {
               onChangeText={(v) => updateForm('confirmPassword', v)}
               secureTextEntry
             />
+
+            {tenant && (
+              <View className="mt-4 pt-4 border-t border-border">
+                <View className="flex-row items-center mb-4">
+                  <MaterialCommunityIcons name="account-group" size={20} color={primaryColor} />
+                  <Text className="text-foreground font-bold ml-2">Referred By (Optional)</Text>
+                </View>
+
+                <Input
+                  label="Referrer Name"
+                  placeholder="Name"
+                  value={formData.referredByName}
+                  onChangeText={(v) => updateForm('referredByName', v)}
+                />
+
+                <Input
+                  label="Referrer Phone"
+                  placeholder="Phone Number"
+                  value={formData.referredByPhone}
+                  onChangeText={(v) => updateForm('referredByPhone', v)}
+                  keyboardType="phone-pad"
+                />
+              </View>
+            )}
             
             {error && (
               <View className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mt-2">
@@ -276,11 +368,77 @@ export default function Register() {
           <Button 
             title={tenant ? "Create Member Account" : "Register Cooperative"} 
             onPress={handleRegister} 
-            isLoading={isLoading}
-            className="mb-12"
+            isLoading={isLoading && !showCompletionModal}
+            className={tenant ? "mb-6" : "mb-12"}
           />
+
+          {tenant && (
+            <>
+              <View className="flex-row items-center mb-6">
+                <View className="flex-1 h-[1px] bg-border" />
+                <Text className="mx-4 text-[10px] font-bold text-foreground/40 uppercase tracking-widest">OR</Text>
+                <View className="flex-1 h-[1px] bg-border" />
+              </View>
+
+              <Button 
+                title="Sign Up with Google" 
+                onPress={() => promptAsync()} 
+                disabled={!request}
+                className="mb-12 bg-surface border-border"
+                textClassName="text-foreground"
+              />
+            </>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {showCompletionModal && (
+        <View className="absolute inset-0 bg-background/90 justify-center px-6 z-50">
+          <View className="bg-surface border border-border p-6 rounded-3xl w-full max-w-md shadow-2xl">
+            <Text className="text-2xl font-bold text-foreground mb-2">Complete Profile</Text>
+            <Text className="text-sm text-foreground/60 mb-6">Just one more step to finish your cooperative account.</Text>
+            
+            <View className="space-y-4 mb-6">
+              <Input
+                label="Phone Number"
+                placeholder="803 123 4567"
+                value={googlePhone}
+                onChangeText={setGooglePhone}
+                keyboardType="phone-pad"
+              />
+              <Input
+                label="Referred By Name (Optional)"
+                placeholder="Name"
+                value={googleRefName}
+                onChangeText={setGoogleRefName}
+              />
+              <Input
+                label="Referred By Phone (Optional)"
+                placeholder="Phone Number"
+                value={googleRefPhone}
+                onChangeText={setGoogleRefPhone}
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            <View className="flex-row gap-3">
+              <TouchableOpacity 
+                onPress={() => setShowCompletionModal(false)}
+                className="flex-1 py-4 border border-border rounded-2xl items-center"
+              >
+                <Text className="text-[11px] font-bold uppercase tracking-widest text-foreground/60">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={submitGoogleSignup}
+                disabled={isLoading}
+                className="flex-1 py-4 bg-primary rounded-2xl items-center"
+              >
+                <Text className="text-[11px] font-bold uppercase tracking-widest text-white">Complete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

@@ -271,7 +271,7 @@ export default function Members() {
             <Text className="text-foreground font-black text-2xl tracking-tighter">Directory</Text>
             <Text className="text-foreground/40 text-[10px] font-bold uppercase tracking-widest">Cooperative Registry</Text>
           </View>
-          {isMainAdmin && activeTab === 'active' && (
+          {activeTab === 'active' && (
             <TouchableOpacity 
               onPress={() => setIsEnrollModalVisible(true)}
               className="bg-primary/20 border border-primary/30 px-4 py-2 rounded-xl flex-row items-center"

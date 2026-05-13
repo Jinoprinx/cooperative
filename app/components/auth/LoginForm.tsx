@@ -9,6 +9,8 @@ import { FaLock, FaUser, FaCircleNotch } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 import { useTenant } from '@/app/context/TenantContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 const loginSchema = z.object({
   credential: z.string().min(1, 'Email or phone number is required'),
@@ -18,8 +20,12 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
-  const { login, loading } = useAuth();
+  const { login, handleGoogleAuthSuccess, loading: authLoading } = useAuth();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [availableTenants, setAvailableTenants] = useState<any[]>([]);
+  const [googleIdToken, setGoogleIdToken] = useState('');
 
   const {
     register,
@@ -33,10 +39,52 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setError('');
+    setLoading(true);
     try {
       await login(data.credential, data.password, tenant?.id || tenant?._id);
     } catch (err: any) {
       setError(err.message || 'Failed to login. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setGoogleIdToken(credentialResponse.credential);
+    setLoading(true);
+    setError('');
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google/login`, {
+        idToken: credentialResponse.credential,
+      });
+
+      if (response.data.needsSelection) {
+        setAvailableTenants(response.data.tenants);
+        setShowPicker(true);
+      } else {
+        handleGoogleAuthSuccess(response.data.token, response.data.user);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Google Sign In failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectTenant = async (selectedTenantId: string) => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google/select-tenant`, {
+        idToken: googleIdToken,
+        tenantId: selectedTenantId,
+      });
+      handleGoogleAuthSuccess(response.data.token, response.data.user);
+      setShowPicker(false);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Tenant selection failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,15 +174,63 @@ export default function LoginForm() {
         className="w-full btn-primary py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 disabled:opacity-50"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-        <span className={loading ? 'opacity-0' : 'opacity-100 flex items-center justify-center'}>
+        <span className={loading || authLoading ? 'opacity-0' : 'opacity-100 flex items-center justify-center'}>
           Enter Cooperative
         </span>
-        {loading && (
+        {(loading || authLoading) && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           </div>
         )}
       </button>
+
+      <div className="space-y-4 mt-6">
+        <div className="flex items-center gap-4">
+          <div className="h-px bg-border flex-1"></div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-tertiary-text">OR</span>
+          <div className="h-px bg-border flex-1"></div>
+        </div>
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google Sign In failed')}
+            theme="filled_black"
+            shape="pill"
+            text="signin_with"
+          />
+        </div>
+      </div>
+
+      {showPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="bg-surface border border-border p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
+            <h3 className="text-2xl font-black mb-2 text-primary-text">Select Cooperative</h3>
+            <p className="text-xs text-tertiary-text mb-6">You are a member of multiple cooperatives. Please choose one to enter.</p>
+            
+            <div className="space-y-3">
+              {availableTenants.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => selectTenant(t.id)}
+                  disabled={loading}
+                  className="w-full p-4 rounded-2xl border border-border bg-background hover:border-primary transition-all flex items-center gap-4 group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <span className="text-primary font-black text-lg">{t.name[0]}</span>
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-black text-primary-text group-hover:text-primary transition-colors">{t.name}</div>
+                    <div className="text-[10px] text-tertiary-text tracking-widest uppercase">{t.subdomain}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <button type="button" onClick={() => setShowPicker(false)} className="w-full mt-6 py-4 rounded-2xl border border-border font-black text-[11px] uppercase tracking-widest text-tertiary-text hover:text-white transition-colors">Cancel</button>
+          </div>
+        </div>
+      )}
     </form>
   );
 }
