@@ -10,6 +10,9 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
 import { useTenant } from '@/app/context/TenantContext';
+import { FcGoogle } from 'react-icons/fc';
+import { getMainDomain } from '@/app/utils/domain';
+import { useSearchParams } from 'next/navigation';
 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -37,6 +40,12 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [baseDomain, setBaseDomain] = useState('');
+
+  const searchParams = useSearchParams();
+  const joinTenantId = searchParams.get('joinTenant');
+  
+  const isJoiningTenant = !!tenant || !!joinTenantId;
+  const effectiveTenantId = tenant?.id || tenant?._id || joinTenantId;
 
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [googleIdToken, setGoogleIdToken] = useState('');
@@ -73,7 +82,7 @@ export default function RegisterForm() {
         coopName: data.coopName,
         subdomain: data.subdomain,
         superAdminKey: data.superAdminKey,
-        tenantId: tenant?.id || tenant?._id,
+        tenantId: effectiveTenantId,
       };
 
       if (data.referredByName || data.referredByPhone) {
@@ -83,7 +92,7 @@ export default function RegisterForm() {
         };
       }
 
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register${tenant ? '/member' : ''}`, payload);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register${isJoiningTenant ? '/member' : ''}`, payload);
 
       if (data.superAdminKey) {
         router.push(`/auth/login?message=${encodeURIComponent('Super Admin account activated. Please sign in.')}`);
@@ -113,7 +122,7 @@ export default function RegisterForm() {
     try {
       const payload: any = {
         idToken: googleIdToken,
-        tenantId: tenant?.id || tenant?._id,
+        tenantId: effectiveTenantId,
         phoneNumber: googlePhone,
       };
       if (googleRefName || googleRefPhone) {
@@ -130,6 +139,12 @@ export default function RegisterForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const redirectToMainDomain = () => {
+    const mainDomain = getMainDomain();
+    const protocol = window.location.protocol;
+    window.location.href = `${protocol}//${mainDomain}/auth/register?joinTenant=${tenant?.id || tenant?._id}`;
   };
 
   return (
@@ -237,7 +252,41 @@ export default function RegisterForm() {
         </div>
       </div>
 
-      {!tenant && (
+      {isJoiningTenant && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="space-y-6 pt-8 border-t border-border mt-6"
+        >
+          <div className="space-y-1 px-2 mb-4">
+            <label className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Referral Program</label>
+            <p className="text-[10px] text-tertiary-text font-medium">Optional: Who referred you to this cooperative?</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2 relative group/field">
+              <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Referrer Name</span>
+              <input
+                type="text"
+                className={`w-full bg-surface border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text`}
+                placeholder="Name"
+                {...register('referredByName')}
+              />
+            </div>
+            <div className="space-y-2 relative group/field">
+              <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Referrer Phone</span>
+              <input
+                type="tel"
+                className={`w-full bg-surface border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text`}
+                placeholder="Phone Number"
+                {...register('referredByPhone')}
+              />
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {!isJoiningTenant && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -293,7 +342,7 @@ export default function RegisterForm() {
         className="w-full btn-primary py-5 rounded-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 mt-6 disabled:opacity-50"
       >
         <span className={loading ? 'opacity-0' : 'opacity-100'}>
-          {tenant ? 'Activate Membership' : 'Initialize Cooperative'}
+          {isJoiningTenant ? 'Activate Membership' : 'Initialize Cooperative'}
         </span>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -302,7 +351,7 @@ export default function RegisterForm() {
         )}
       </button>
 
-      {tenant && (
+      {isJoiningTenant && (
         <div className="space-y-4 mt-6">
           <div className="flex items-center gap-4">
             <div className="h-px bg-border flex-1"></div>
@@ -310,13 +359,24 @@ export default function RegisterForm() {
             <div className="h-px bg-border flex-1"></div>
           </div>
           <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google Sign In failed')}
-              theme="filled_black"
-              shape="pill"
-              text="signup_with"
-            />
+            {tenant ? (
+              <button
+                type="button"
+                onClick={redirectToMainDomain}
+                className="w-full max-w-[400px] bg-[#131314] hover:bg-[#131314]/90 text-white font-medium py-3 px-4 rounded-full flex items-center justify-center gap-3 transition-colors border border-[#8e918f]/30 h-10"
+              >
+                <FcGoogle className="text-lg" />
+                <span className="text-[13px] font-roboto tracking-wide">Sign up with Google</span>
+              </button>
+            ) : (
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Google Sign Up failed')}
+                theme="filled_black"
+                shape="pill"
+                text="signup_with"
+              />
+            )}
           </div>
         </div>
       )}

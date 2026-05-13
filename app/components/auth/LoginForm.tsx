@@ -11,6 +11,8 @@ import { useTenant } from '@/app/context/TenantContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import { FcGoogle } from 'react-icons/fc';
+import { getMainDomain } from '@/app/utils/domain';
 
 const loginSchema = z.object({
   credential: z.string().min(1, 'Email or phone number is required'),
@@ -86,6 +88,12 @@ export default function LoginForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const redirectToMainDomain = () => {
+    const mainDomain = getMainDomain();
+    const protocol = window.location.protocol;
+    window.location.href = `${protocol}//${mainDomain}/auth/login`;
   };
 
   return (
@@ -191,13 +199,24 @@ export default function LoginForm() {
           <div className="h-px bg-border flex-1"></div>
         </div>
         <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => setError('Google Sign In failed')}
-            theme="filled_black"
-            shape="pill"
-            text="signin_with"
-          />
+          {tenant ? (
+            <button
+              type="button"
+              onClick={redirectToMainDomain}
+              className="w-full max-w-[400px] bg-[#131314] hover:bg-[#131314]/90 text-white font-medium py-3 px-4 rounded-full flex items-center justify-center gap-3 transition-colors border border-[#8e918f]/30 h-10"
+            >
+              <FcGoogle className="text-lg" />
+              <span className="text-[13px] font-roboto tracking-wide">Sign in with Google</span>
+            </button>
+          ) : (
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Sign In failed')}
+              theme="filled_black"
+              shape="pill"
+              text="signin_with"
+            />
+          )}
         </div>
       </div>
 
