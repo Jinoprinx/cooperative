@@ -93,7 +93,8 @@ export default function LoginForm() {
   const redirectToMainDomain = () => {
     const mainDomain = getMainDomain();
     const protocol = window.location.protocol;
-    window.location.href = `${protocol}//${mainDomain}/auth/login`;
+    // We add ?sso=true to bust the browser's 307 redirect cache from the old middleware
+    window.location.href = `${protocol}//${mainDomain}/auth/login?sso=true`;
   };
 
   return (

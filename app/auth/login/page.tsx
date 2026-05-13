@@ -7,19 +7,11 @@ import AuthLayout from '@/app/components/auth/AuthLayout';
 import LoginForm from '@/app/components/auth/LoginForm';
 
 export default function LoginPage() {
-  const { tenant, loading } = useTenant();
+  const { loading } = useTenant();
   const router = useRouter();
 
-  // Client-side fallback: if there's no tenant (user is on the main domain),
-  // redirect to tenant-select so they pick a cooperative first.
-  useEffect(() => {
-    if (!loading && !tenant) {
-      router.replace('/tenant-select');
-    }
-  }, [tenant, loading, router]);
-
-  // While loading or redirecting, don't flash the login form
-  if (loading || !tenant) {
+  // While loading context, don't flash the login form
+  if (loading) {
     return null;
   }
 
