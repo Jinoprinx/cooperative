@@ -114,6 +114,25 @@ export default function LoginForm() {
         )}
       </AnimatePresence>
 
+      {!tenant && (
+        <div className="space-y-4 mb-6">
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Sign In failed')}
+              theme="filled_black"
+              shape="pill"
+              text="signin_with"
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="h-px bg-border flex-1"></div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-tertiary-text">OR</span>
+            <div className="h-px bg-border flex-1"></div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-6">
         <div className="space-y-2 relative group/field">
           <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Entry Credentials</span>
@@ -192,14 +211,14 @@ export default function LoginForm() {
         )}
       </button>
 
-      <div className="space-y-4 mt-6">
-        <div className="flex items-center gap-4">
-          <div className="h-px bg-border flex-1"></div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-tertiary-text">OR</span>
-          <div className="h-px bg-border flex-1"></div>
-        </div>
-        <div className="flex justify-center">
-          {tenant ? (
+      {tenant && (
+        <div className="space-y-4 mt-6">
+          <div className="flex items-center gap-4">
+            <div className="h-px bg-border flex-1"></div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-tertiary-text">OR</span>
+            <div className="h-px bg-border flex-1"></div>
+          </div>
+          <div className="flex justify-center">
             <button
               type="button"
               onClick={redirectToMainDomain}
@@ -208,17 +227,9 @@ export default function LoginForm() {
               <FcGoogle className="text-lg" />
               <span className="text-[13px] font-roboto tracking-wide">Sign in with Google</span>
             </button>
-          ) : (
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google Sign In failed')}
-              theme="filled_black"
-              shape="pill"
-              text="signin_with"
-            />
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {showPicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">

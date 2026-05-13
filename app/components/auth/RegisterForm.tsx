@@ -165,6 +165,25 @@ export default function RegisterForm() {
         )}
       </AnimatePresence>
 
+      {!tenant && isJoiningTenant && (
+        <div className="space-y-4 mb-6">
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Sign Up failed')}
+              theme="filled_black"
+              shape="pill"
+              text="signup_with"
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="h-px bg-border flex-1"></div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-tertiary-text">OR</span>
+            <div className="h-px bg-border flex-1"></div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2 relative group/field">
           <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Given Name</span>
@@ -351,7 +370,7 @@ export default function RegisterForm() {
         )}
       </button>
 
-      {isJoiningTenant && (
+      {tenant && (
         <div className="space-y-4 mt-6">
           <div className="flex items-center gap-4">
             <div className="h-px bg-border flex-1"></div>
@@ -359,24 +378,14 @@ export default function RegisterForm() {
             <div className="h-px bg-border flex-1"></div>
           </div>
           <div className="flex justify-center">
-            {tenant ? (
-              <button
-                type="button"
-                onClick={redirectToMainDomain}
-                className="w-full max-w-[400px] bg-[#131314] hover:bg-[#131314]/90 text-white font-medium py-3 px-4 rounded-full flex items-center justify-center gap-3 transition-colors border border-[#8e918f]/30 h-10"
-              >
-                <FcGoogle className="text-lg" />
-                <span className="text-[13px] font-roboto tracking-wide">Sign up with Google</span>
-              </button>
-            ) : (
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => setError('Google Sign Up failed')}
-                theme="filled_black"
-                shape="pill"
-                text="signup_with"
-              />
-            )}
+            <button
+              type="button"
+              onClick={redirectToMainDomain}
+              className="w-full max-w-[400px] bg-[#131314] hover:bg-[#131314]/90 text-white font-medium py-3 px-4 rounded-full flex items-center justify-center gap-3 transition-colors border border-[#8e918f]/30 h-10"
+            >
+              <FcGoogle className="text-lg" />
+              <span className="text-[13px] font-roboto tracking-wide">Sign up with Google</span>
+            </button>
           </div>
         </div>
       )}

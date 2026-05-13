@@ -41,13 +41,7 @@ export async function middleware(request: NextRequest) {
 
     // If no subdomain, or it's just 'www', this is the main/parent site
     if (!subdomain || subdomain === 'www') {
-        // On the main domain, redirect /auth/login to /tenant-select
-        // so users must pick a cooperative before logging in.
-        // /auth/register is allowed on the main domain for creating new cooperatives.
-        const pathname = url.pathname;
-        if (pathname.startsWith('/auth/login')) {
-            return NextResponse.redirect(new URL('/tenant-select', request.url));
-        }
+        // Main domain handles its own auth and redirects via AuthContext
         return NextResponse.next();
     }
 
