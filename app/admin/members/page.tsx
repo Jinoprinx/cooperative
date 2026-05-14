@@ -50,8 +50,9 @@ export default function Members() {
       setMembers([...members, response.data.member]);
       setNewMember({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '', email: '' });
       setShowAddModal(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding member:', error);
+      alert(error.response?.data?.message || 'Failed to enrol member. Please check your connection and try again.');
     }
   };
 
@@ -230,7 +231,7 @@ export default function Members() {
       {showAddModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowAddModal(false)} />
-          <div className="relative glass-card p-12 rounded-[3.5rem] border border-border w-full max-w-xl shadow-2xl animate-float">
+          <div className="relative glass-card p-12 rounded-[3.5rem] border border-border w-full max-w-xl shadow-2xl">
             <div className="mb-10 text-center">
                <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-2">Enroll Manual Member</h3>
                <p className="text-tertiary-text text-xs font-bold uppercase tracking-widest">For members who cannot manage their accounts digitally. Default password: <span className="text-primary">password123</span></p>
@@ -296,7 +297,7 @@ export default function Members() {
               
               <div className="flex gap-4 mt-12">
                 <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 btn-secondary py-4 rounded-2xl">Discard</button>
-                <button type="submit" className="flex-[2] btn-primary py-4 rounded-2xl shadow-none">Commit Enrollment</button>
+                <button type="submit" className="flex-[2] btn-primary py-4 rounded-2xl shadow-none">Enrol Member</button>
               </div>
             </form>
           </div>
