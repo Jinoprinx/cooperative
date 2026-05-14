@@ -120,7 +120,8 @@ export default function LoginForm() {
           <div className="flex justify-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google Sign In failed')}
+              onError={() => setError('Google Sign In failed: Request blocked or cancelled')}
+              use_fedcm_for_prompt={true}
               theme="filled_black"
               shape="pill"
               text="signin_with"

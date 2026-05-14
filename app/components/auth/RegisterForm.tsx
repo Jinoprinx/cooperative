@@ -170,7 +170,8 @@ export default function RegisterForm() {
           <div className="flex justify-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google Sign Up failed')}
+              onError={() => setError('Google Sign Up failed: Request blocked or cancelled')}
+              use_fedcm_for_prompt={true}
               theme="filled_black"
               shape="pill"
               text="signup_with"

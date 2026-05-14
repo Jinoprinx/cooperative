@@ -23,8 +23,19 @@ export default function AuthLayout({
 }: AuthLayoutProps) {
   const { tenant } = useTenant();
 
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+
+  // Debug check (will only log in development)
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    if (!googleClientId) {
+      console.warn('⚠️ Google Client ID is missing! Check your .env.local file.');
+    } else {
+      console.log(`✅ Google Client ID loaded: ${googleClientId.substring(0, 10)}...`);
+    }
+  }
+
   return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+    <GoogleOAuthProvider clientId={googleClientId}>
       <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
