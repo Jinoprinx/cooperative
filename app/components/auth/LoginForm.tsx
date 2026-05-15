@@ -58,6 +58,7 @@ export default function LoginForm() {
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google/login`, {
         idToken: credentialResponse.credential,
+        tenantId: tenant?.id || tenant?._id,
       });
 
       if (response.data.needsSelection) {
@@ -119,6 +120,7 @@ export default function LoginForm() {
         <div className="space-y-4 mb-6">
           <div className="flex justify-center">
             <GoogleLogin
+              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
               onSuccess={handleGoogleSuccess}
               onError={() => setError('Google Sign In failed: Request blocked or cancelled')}
               use_fedcm_for_prompt={true}

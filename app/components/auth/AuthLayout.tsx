@@ -24,19 +24,19 @@ export default function AuthLayout({
   const { tenant } = useTenant();
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+  const isDev = process.env.NODE_ENV === 'development';
 
-  // Debug check (will only log in development)
-  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  // Debug check
+  if (typeof window !== 'undefined' && isDev) {
     if (!googleClientId) {
-      console.warn('⚠️ Google Client ID is missing! Check your .env.local file.');
+      console.error('❌ Google Client ID is MISSING! Check your .env.local file and ensure NEXT_PUBLIC_GOOGLE_CLIENT_ID is set.');
     } else {
-      console.log(`✅ Google Client ID loaded: ${googleClientId.substring(0, 10)}...`);
+      console.log(`✅ Google Client ID initialized: ${googleClientId.substring(0, 15)}...`);
     }
   }
 
-  return (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
+  const content = (
+    <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#3b82f615,transparent)]" />
@@ -104,6 +104,15 @@ export default function AuthLayout({
         </div>
       </motion.div>
     </div>
+  );
+
+  if (!googleClientId) {
+    return content;
+  }
+
+  return (
+    <GoogleOAuthProvider clientId={googleClientId}>
+      {content}
     </GoogleOAuthProvider>
   );
 }

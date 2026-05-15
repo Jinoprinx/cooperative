@@ -169,6 +169,7 @@ export default function RegisterForm() {
         <div className="space-y-4 mb-6">
           <div className="flex justify-center">
             <GoogleLogin
+              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
               onSuccess={handleGoogleSuccess}
               onError={() => setError('Google Sign Up failed: Request blocked or cancelled')}
               use_fedcm_for_prompt={true}

@@ -16,6 +16,7 @@ const nextConfig = {
     NEXT_PUBLIC_BACKEND_URL: process.env.NODE_ENV === 'production'
       ? 'https://coopbkend-acfb9cb075e5.herokuapp.com'
       : 'http://localhost:5000',
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
   },
   async rewrites() {
     return [

@@ -19,15 +19,28 @@ export default function SuperAdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
 
   // Redirect if not super-admin
   React.useEffect(() => {
-    if (user && user.role !== 'super-admin') {
+    if (!loading && (!user || user.role !== 'super-admin')) {
       router.push('/admin/dashboard');
     }
-  }, [user, router]);
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-700 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.2)] mx-auto mb-6 animate-pulse">
+            <FaCrown className="text-black text-2xl" />
+          </div>
+          <p className="text-amber-500 font-black uppercase tracking-[0.4em] text-[10px]">Initializing Executive Suite</p>
+        </div>
+      </div>
+    );
+  }
 
   const navItems = [
     { name: 'Platform Overview', href: '/super-admin/dashboard', icon: FaChartBar },

@@ -100,7 +100,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const protocol = window.location.protocol;
         const port = window.location.port ? `:${window.location.port}` : '';
         const encodedUser = encodeURIComponent(JSON.stringify(user));
-        const redirectUrl = `${protocol}//${targetSubdomain}.${mainDomain}${port}/admin/dashboard?token=${token}&user=${encodedUser}`;
+        const redirectPath = 
+          user.role === 'super-admin' ? '/super-admin/dashboard' : 
+          user.role === 'admin' ? '/admin/dashboard' : 
+          '/dashboard';
+          
+        const redirectUrl = `${protocol}//${targetSubdomain}.${mainDomain}${port}${redirectPath}?token=${token}&user=${encodedUser}`;
 
         window.location.href = redirectUrl;
         return; // Stop execution here as we are redirecting
@@ -147,7 +152,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const protocol = window.location.protocol;
         const port = window.location.port ? `:${window.location.port}` : '';
         const encodedUser = encodeURIComponent(JSON.stringify(user));
-        const redirectUrl = `${protocol}//${targetSubdomain}.${mainDomain}${port}/admin/dashboard?token=${token}&user=${encodedUser}`;
+        const redirectPath = 
+          user.role === 'super-admin' ? '/super-admin/dashboard' : 
+          user.role === 'admin' ? '/admin/dashboard' : 
+          '/dashboard';
+          
+        const redirectUrl = `${protocol}//${targetSubdomain}.${mainDomain}${port}${redirectPath}?token=${token}&user=${encodedUser}`;
 
         window.location.href = redirectUrl;
         return; // Stop execution here as we are redirecting

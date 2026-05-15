@@ -62,6 +62,17 @@ export default function AdminLayout({
     checkSubscription();
   }, [loading, user, pathname, router]);
 
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <FaChartLine className="h-10 w-10 text-primary animate-pulse mx-auto mb-4" />
+          <p className="text-secondary-text font-medium tracking-widest uppercase text-xs">Authenticating...</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleSignOut = () => {
     logout();
   };
