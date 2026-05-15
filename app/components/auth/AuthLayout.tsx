@@ -105,10 +105,16 @@ export default function AuthLayout({
       </motion.div>
     </div>
   );
+  // Only initialize Google OAuth on the main domain where Google login is actually used.
+  // On tenant subdomains, the "Sign in with Google" button redirects to the main domain,
+  // so the Google SDK should NOT load on subdomains (their origins aren't whitelisted).
+  if (!tenant && googleClientId) {
+    return (
+      <GoogleOAuthProvider clientId={googleClientId}>
+        {content}
+      </GoogleOAuthProvider>
+    );
+  }
 
-  return (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      {content}
-    </GoogleOAuthProvider>
-  );
+  return content;
 }
