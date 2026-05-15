@@ -106,10 +106,6 @@ export default function AuthLayout({
     </div>
   );
 
-  if (!googleClientId) {
-    return content;
-  }
-
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
       {content}
