@@ -116,7 +116,7 @@ export default function LoginForm() {
         )}
       </AnimatePresence>
 
-      {!tenant && (
+      {!tenant && !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
         <div className="space-y-4 mb-6">
           <div className="flex justify-center">
             <GoogleLogin
