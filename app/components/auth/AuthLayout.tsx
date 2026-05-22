@@ -53,7 +53,7 @@ export default function AuthLayout({
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md z-10"
       >
-        <div className="card-premium bg-surface backdrop-blur-[40px] border border-border p-8 sm:p-12 rounded-[2.5rem] shadow-2xl relative group">
+        <div className="card-premium bg-surface backdrop-blur-[40px] border border-border px-5 py-8 sm:p-12 rounded-[2.5rem] shadow-2xl relative group">
           <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/10 to-transparent rounded-[2.5rem] -z-10 opacity-50" />
           
           <div className="text-center mb-10">
@@ -98,7 +98,7 @@ export default function AuthLayout({
         <div className="mt-10 text-center animate-fade-in">
           <div className="text-[10px] text-tertiary-text font-black uppercase tracking-[0.4em] italic flex items-center justify-center gap-4">
              <div className="w-8 h-px bg-border" />
-             &copy; {new Date().getFullYear()} NEXUS CORE
+             &copy; {new Date().getFullYear()} COOPERATIVE CORE
              <div className="w-8 h-px bg-border" />
           </div>
         </div>

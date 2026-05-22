@@ -111,17 +111,19 @@ function VerifyEmailContent() {
             </div>
 
             <form onSubmit={handleVerify} className="space-y-6">
-                <div className="flex justify-between gap-2">
+                <div className="flex justify-between gap-1 sm:gap-2">
                     {code.map((digit, index) => (
                         <input
                             key={index}
                             ref={(el) => { inputRefs.current[index] = el; }}
                             type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             maxLength={1}
                             value={digit}
                             onChange={(e) => handleChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
-                            className="w-12 h-14 bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl text-center text-xl font-bold text-foreground dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                            className="flex-1 max-w-[44px] sm:max-w-[48px] h-12 sm:h-14 bg-surface-lighter dark:bg-white/5 border border-border dark:border-white/10 rounded-xl text-center text-lg sm:text-xl font-bold text-foreground dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                         />
                     ))}
                 </div>

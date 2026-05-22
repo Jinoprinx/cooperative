@@ -187,7 +187,7 @@ export default function RegisterForm() {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2 relative group/field">
-          <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Given Name</span>
+          <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Firstname</span>
           <input
             type="text"
             className={`w-full bg-surface border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text ${errors.firstName ? 'border-red-500/50' : ''}`}
@@ -220,7 +220,7 @@ export default function RegisterForm() {
       </div>
 
       <div className="space-y-2 relative group/field">
-        <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Communication Vector</span>
+        <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Phone Number</span>
         <div className="flex gap-3">
           <div className="w-28 relative group/select">
             <select
@@ -251,7 +251,7 @@ export default function RegisterForm() {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2 relative group/field">
-          <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Security Key</span>
+          <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Password</span>
           <input
             type="password"
             className={`w-full bg-surface border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text tracking-[0.3em] ${errors.password ? 'border-red-500/50' : ''}`}
@@ -261,7 +261,7 @@ export default function RegisterForm() {
           {errors.password && <p className="text-[9px] font-black uppercase tracking-widest text-red-500/60 px-4">{errors.password.message}</p>}
         </div>
         <div className="space-y-2 relative group/field">
-          <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Verify Security</span>
+          <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors z-10">Re-type Password</span>
           <input
             type="password"
             className={`w-full bg-surface border border-border rounded-2xl p-6 pt-10 text-primary-text text-xs outline-none focus:border-primary transition-all font-bold placeholder:text-tertiary-text tracking-[0.3em] ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
@@ -362,7 +362,7 @@ export default function RegisterForm() {
         className="w-full btn-primary py-5 rounded-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 mt-6 disabled:opacity-50"
       >
         <span className={loading ? 'opacity-0' : 'opacity-100'}>
-          {isJoiningTenant ? 'Activate Membership' : 'Initialize Cooperative'}
+          {isJoiningTenant ? 'Register Membership' : 'Initialize Cooperative'}
         </span>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center">

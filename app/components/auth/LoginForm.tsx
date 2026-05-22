@@ -158,9 +158,9 @@ export default function LoginForm() {
 
         <div className="space-y-2 relative group/field">
           <div className="flex justify-between items-center absolute top-2 left-6 right-6 z-10">
-            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Security Vector</span>
+            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Password</span>
             <Link href="/auth/forgot-password" title="Forgot Password" className="text-[8px] font-black text-tertiary-text hover:text-primary uppercase tracking-[0.2em] transition-colors">
-              Reset Key?
+              Reset Password?
             </Link>
           </div>
           <div className="relative">

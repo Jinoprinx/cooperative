@@ -819,10 +819,12 @@ export default function AdminDashboard() {
               <div className="flex justify-center">
                 <input
                   type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength={4}
                   value={pin}
                   onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                  className="w-full text-center text-5xl tracking-[1.2em] font-black border-b-2 border-border focus:border-primary outline-none bg-transparent py-4 text-primary-text placeholder:text-tertiary-text appearance-none mb-4"
+                  className="w-full max-w-[180px] sm:max-w-[220px] mx-auto text-center text-3xl sm:text-4xl tracking-[0.35em] sm:tracking-[0.5em] pl-[0.35em] sm:pl-[0.5em] font-black border-b-2 border-border focus:border-primary outline-none bg-transparent py-4 text-primary-text placeholder:text-tertiary-text appearance-none mb-4"
                   placeholder="0000"
                   autoFocus
                   required

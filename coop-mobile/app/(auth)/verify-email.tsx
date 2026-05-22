@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, TextInput, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '../../lib/api';
@@ -18,7 +18,15 @@ export default function VerifyEmail() {
   const [success, setSuccess] = useState<string | null>(null);
   const [timer, setTimer] = useState(60);
   
+  const { width: screenWidth } = useWindowDimensions();
   const inputRefs = useRef<Array<TextInput | null>>([]);
+
+  // Calculate dynamic size for 6 OTP boxes
+  // Horizontal padding is 24 on each side = 48
+  // We leave a 24px safety buffer for gaps
+  const boxWidth = Math.min(48, Math.floor((screenWidth - 48 - 24) / 6));
+  const boxHeight = Math.floor(boxWidth * 1.15);
+  const fontSize = boxWidth > 42 ? 22 : 18;
 
   useEffect(() => {
     if (!email) {
@@ -142,7 +150,7 @@ export default function VerifyEmail() {
             </Text>
           </View>
 
-          <View className="flex-row justify-between mb-8 px-2">
+          <View className="flex-row justify-between mb-8">
             {code.map((digit, index) => (
               <TextInput
                 key={`digit-${index}`}
@@ -152,8 +160,13 @@ export default function VerifyEmail() {
                 onKeyPress={(e) => handleKeyPress(e, index)}
                 keyboardType="number-pad"
                 maxLength={1}
-                className="w-12 h-14 bg-surface border border-border rounded-xl text-center text-2xl font-black text-white"
-                style={{ textAlign: 'center' }}
+                className="bg-surface border border-border rounded-xl text-center font-black text-white"
+                style={{ 
+                  width: boxWidth, 
+                  height: boxHeight, 
+                  fontSize: fontSize,
+                  textAlign: 'center' 
+                }}
                 selectTextOnFocus
               />
             ))}

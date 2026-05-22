@@ -51,9 +51,9 @@ export default function ForgotPasswordForm() {
         <div className="w-24 h-24 bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 border border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.1)]">
           <FaCheckCircle className="text-emerald-500 text-5xl" />
         </div>
-        <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-4">Transmission Successful</h3>
+        <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-4">Your Reset Token has Been Sent</h3>
         <p className="text-tertiary-text text-sm font-medium leading-relaxed max-w-xs mx-auto mb-10">
-          We've dispatched a secure recovery vector to your communication endpoint.
+          Check your email/phone number for your account recovery message
         </p>
         <Link href="/auth/login" className="btn-secondary inline-flex items-center gap-3 px-8 text-xs font-black uppercase tracking-widest">
            <FaArrowLeft className="text-[10px]" /> Return to Base
@@ -108,7 +108,7 @@ export default function ForgotPasswordForm() {
           disabled={isSubmitting}
           className="w-full btn-primary py-5 rounded-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-[0_0_50px_rgba(59,130,246,0.15)] hover:tracking-[0.6em] transition-all duration-500 disabled:opacity-50"
         >
-          <span className={isSubmitting ? 'opacity-0' : 'opacity-100'}>Dispatch Reset Vector</span>
+          <span className={isSubmitting ? 'opacity-0' : 'opacity-100'}>Send Reset Email</span>
           {isSubmitting && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -120,7 +120,7 @@ export default function ForgotPasswordForm() {
           href="/auth/login" 
           className="flex items-center justify-center gap-3 text-[10px] font-black text-tertiary-text uppercase tracking-[0.4em] hover:text-primary-text transition-colors py-2"
         >
-          <FaArrowLeft className="text-[8px]" /> Remember Protocols?
+          <FaArrowLeft className="text-[8px]" /> Back to Signin
         </Link>
       </div>
     </form>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Alert, Image, Modal, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Alert, Image, Modal, ActivityIndicator, Linking, TextInput } from 'react-native';
 import * as ExpoLinking from 'expo-linking';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../../hooks/useUser';
@@ -8,7 +8,6 @@ import { useAdminData } from '../../hooks/useAdminData';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { formatCurrency } from '../../lib/utils';
 import { Card } from '../../components/ui/Card';
-import { Input } from '../../components/ui/Input';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import api from '../../lib/api';
@@ -360,16 +359,24 @@ export default function AdminDashboard() {
               <Text className="text-foreground/50 text-center font-medium">Enter your 4-digit security PIN to view sensitive totals.</Text>
             </View>
 
-            <Input
-              placeholder="0000"
-              keyboardType="numeric"
-              maxLength={4}
-              secureTextEntry
-              value={pin}
-              onChangeText={setPin}
-              className="text-center text-4xl tracking-[1em] font-black"
-              autoFocus
-            />
+            <View className="items-center mb-8">
+              <TextInput
+                placeholder="0000"
+                keyboardType="numeric"
+                maxLength={4}
+                secureTextEntry
+                value={pin}
+                onChangeText={(text) => setPin(text.replace(/\D/g, ''))}
+                className="text-center text-4xl font-black text-foreground border-b-2 border-border/80 py-3 w-48"
+                style={{
+                  letterSpacing: 18,
+                  paddingLeft: 18, // to offset the trailing letterSpacing and center the dots
+                  textAlign: 'center'
+                }}
+                placeholderTextColor="rgba(255, 255, 255, 0.25)"
+                autoFocus
+              />
+            </View>
 
             {pinError ? (
               <View className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl mb-6">
