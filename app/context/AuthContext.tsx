@@ -15,6 +15,12 @@ interface User {
   hasPin?: boolean;
   accountNumber: string;
   profileImage?: string;
+  ledgerBalances?: {
+    shareCapital: number;
+    thriftSavings: number;
+    deposits: number;
+    capitalMobilization: number;
+  };
 }
 
 interface AuthContextType {

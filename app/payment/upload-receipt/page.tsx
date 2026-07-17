@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/app/context/AuthContext';
+import { useTenant } from '@/app/context/TenantContext';
 import { useDashboardData } from '@/app/hooks/useDashboardData';
-import { FaCloudUploadAlt, FaReceipt, FaMoneyBillWave, FaInfoCircle, FaShieldAlt } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaReceipt, FaMoneyBillWave, FaInfoCircle, FaShieldAlt, FaCog } from 'react-icons/fa';
 
 export default function UploadReceiptPage() {
   const { user } = useAuth();
+  const { tenant } = useTenant();
   const { refetch: refetchDashboardData } = useDashboardData();
   const [file, setFile] = useState<File | null>(null);
   const [amount, setAmount] = useState('');
@@ -17,6 +19,38 @@ export default function UploadReceiptPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  
+  const [includeCapitalMobilization, setIncludeCapitalMobilization] = useState(false);
+  const [capitalMobilizationAmount, setCapitalMobilizationAmount] = useState('');
+
+  const shareCapitalAmountFixed = tenant?.settings?.paymentAllocation?.shareCapitalAmount ?? 5000;
+  const thriftSavingsAmountFixed = tenant?.settings?.paymentAllocation?.thriftSavingsAmount ?? 10000;
+  const capitalMobilizationEnabled = tenant?.settings?.paymentAllocation?.capitalMobilization?.enabled ?? false;
+  const capitalMobilizationName = tenant?.settings?.paymentAllocation?.capitalMobilization?.name ?? 'Capital Mobilization';
+
+  const getLedgerBreakdown = () => {
+    const creditVal = parseFloat(savingsAmount || '0');
+    const capMobilizationVal = includeCapitalMobilization ? parseFloat(capitalMobilizationAmount || '0') : 0;
+    
+    const shareAllocated = Math.min(creditVal, shareCapitalAmountFixed);
+    const remainingAfterShare = Math.max(0, creditVal - shareAllocated);
+    
+    const thriftAllocated = Math.min(remainingAfterShare, thriftSavingsAmountFixed);
+    const remainingAfterThrift = Math.max(0, remainingAfterShare - thriftAllocated);
+    
+    const capAllocated = Math.min(remainingAfterThrift, capMobilizationVal);
+    const depositsAllocated = Math.max(0, remainingAfterThrift - capAllocated);
+    
+    return {
+      shareCapital: shareAllocated,
+      thriftSavings: thriftAllocated,
+      capitalMobilization: capAllocated,
+      deposits: depositsAllocated,
+      isShortfall: creditVal < (shareCapitalAmountFixed + thriftSavingsAmountFixed + capMobilizationVal)
+    };
+  };
+
+  const breakdown = getLedgerBreakdown();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -86,6 +120,10 @@ export default function UploadReceiptPage() {
     formData.append('purpose', 'split');
     formData.append('savingsAmount', savingsAmount || '0');
     formData.append('loanAmount', loanAmount || '0');
+    formData.append('shareCapitalAmount', breakdown.shareCapital.toString());
+    formData.append('thriftSavingsAmount', breakdown.thriftSavings.toString());
+    formData.append('capitalMobilizationAmount', breakdown.capitalMobilization.toString());
+    formData.append('depositsAmount', breakdown.deposits.toString());
 
     if (description) {
       formData.append('description', description);
@@ -105,6 +143,8 @@ export default function UploadReceiptPage() {
       setSavingsAmount('');
       setLoanAmount('');
       setDescription('');
+      setIncludeCapitalMobilization(false);
+      setCapitalMobilizationAmount('');
       refetchDashboardData();
     } catch (err) {
       setError('Failed to upload receipt. Please try again.');
@@ -209,6 +249,85 @@ export default function UploadReceiptPage() {
                       />
                     </div>
                   </div>
+
+                  {/* Capital Mobilization Toggle and Input */}
+                  {capitalMobilizationEnabled && (
+                    <div className="space-y-4 pt-2">
+                      <div className="flex items-center justify-between gap-4 bg-surface p-4 rounded-2xl border border-border group hover:bg-surface-lighter transition-all">
+                        <div className="flex flex-col">
+                          <label htmlFor="includeCapitalMobilization" className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary-text transition-colors cursor-pointer">
+                            Include {capitalMobilizationName}
+                          </label>
+                          <span className="text-[8px] text-tertiary-text font-bold uppercase tracking-tight mt-0.5">
+                            Deduct contribution from this transaction
+                          </span>
+                        </div>
+                        <div className="relative inline-block w-10 h-5 transition duration-200 ease-in-out bg-border rounded-full cursor-pointer">
+                          <input
+                            type="checkbox"
+                            id="includeCapitalMobilization"
+                            checked={includeCapitalMobilization}
+                            onChange={(e) => {
+                              setIncludeCapitalMobilization(e.target.checked);
+                              if (!e.target.checked) setCapitalMobilizationAmount('');
+                            }}
+                            className="absolute w-5 h-5 rounded-full appearance-none cursor-pointer checked:bg-primary border-none left-0 checked:left-5 transition-all duration-300"
+                          />
+                        </div>
+                      </div>
+
+                      {includeCapitalMobilization && (
+                        <div className="relative group/field animate-fade-in">
+                          <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">
+                            {capitalMobilizationName} Amount (NGN)
+                          </span>
+                          <input
+                            type="number"
+                            value={capitalMobilizationAmount}
+                            onChange={(e) => setCapitalMobilizationAmount(e.target.value)}
+                            placeholder="0.00"
+                            className="w-full bg-surface-lighter border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold text-sm"
+                            required={includeCapitalMobilization}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Ledger Breakdown Preview */}
+                  {parseFloat(savingsAmount || '0') > 0 && (
+                    <div className="bg-surface-lighter p-6 rounded-2xl border border-border space-y-4">
+                      <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Ledger Split Preview</h4>
+                      <div className="space-y-2 text-[10px] font-bold text-tertiary-text uppercase tracking-wider">
+                        <div className="flex justify-between">
+                          <span>Share Capital (Fixed):</span>
+                          <span className="text-primary-text font-black">₦{breakdown.shareCapital.toLocaleString()} / ₦{shareCapitalAmountFixed.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Thrift Savings (Fixed):</span>
+                          <span className="text-primary-text font-black">₦{breakdown.thriftSavings.toLocaleString()} / ₦{thriftSavingsAmountFixed.toLocaleString()}</span>
+                        </div>
+                        {includeCapitalMobilization && (
+                          <div className="flex justify-between">
+                            <span>{capitalMobilizationName}:</span>
+                            <span className="text-primary-text font-black">₦{breakdown.capitalMobilization.toLocaleString()}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between border-t border-border/50 pt-2 text-xs">
+                          <span className="text-primary">Voluntary Deposits:</span>
+                          <span className="text-primary-text font-black">₦{breakdown.deposits.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      
+                      {breakdown.isShortfall && (
+                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                          <p className="text-[9px] font-black text-red-500 uppercase tracking-widest text-center leading-relaxed">
+                            Warning: Credit amount is below the required monthly minimum (₦{(shareCapitalAmountFixed + thriftSavingsAmountFixed + (includeCapitalMobilization ? parseFloat(capitalMobilizationAmount || '0') : 0)).toLocaleString()})
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 

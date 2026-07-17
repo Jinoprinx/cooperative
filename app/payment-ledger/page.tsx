@@ -3,35 +3,37 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { PaymentRecord } from '@/app/types';
 import { useAuth } from '@/app/context/AuthContext';
+import { useTenant } from '@/app/context/TenantContext';
+import { FaHistory, FaReceipt, FaMoneyBillWave, FaShieldAlt, FaCalendarAlt, FaDownload } from 'react-icons/fa';
 
 export default function PaymentLedger() {
   const { user, loading: authLoading } = useAuth();
-  const [paymentRecords, setPaymentRecords] = useState<PaymentRecord[]>([]);
+  const { tenant } = useTenant();
+  const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const fetchPaymentRecords = async (params = {}) => {
+  const fetchTransactions = async (params = {}) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/payment-ledger`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transactions/history`, {
         headers: { Authorization: `Bearer ${token}` },
-        params
+        params: { limit: 1000, ...params } // Fetch all to calculate correct running balances
       });
-      setPaymentRecords(response.data.paymentRecords);
+      setTransactions(response.data.transactions || []);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching payment records:', error);
+      console.error('Error fetching transactions:', error);
       setLoading(false);
     }
   };
 
   useEffect(() => {
     if (user) {
-      fetchPaymentRecords();
+      fetchTransactions();
     }
   }, [user]);
 
@@ -44,11 +46,7 @@ export default function PaymentLedger() {
   };
 
   const handleFilter = () => {
-    fetchPaymentRecords({ startDate, endDate });
-  };
-
-  const handleQuickFilter = (limit: number) => {
-    fetchPaymentRecords({ limit });
+    fetchTransactions({ startDate, endDate });
   };
 
   const handleViewReceipt = (transactionId: string) => {
@@ -58,74 +56,253 @@ export default function PaymentLedger() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="min-h-screen bg-background pt-32 pb-20 flex items-center justify-center">
         <div className="text-center">
-          <div className="loader mb-4 h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 border-t-primary animate-spin"></div>
-          <p>Loading payment records...</p>
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Decrypting Ledger Vault...</p>
         </div>
       </div>
     );
   }
 
+  // Filter completed transactions and sort chronologically (oldest first) to compute running balances
+  const completedTransactions = transactions
+    .filter(tx => tx.status === 'completed')
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  let runningShare = 0;
+  let runningThrift = 0;
+  let runningDeposits = 0;
+  let runningLoan = 0;
+  let runningMobilization = 0;
+
+  const passbookRows = completedTransactions.map((tx) => {
+    let particulars = tx.description || '';
+    
+    let shareDR = 0;
+    let shareCR = 0;
+    
+    let thriftDR = 0;
+    let thriftCR = 0;
+    
+    let depositsDR = 0;
+    let depositsCR = 0;
+    
+    let loanDR = 0;
+    let loanCR = 0;
+    
+    let mobilizationDR = 0;
+    let mobilizationCR = 0;
+
+    if (tx.type === 'deposit') {
+      particulars = particulars || 'Monthly Contribution';
+      const breakdown = tx.ledgerBreakdown || { shareCapital: 0, thriftSavings: 0, deposits: tx.amount, capitalMobilization: 0 };
+      shareCR = breakdown.shareCapital || 0;
+      thriftCR = breakdown.thriftSavings || 0;
+      depositsCR = breakdown.deposits || 0;
+      mobilizationCR = breakdown.capitalMobilization || 0;
+    } else if (tx.type === 'withdrawal') {
+      particulars = particulars || 'Debit Settlement';
+      depositsDR = tx.amount + (tx.platformFee || 0);
+    } else if (tx.type === 'loan_disbursement') {
+      particulars = particulars || 'Loan Disbursement';
+      loanDR = tx.amount;
+    } else if (tx.type === 'loan_repayment') {
+      particulars = particulars || 'Loan Repayment';
+      loanCR = tx.amount;
+    }
+
+    runningShare += (shareCR - shareDR);
+    runningThrift += (thriftCR - thriftDR);
+    runningDeposits += (depositsCR - depositsDR);
+    runningLoan += (loanDR - loanCR);
+    runningMobilization += (mobilizationCR - mobilizationDR);
+
+    return {
+      ...tx,
+      particulars,
+      share: { cr: shareCR, bal: runningShare },
+      thrift: { cr: thriftCR, bal: runningThrift },
+      deposits: { dr: depositsDR, cr: depositsCR, bal: runningDeposits },
+      loan: { dr: loanDR, cr: loanCR, bal: runningLoan },
+      mobilization: { cr: mobilizationCR, bal: runningMobilization },
+    };
+  });
+
+  // Display newest first for the user interface
+  const displayRows = [...passbookRows].reverse();
+
+  const totalWithdrawable = user?.ledgerBalances?.deposits ?? runningDeposits;
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">My Payment Ledger</h1>
-
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <div className="flex flex-col space-y-4 md:flex-row md:items-end md:space-x-4 md:space-y-0">
-          <div className="form-control flex-1">
-            <label className="label"><span className="label-text">Start Date</span></label>
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="input input-bordered w-full" />
-          </div>
-          <div className="form-control flex-1">
-            <label className="label"><span className="label-text">End Date</span></label>
-            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="input input-bordered w-full" />
-          </div>
-          <button onClick={handleFilter} className="btn btn-primary">Search</button>
-          <div className="flex items-center space-x-2 pb-2">
-            <span className="text-sm font-medium text-gray-500">Quick Filters:</span>
-            <button onClick={() => handleQuickFilter(5)} className="btn btn-outline btn-xs btn-primary">Last 5</button>
-            <button onClick={() => handleQuickFilter(10)} className="btn btn-outline btn-xs btn-primary">Last 10</button>
-            <button onClick={() => { setStartDate(''); setEndDate(''); fetchPaymentRecords(); }} className="btn btn-outline btn-xs text-gray-400">Clear</button>
+    <div className="min-h-screen bg-background pt-32 pb-20 px-4 sm:px-6">
+      <main className="max-w-7xl mx-auto space-y-12">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
+          <div>
+            <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block font-mono">Vault Settlement Ledger</span>
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-primary-text">
+              Membership <span className="text-tertiary-text">Passbook</span>
+            </h1>
           </div>
         </div>
-      </div>
 
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Payment Method</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {paymentRecords.map((record) => (
-                <tr key={record._id}>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(record.date)}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatCurrency(record.amount)}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{record.paymentMethod}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 capitalize">{record.status}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                    {(record as any).receiptUrl && (
-                      <button
-                        onClick={() => handleViewReceipt(record._id)}
-                        className="text-primary hover:underline font-medium"
-                      >
-                        View Receipt
-                      </button>
-                    )}
-                  </td>
+        {/* Running Balance Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">Total Balance (Withdrawable)</span>
+            <div>
+              <p className="text-2xl font-black tracking-tighter text-primary-text mb-1">{formatCurrency(totalWithdrawable)}</p>
+              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-wider">Deposits Liquid</span>
+            </div>
+          </div>
+          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">Share Capital</span>
+            <div>
+              <p className="text-2xl font-black tracking-tighter text-primary-text mb-1">{formatCurrency(user?.ledgerBalances?.shareCapital ?? runningShare)}</p>
+              <span className="text-[8px] font-black text-primary uppercase tracking-wider">Membership Equity</span>
+            </div>
+          </div>
+          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">Thrift Savings</span>
+            <div>
+              <p className="text-2xl font-black tracking-tighter text-primary-text mb-1">{formatCurrency(user?.ledgerBalances?.thriftSavings ?? runningThrift)}</p>
+              <span className="text-[8px] font-black text-primary uppercase tracking-wider">Mandatory Savings</span>
+            </div>
+          </div>
+          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">Capital Mobilization</span>
+            <div>
+              <p className="text-2xl font-black tracking-tighter text-primary-text mb-1">{formatCurrency(user?.ledgerBalances?.capitalMobilization ?? runningMobilization)}</p>
+              <span className="text-[8px] font-black text-tertiary-text uppercase tracking-wider">Special Projects</span>
+            </div>
+          </div>
+          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between col-span-2 md:col-span-1">
+            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">Outstanding Loan</span>
+            <div>
+              <p className={`text-2xl font-black tracking-tighter mb-1 ${runningLoan > 0 ? 'text-rose-500' : 'text-primary-text'}`}>{formatCurrency(runningLoan)}</p>
+              <span className="text-[8px] font-black text-tertiary-text uppercase tracking-wider">Repayment Obligation</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Date Filters */}
+        <div className="card-premium bg-surface border border-border p-6 rounded-2xl">
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1 space-y-2">
+              <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest ml-2">Epoch Start</span>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full bg-surface-lighter border border-border rounded-xl p-4 text-primary-text outline-none focus:border-primary text-xs font-bold"
+                />
+              </div>
+            </div>
+            <div className="flex-1 space-y-2">
+              <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest ml-2">Epoch End</span>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full bg-surface-lighter border border-border rounded-xl p-4 text-primary-text outline-none focus:border-primary text-xs font-bold"
+                />
+              </div>
+            </div>
+            <button
+              onClick={handleFilter}
+              className="btn-primary py-4 px-8 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 border-none h-12"
+            >
+              Filter Ledger
+            </button>
+            <button
+              onClick={() => { setStartDate(''); setEndDate(''); fetchTransactions(); }}
+              className="bg-surface-lighter hover:bg-surface border border-border text-primary-text font-black text-xs uppercase tracking-widest px-8 rounded-xl h-12"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        {/* Passbook Table */}
+        <div className="card-premium bg-surface border border-border p-6 rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-3 mb-6">
+            <FaHistory className="text-primary h-4 w-4" />
+            <h3 className="text-sm font-black tracking-widest uppercase text-primary-text">Settled Transactions Passbook</h3>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs font-bold text-tertiary-text uppercase">
+              <thead>
+                <tr className="border-b border-border text-[8px] tracking-[0.2em] font-black text-tertiary-text">
+                  <th className="pb-4 pr-4">Date</th>
+                  <th className="pb-4 pr-4">Particulars</th>
+                  <th className="pb-4 pr-4 text-center border-l border-border/50">Share Capital<br/><span className="text-[6px] text-tertiary-text/60">(CR | BAL)</span></th>
+                  <th className="pb-4 pr-4 text-center border-l border-border/50">Thrift Savings<br/><span className="text-[6px] text-tertiary-text/60">(CR | BAL)</span></th>
+                  <th className="pb-4 pr-4 text-center border-l border-border/50">Vol. Deposits<br/><span className="text-[6px] text-tertiary-text/60">(DR | CR | BAL)</span></th>
+                  <th className="pb-4 pr-4 text-center border-l border-border/50">Member Loan<br/><span className="text-[6px] text-tertiary-text/60">(DR | CR | BAL)</span></th>
+                  <th className="pb-4 pr-4 text-center border-l border-border/50">Capital Mobilization<br/><span className="text-[6px] text-tertiary-text/60">(CR | BAL)</span></th>
+                  <th className="pb-4 text-right border-l border-border/50">Receipt</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border/50 font-mono text-[10px]">
+                {displayRows.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-8 text-center text-[10px] font-black tracking-widest text-tertiary-text/40">No entries recorded in passbook.</td>
+                  </tr>
+                ) : (
+                  displayRows.map((row) => (
+                    <tr key={row._id} className="hover:bg-primary/5 transition-colors">
+                      <td className="py-4 pr-4 font-bold font-sans text-primary-text">{formatDate(row.date)}</td>
+                      <td className="py-4 pr-4 font-sans text-primary-text max-w-[150px] truncate">{row.particulars}</td>
+                      
+                      {/* Share Capital */}
+                      <td className="py-4 pr-4 text-center border-l border-border/50">
+                        {row.share.cr > 0 ? `+₦${row.share.cr.toLocaleString()}` : '—'} <span className="text-primary-text">| ₦{row.share.bal.toLocaleString()}</span>
+                      </td>
+                      
+                      {/* Thrift Savings */}
+                      <td className="py-4 pr-4 text-center border-l border-border/50">
+                        {row.thrift.cr > 0 ? `+₦${row.thrift.cr.toLocaleString()}` : '—'} <span className="text-primary-text">| ₦{row.thrift.bal.toLocaleString()}</span>
+                      </td>
+                      
+                      {/* Deposits */}
+                      <td className="py-4 pr-4 text-center border-l border-border/50">
+                        {row.deposits.dr > 0 ? `-₦${row.deposits.dr.toLocaleString()}` : row.deposits.cr > 0 ? `+₦${row.deposits.cr.toLocaleString()}` : '—'} <span className="text-primary-text">| ₦{row.deposits.bal.toLocaleString()}</span>
+                      </td>
+                      
+                      {/* Member Loan */}
+                      <td className="py-4 pr-4 text-center border-l border-border/50">
+                        {row.loan.dr > 0 ? `+₦${row.loan.dr.toLocaleString()}` : row.loan.cr > 0 ? `-₦${row.loan.cr.toLocaleString()}` : '—'} <span className="text-rose-500 font-bold">| ₦{row.loan.bal.toLocaleString()}</span>
+                      </td>
+                      
+                      {/* Capital Mobilization */}
+                      <td className="py-4 pr-4 text-center border-l border-border/50">
+                        {row.mobilization.cr > 0 ? `+₦${row.mobilization.cr.toLocaleString()}` : '—'} <span className="text-primary-text">| ₦{row.mobilization.bal.toLocaleString()}</span>
+                      </td>
+
+                      <td className="py-4 text-right border-l border-border/50">
+                        {row.receiptUrl ? (
+                          <button
+                            onClick={() => handleViewReceipt(row._id)}
+                            className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-lg transition-colors inline-flex items-center gap-1.5 font-sans font-bold"
+                          >
+                            <FaReceipt className="w-3.5 h-3.5" /> View
+                          </button>
+                        ) : (
+                          <span className="text-tertiary-text/40 font-sans">System Manual</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

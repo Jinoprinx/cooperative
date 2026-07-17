@@ -17,6 +17,14 @@ interface TenantSettings {
         deductInterestAtSource?: boolean;
     };
     registrationOpen: boolean;
+    paymentAllocation?: {
+        shareCapitalAmount?: number;
+        thriftSavingsAmount?: number;
+        capitalMobilization?: {
+            enabled?: boolean;
+            name?: string;
+        };
+    };
 }
 
 interface Tenant {

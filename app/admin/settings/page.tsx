@@ -31,6 +31,14 @@ export default function SettingsPage() {
                 deductInterestAtSource: true,
             },
             registrationOpen: true,
+            paymentAllocation: {
+                shareCapitalAmount: 5000,
+                thriftSavingsAmount: 10000,
+                capitalMobilization: {
+                    enabled: false,
+                    name: 'Capital Mobilization',
+                },
+            },
         }
     });
 
@@ -51,6 +59,14 @@ export default function SettingsPage() {
                         deductInterestAtSource: tenant.settings?.loanRules?.deductInterestAtSource ?? true,
                     },
                     registrationOpen: tenant.settings?.registrationOpen ?? true,
+                    paymentAllocation: {
+                        shareCapitalAmount: tenant.settings?.paymentAllocation?.shareCapitalAmount ?? 5000,
+                        thriftSavingsAmount: tenant.settings?.paymentAllocation?.thriftSavingsAmount ?? 10000,
+                        capitalMobilization: {
+                            enabled: tenant.settings?.paymentAllocation?.capitalMobilization?.enabled ?? false,
+                            name: tenant.settings?.paymentAllocation?.capitalMobilization?.name || 'Capital Mobilization',
+                        },
+                    },
                 }
             });
         }
@@ -122,6 +138,20 @@ export default function SettingsPage() {
             settings: {
                 ...prev.settings,
                 loanRules: { ...prev.settings.loanRules, [name]: parseFloat(value) }
+            }
+        }));
+    };
+
+    const handlePaymentAllocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            settings: {
+                ...prev.settings,
+                paymentAllocation: {
+                    ...prev.settings.paymentAllocation,
+                    [name]: parseFloat(value) || 0
+                }
             }
         }));
     };
@@ -324,6 +354,93 @@ export default function SettingsPage() {
                                     />
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Ledger Rules */}
+                    <div className="card-premium relative overflow-hidden bg-primary/5 border-primary/20">
+                        <div className="flex items-center gap-3 mb-8">
+                             <FaCog className="text-primary h-5 w-5" />
+                             <h2 className="text-xl font-black tracking-tighter uppercase text-primary">Ledger Algorithms</h2>
+                        </div>
+                        <div className="space-y-8">
+                            <div className="relative group/field">
+                                <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-primary-text transition-colors">Default Monthly Share Capital (NGN)</span>
+                                <input
+                                    type="number"
+                                    name="shareCapitalAmount"
+                                    value={formData.settings.paymentAllocation?.shareCapitalAmount || ''}
+                                    onChange={handlePaymentAllocationChange}
+                                    className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-black text-2xl tracking-tighter"
+                                />
+                            </div>
+                            <div className="relative group/field">
+                                <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-primary-text transition-colors">Default Monthly Thrift Savings (NGN)</span>
+                                <input
+                                    type="number"
+                                    name="thriftSavingsAmount"
+                                    value={formData.settings.paymentAllocation?.thriftSavingsAmount || ''}
+                                    onChange={handlePaymentAllocationChange}
+                                    className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-black text-2xl tracking-tighter"
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between gap-4 bg-surface p-6 rounded-2xl border border-border group hover:bg-surface-lighter transition-all">
+                                <div className="flex flex-col">
+                                    <label htmlFor="capitalMobilizationEnabled" className="text-xs font-black uppercase tracking-widest text-primary hover:text-primary-text transition-colors cursor-pointer">
+                                        Capital Mobilization active
+                                    </label>
+                                    <span className="text-[9px] text-tertiary-text font-bold uppercase tracking-tight mt-1 group-hover:text-primary/70">
+                                        Activate Special Fund / Capital Mobilization
+                                    </span>
+                                </div>
+                                <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out bg-border rounded-full cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        id="capitalMobilizationEnabled"
+                                        checked={formData.settings.paymentAllocation?.capitalMobilization?.enabled || false}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            settings: {
+                                                ...prev.settings,
+                                                paymentAllocation: {
+                                                    ...prev.settings.paymentAllocation,
+                                                    capitalMobilization: {
+                                                        ...prev.settings.paymentAllocation?.capitalMobilization,
+                                                        enabled: e.target.checked
+                                                    }
+                                                }
+                                            }
+                                        }))}
+                                        className="absolute w-6 h-6 rounded-full appearance-none cursor-pointer checked:bg-primary border-none left-0 checked:left-6 transition-all duration-300"
+                                    />
+                                </div>
+                            </div>
+
+                            {formData.settings.paymentAllocation?.capitalMobilization?.enabled && (
+                                <div className="relative group/field">
+                                    <span className="absolute top-2 left-6 text-[8px] font-black text-primary/40 uppercase tracking-[0.2em] group-focus-within/field:text-primary-text transition-colors">Mobilization Title</span>
+                                    <input
+                                        type="text"
+                                        value={formData.settings.paymentAllocation?.capitalMobilization?.name || ''}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            settings: {
+                                                ...prev.settings,
+                                                paymentAllocation: {
+                                                    ...prev.settings.paymentAllocation,
+                                                    capitalMobilization: {
+                                                        ...prev.settings.paymentAllocation?.capitalMobilization,
+                                                        name: e.target.value
+                                                    }
+                                                }
+                                            }
+                                        }))}
+                                        className="w-full bg-surface border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold text-sm"
+                                        placeholder="e.g. Building Fund Levy"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
 
