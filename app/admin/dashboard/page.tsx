@@ -539,10 +539,10 @@ export default function AdminDashboard() {
               <h3 className="text-3xl font-black text-primary-text tracking-tighter">{(stats?.pendingLoans || 0) + pendingPayments.length + pendingRegistrations.length}</h3>
             </div>
           </div>
-          <Link href="/admin/loans/pending" className="text-[10px] font-black text-amber-500 hover:text-amber-400 uppercase tracking-widest flex items-center gap-2">
+          <a href="#approvals-section" className="text-[10px] font-black text-amber-500 hover:text-amber-400 uppercase tracking-widest flex items-center gap-2">
             View All Action Items
-            <FaArrowUp className="rotate-45 h-2 w-2" />
-          </Link>
+            <FaArrowDown className="h-2 w-2" />
+          </a>
         </div>
 
         {/* Billing & Reserve (Main Admin Only) */}
@@ -720,7 +720,7 @@ export default function AdminDashboard() {
 
       {/* Approvals Section */}
       {(pendingPayments.length > 0 || pendingLoans.length > 0 || pendingRegistrations.length > 0) && (
-        <div className="space-y-6">
+        <div id="approvals-section" className="space-y-6">
           <div className="flex items-center gap-4">
             <h2 className="text-3xl font-black text-primary-text tracking-tighter">Queue <span className="text-tertiary-text">Approvals</span></h2>
             <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full animate-pulse">Action Required</span>
@@ -773,6 +773,32 @@ export default function AdminDashboard() {
                     </button>
                   </div>
                 )}
+              </div>
+            ))}
+
+            {/* Pending Loans */}
+            {pendingLoans.map((loan) => (
+              <div key={loan._id} className="card-premium bg-surface border-border hover:border-purple-500/30 transition-all duration-500 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 border border-purple-500/20">
+                      <FaHandHoldingUsd className="h-6 w-6" />
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest block mb-1">Type</span>
+                      <span className="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Loan Request</span>
+                    </div>
+                  </div>
+                  <div className="mb-6">
+                    <p className="text-primary-text font-bold text-sm truncate">{loan.user?.firstName} {loan.user?.lastName}</p>
+                    <p className="text-tertiary-text text-[10px] font-black tracking-tighter mb-2">Value: {formatCurrency(loan.amount)}</p>
+                    <p className="text-tertiary-text text-xs font-medium line-clamp-2">{loan.purpose || 'Cooperative Loan Request'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => handleApproveLoan(loan._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-purple-600 hover:bg-purple-500 shadow-none border-none">Approve Request</button>
+                  <button onClick={() => handleRejectLoan(loan._id)} className="btn-secondary text-[10px] py-2 px-4 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30">Reject</button>
+                </div>
               </div>
             ))}
 

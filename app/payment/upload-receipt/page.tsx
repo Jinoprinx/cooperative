@@ -11,7 +11,8 @@ export default function UploadReceiptPage() {
   const { refetch: refetchDashboardData } = useDashboardData();
   const [file, setFile] = useState<File | null>(null);
   const [amount, setAmount] = useState('');
-  const [purpose, setPurpose] = useState<'deposit' | 'loan_repayment'>('deposit');
+  const [savingsAmount, setSavingsAmount] = useState('');
+  const [loanAmount, setLoanAmount] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,10 +24,55 @@ export default function UploadReceiptPage() {
     }
   };
 
+  const handleAmountChange = (val: string) => {
+    setAmount(val);
+    setSavingsAmount(val);
+    setLoanAmount('0');
+  };
+
+  const handleSavingsChange = (val: string) => {
+    setSavingsAmount(val);
+    const total = parseFloat(amount || '0');
+    const savings = parseFloat(val || '0');
+    if (!isNaN(total) && !isNaN(savings)) {
+      const remaining = Math.max(0, total - savings);
+      setLoanAmount(remaining.toString());
+    }
+  };
+
+  const handleLoanChange = (val: string) => {
+    setLoanAmount(val);
+    const total = parseFloat(amount || '0');
+    const loan = parseFloat(val || '0');
+    if (!isNaN(total) && !isNaN(loan)) {
+      const remaining = Math.max(0, total - loan);
+      setSavingsAmount(remaining.toString());
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !amount) {
       setError('Please provide a receipt and an amount.');
+      return;
+    }
+
+    const total = parseFloat(amount);
+    const savings = parseFloat(savingsAmount || '0');
+    const loan = parseFloat(loanAmount || '0');
+
+    if (isNaN(total) || total <= 0) {
+      setError('Please provide a valid total amount.');
+      return;
+    }
+
+    if (isNaN(savings) || savings < 0 || isNaN(loan) || loan < 0) {
+      setError('Savings and loan allocations must be non-negative.');
+      return;
+    }
+
+    if (Math.abs((savings + loan) - total) > 0.01) {
+      setError('The sum of Savings and Loan allocations must equal the Total Amount.');
       return;
     }
 
@@ -37,7 +83,9 @@ export default function UploadReceiptPage() {
     const formData = new FormData();
     formData.append('receipt', file);
     formData.append('amount', amount);
-    formData.append('purpose', purpose);
+    formData.append('purpose', 'split');
+    formData.append('savingsAmount', savingsAmount || '0');
+    formData.append('loanAmount', loanAmount || '0');
 
     if (description) {
       formData.append('description', description);
@@ -54,6 +102,8 @@ export default function UploadReceiptPage() {
       setSuccess('Receipt uploaded successfully. It is pending review.');
       setFile(null);
       setAmount('');
+      setSavingsAmount('');
+      setLoanAmount('');
       setDescription('');
       refetchDashboardData();
     } catch (err) {
@@ -120,29 +170,44 @@ export default function UploadReceiptPage() {
 
                 <div className="space-y-6">
                   <div className="relative group/field">
-                    <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Classification</span>
-                    <select
-                      id="purpose"
-                      value={purpose}
-                      onChange={(e) => setPurpose(e.target.value as 'deposit' | 'loan_repayment')}
-                      className="w-full bg-surface-lighter border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold appearance-none cursor-pointer"
-                    >
-                      <option value="deposit">CREDIT (SAVINGS)</option>
-                      <option value="loan_repayment">DEBT RECOVERY (LOAN)</option>
-                    </select>
-                  </div>
-
-                  <div className="relative group/field">
-                    <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Exact Denomination (NGN)</span>
+                    <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Total Receipt Amount (NGN)</span>
                     <input
                       type="number"
                       id="amount"
                       value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      onChange={(e) => handleAmountChange(e.target.value)}
                       placeholder="0.00"
                       className="w-full bg-surface-lighter border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-black text-lg"
                       required
                     />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="relative group/field">
+                      <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Credit (Savings)</span>
+                      <input
+                        type="number"
+                        id="savingsAmount"
+                        value={savingsAmount}
+                        onChange={(e) => handleSavingsChange(e.target.value)}
+                        placeholder="0.00"
+                        className="w-full bg-surface-lighter border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold text-sm"
+                        required
+                      />
+                    </div>
+
+                    <div className="relative group/field">
+                      <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Debt Recovery (Loan)</span>
+                      <input
+                        type="number"
+                        id="loanAmount"
+                        value={loanAmount}
+                        onChange={(e) => handleLoanChange(e.target.value)}
+                        placeholder="0.00"
+                        className="w-full bg-surface-lighter border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-bold text-sm"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

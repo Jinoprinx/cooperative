@@ -44,7 +44,7 @@ export default function AdminDashboard() {
       setIsProcessingPayment(true);
       
       // Create a deep link to return to the mobile app's admin dashboard
-      // Note: We wrap this in a backend proxy because Monnify requires a valid http/https URL
+      // Note: We wrap this in a backend proxy because Paystack requires a valid http/https callback URL
       const appLink = ExpoLinking.createURL('(admin)', {
         queryParams: { payment: 'success' }
       });

@@ -10,6 +10,8 @@ import Link from 'next/link';
 export default function Members() {
   const [searchQuery, setSearchQuery] = useState('');
   const [members, setMembers] = useState<Member[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMember, setNewMember] = useState({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '', email: '' });
   const [loading, setLoading] = useState(true);
@@ -18,11 +20,14 @@ export default function Members() {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const token = localStorage.getItem('token'); // Assuming token is stored here after login
+        setLoading(true);
+        const token = localStorage.getItem('token');
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`, {
+          params: { page, limit: 10, search: searchQuery },
           headers: { Authorization: `Bearer ${token}` },
         });
-        setMembers(response.data.members);
+        setMembers(response.data.members || []);
+        setTotalPages(response.data.totalPages || 1);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -30,12 +35,9 @@ export default function Members() {
       }
     };
     fetchMembers();
-  }, []);
+  }, [page, searchQuery]);
 
-  const filteredMembers = members.filter(member =>
-    (member.firstName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (member.lastName || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMembers = members;
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,7 +145,10 @@ export default function Members() {
             type="text"
             placeholder="Search by first or last name..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
             className="w-full bg-surface border border-border rounded-3xl py-5 pl-16 pr-8 text-primary-text text-sm focus:border-primary/50 outline-none transition-all placeholder:text-tertiary-text font-bold"
           />
         </div>
@@ -224,6 +229,32 @@ export default function Members() {
         {filteredMembers.length === 0 && (
           <div className="p-32 text-center bg-surface">
             <p className="text-tertiary-text text-sm font-black uppercase tracking-[0.4em]">No members found in directory</p>
+          </div>
+        )}
+        
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center px-8 py-5 border-t border-border bg-surface/50">
+            <div className="text-[10px] text-tertiary-text font-black uppercase tracking-widest">
+              Page {page} of {totalPages}
+            </div>
+            <div className="flex gap-4">
+              {page > 1 && (
+                <button
+                  onClick={() => setPage(p => Math.max(p - 1, 1))}
+                  className="px-6 py-2.5 rounded-xl border border-border text-[10px] uppercase tracking-widest font-black text-primary-text hover:bg-surface-lighter transition-all"
+                >
+                  Back
+                </button>
+              )}
+              {page < totalPages && (
+                <button
+                  onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+                  className="btn-primary px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest font-black"
+                >
+                  Next
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
