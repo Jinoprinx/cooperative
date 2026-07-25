@@ -185,32 +185,84 @@ export default function SuretyPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-border bg-surface-lighter">
-                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Applicant</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Role</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Associated Party</th>
                     <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Endorsed Value</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Identity Status</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Verification Status</th>
                     <th className="px-8 py-5 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Timestamp</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {history.map((item) => {
+                    let myUserId = '';
+                    try {
+                      const token = localStorage.getItem('token');
+                      if (token) {
+                        myUserId = JSON.parse(atob(token.split('.')[1] || '{}')).id;
+                      }
+                    } catch (e) {}
+
+                    const isApplicant = item.user?._id === myUserId || item.user === myUserId;
                     const status = getMySuretyStatus(item);
+
+                    const approvedCount = item.sureties?.filter((s: any) => s.status === 'approved').length || 0;
+                    const totalCount = item.sureties?.length || 0;
+                    const hasRejected = item.sureties?.some((s: any) => s.status === 'rejected');
+
                     return (
                       <tr key={item._id} className="group hover:bg-surface-lighter transition-colors">
                         <td className="px-8 py-6">
-                          <p className="font-bold text-primary-text group-hover:text-primary transition-colors">
-                            {item.user ? `${item.user.firstName} ${item.user.lastName}` : 'System Subject'}
-                          </p>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                            isApplicant ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                          }`}>
+                            {isApplicant ? 'Applicant' : 'Surety'}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6">
+                          {isApplicant ? (
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest leading-none">Your Sureties:</span>
+                              <p className="font-bold text-primary-text text-xs">
+                                {item.sureties && item.sureties.length > 0
+                                  ? item.sureties.map((s: any) => {
+                                      const name = s.user ? `${s.user.firstName} ${s.user.lastName}` : 'Unknown member';
+                                      return `${name} (${s.status})`;
+                                    }).join(', ')
+                                  : 'No sureties assigned'}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest leading-none">Applicant:</span>
+                              <p className="font-bold text-primary-text group-hover:text-primary transition-colors text-sm">
+                                {item.user ? `${item.user.firstName} ${item.user.lastName}` : 'System Subject'}
+                              </p>
+                            </div>
+                          )}
                         </td>
                         <td className="px-8 py-6">
                           <p className="font-black text-primary-text">₦{item.amount?.toLocaleString()}</p>
                         </td>
                         <td className="px-8 py-6">
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                            status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'
-                          }`}>
-                            <div className={`w-1 h-1 rounded-full ${status === 'approved' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                            {status}
-                          </span>
+                          {isApplicant ? (
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                              approvedCount === totalCount ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                              hasRejected ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                            }`}>
+                              <div className={`w-1 h-1 rounded-full ${
+                                approvedCount === totalCount ? 'bg-emerald-500' :
+                                hasRejected ? 'bg-red-500' : 'bg-amber-500'
+                              }`} />
+                              {approvedCount}/{totalCount} Approved
+                            </span>
+                          ) : (
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                              status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                            }`}>
+                              <div className={`w-1 h-1 rounded-full ${status === 'approved' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                              {status}
+                            </span>
+                          )}
                         </td>
                         <td className="px-8 py-6 text-right font-black text-tertiary-text text-xs">
                           {new Date(item.createdAt).toLocaleDateString()}

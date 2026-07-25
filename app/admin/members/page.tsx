@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaSearch, FaUserPlus, FaTrash, FaUserShield, FaUserEdit } from 'react-icons/fa';
+import { FaSearch, FaUserPlus, FaTrash, FaUserShield, FaUserEdit, FaHistory, FaTimes } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 import axios from 'axios';
 import { Member } from '@/app/types';
@@ -16,6 +16,11 @@ export default function Members() {
   const [newMember, setNewMember] = useState({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '', email: '' });
   const [loading, setLoading] = useState(true);
   const { isMainAdmin } = useAuth();
+
+  const [showSuretyModal, setShowSuretyModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [suretyHistory, setSuretyHistory] = useState<any[]>([]);
+  const [loadingSurety, setLoadingSurety] = useState(false);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -96,6 +101,25 @@ export default function Members() {
     } catch (error: any) {
       console.error('Error toggling admin role:', error);
       alert(error.response?.data?.message || 'Failed to update role');
+    }
+  };
+
+  const handleViewSuretyHistory = async (member: Member) => {
+    setSelectedMember(member);
+    setShowSuretyModal(true);
+    setLoadingSurety(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/members/${member._id}/surety-history`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSuretyHistory(response.data);
+    } catch (error) {
+      console.error('Error fetching member surety history:', error);
+      alert('Failed to load surety record.');
+    } finally {
+      setLoadingSurety(false);
     }
   };
 
@@ -206,6 +230,13 @@ export default function Members() {
                   </td>
                   <td className="px-8 py-6 text-right whitespace-nowrap">
                     <div className="flex justify-end gap-2 transition-opacity duration-300">
+                      <button
+                        onClick={() => handleViewSuretyHistory(member)}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all"
+                        title="View Surety History"
+                      >
+                        <FaHistory className="h-4 w-4" />
+                      </button>
                       {isMainAdmin && (
                         <>
                           <button
@@ -352,6 +383,125 @@ export default function Members() {
             <div className="flex gap-4">
               <button onClick={() => setShowDeleteModal(false)} className="flex-1 btn-secondary text-xs uppercase tracking-widest py-3 rounded-2xl">Cancel</button>
               <button onClick={handleConfirmDelete} className="flex-1 btn-primary bg-red-600 hover:bg-red-500 text-xs uppercase tracking-widest py-3 rounded-2xl shadow-none border-none">Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSuretyModal && selectedMember && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/85 backdrop-blur-2xl" onClick={() => setShowSuretyModal(false)} />
+          <div className="relative glass-card p-10 rounded-[3rem] border border-border w-full max-w-4xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
+            
+            <div className="relative flex justify-between items-start mb-8 flex-shrink-0">
+               <div>
+                  <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Security Protocol</span>
+                  <h3 className="text-3xl font-black text-primary-text tracking-tighter">
+                    Surety History: <span className="text-tertiary-text">{selectedMember.firstName} {selectedMember.lastName}</span>
+                  </h3>
+               </div>
+               <button onClick={() => setShowSuretyModal(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-surface border border-border text-tertiary-text hover:text-primary-text transition-colors">
+                  <FaTimes className="h-6 w-6" />
+               </button>
+            </div>
+
+            {loadingSurety ? (
+              <div className="flex-1 flex items-center justify-center py-20">
+                <div className="loader h-8 w-8 rounded-full border-4 border-t-4 border-gray-202 border-t-primary animate-spin"></div>
+              </div>
+            ) : suretyHistory.length === 0 ? (
+              <div className="flex-1 py-20 text-center bg-surface-lighter rounded-3xl border border-dashed border-border mb-6">
+                 <p className="text-tertiary-text text-xs font-black uppercase tracking-widest italic">No surety records found for this member</p>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar mb-6">
+                <div className="card-premium p-0 overflow-hidden bg-surface border-border">
+                  <table className="w-full text-left border-collapse font-bold">
+                    <thead>
+                      <tr className="border-b border-border bg-surface-lighter">
+                        <th className="px-6 py-4 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Role</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Associated Party</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Endorsed Value</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Verification Status</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {suretyHistory.map((item) => {
+                        const isApplicant = item.user?._id === selectedMember._id || item.user === selectedMember._id;
+
+                        const mySuretyObj = item.sureties?.find((s: any) => s.user?._id === selectedMember._id || s.user === selectedMember._id);
+                        const suretyStatus = mySuretyObj?.status || 'unknown';
+
+                        const approvedCount = item.sureties?.filter((s: any) => s.status === 'approved').length || 0;
+                        const totalCount = item.sureties?.length || 0;
+                        const hasRejected = item.sureties?.some((s: any) => s.status === 'rejected');
+
+                        return (
+                          <tr key={item._id} className="hover:bg-surface-lighter transition-colors">
+                            <td className="px-6 py-4">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                                isApplicant ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                              }`}>
+                                {isApplicant ? 'Applicant' : 'Surety'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-xs font-medium text-primary-text">
+                              {isApplicant ? (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest">Sureties:</span>
+                                  <span className="font-bold">
+                                    {item.sureties && item.sureties.length > 0
+                                      ? item.sureties.map((s: any) => {
+                                          const name = s.user ? `${s.user.firstName} ${s.user.lastName}` : 'Unknown member';
+                                          return `${name} (${s.status})`;
+                                        }).join(', ')
+                                      : 'No sureties'}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest">Applicant:</span>
+                                  <span className="font-bold">
+                                    {item.user ? `${item.user.firstName} ${item.user.lastName}` : 'Unknown Applicant'}
+                                  </span>
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-xs font-black text-primary-text">
+                              ₦{item.amount?.toLocaleString()}
+                            </td>
+                            <td className="px-6 py-4">
+                              {isApplicant ? (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border ${
+                                  approvedCount === totalCount ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                                  hasRejected ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                                }`}>
+                                  {approvedCount}/{totalCount} Approved
+                                </span>
+                              ) : (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border ${
+                                  suretyStatus === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                                }`}>
+                                  {suretyStatus}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-right text-xs font-bold text-tertiary-text">
+                              {new Date(item.createdAt).toLocaleDateString()}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <div className="flex-shrink-0">
+               <button onClick={() => setShowSuretyModal(false)} className="w-full btn-primary py-4 text-xs font-black tracking-widest uppercase rounded-2xl shadow-none border-none">Dismiss Record</button>
             </div>
           </div>
         </div>

@@ -123,4 +123,12 @@ export const storage = {
       // We keep TENANT_KEY so the user stays in their cooperative's context after logout
     ]);
   },
+
+  // Generic key-value storage access
+  async getItem(key: string): Promise<string | null> {
+    return getItem(key);
+  },
+  async setItem(key: string, value: string | null | undefined): Promise<void> {
+    await setItem(key, value);
+  }
 };

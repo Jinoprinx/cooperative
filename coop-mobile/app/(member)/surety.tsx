@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { useDashboardData } from '../../hooks/useDashboardData';
+import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, formatDate } from '../../lib/utils';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button } from '../../components/ui/Button';
@@ -25,7 +26,23 @@ interface SuretyRequest {
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Surety() {
-  const { suretyRequests, isLoading, refetch } = useDashboardData();
+  const { suretyRequests, isLoading: isDashboardLoading, refetch: refetchDashboard } = useDashboardData();
+  const { user: currentUser } = useAuth();
+  
+  const { data: suretyHistory, isLoading: isHistoryLoading, refetch: refetchHistory } = useQuery({
+    queryKey: ['surety-history'],
+    queryFn: async () => {
+      const res = await api.get('/loans/surety-history');
+      return res.data;
+    }
+  });
+
+  const isLoading = isDashboardLoading || isHistoryLoading;
+  const refetch = () => {
+    refetchDashboard();
+    refetchHistory();
+  };
+
   const { primaryColor } = useTheme();
   const [selectedRequest, setSelectedRequest] = useState<SuretyRequest | null>(null);
 // ... logic ...
@@ -130,6 +147,118 @@ export default function Surety() {
             <Text className="text-foreground/30 text-center px-10">You don't have any pending surety requests at the moment.</Text>
           </View>
         )}
+
+        {/* Historical Archive */}
+        <View className="mt-10 pt-8 border-t border-border/50">
+          <View className="flex-row items-center mb-6">
+            <MaterialCommunityIcons name="history" size={20} color={primaryColor} />
+            <Text className="text-foreground font-black text-lg uppercase tracking-wider ml-2">
+              Historical Archive
+            </Text>
+          </View>
+
+          {suretyHistory && suretyHistory.length > 0 ? (
+            suretyHistory.map((item: any) => {
+              const isApplicant = item.user?._id === currentUser?._id || item.user === currentUser?._id;
+              
+              // Get status for this user if they are the surety
+              const mySuretyObj = item.sureties?.find((s: any) => s.user?._id === currentUser?._id || s.user === currentUser?._id);
+              const myStatus = mySuretyObj?.status || 'unknown';
+
+              const approvedCount = item.sureties?.filter((s: any) => s.status === 'approved').length || 0;
+              const totalCount = item.sureties?.length || 0;
+              const hasRejected = item.sureties?.some((s: any) => s.status === 'rejected');
+
+              const getStatusColor = (statusVal: string) => {
+                if (statusVal === 'approved') return '#10b981';
+                if (statusVal === 'rejected') return '#ef4444';
+                return '#f59e0b';
+              };
+
+              return (
+                <View key={item._id} className="bg-surface border border-border rounded-3xl p-5 mb-4">
+                  <View className="flex-row justify-between items-start mb-3">
+                    <View className="flex-row items-center">
+                      <View className={`px-2 py-0.5 rounded border ${
+                        isApplicant ? 'bg-blue-500/10 border-blue-500/20' : 'bg-purple-500/10 border-purple-500/20'
+                      }`}>
+                        <Text className={`text-[8px] font-black uppercase ${isApplicant ? 'text-blue-400' : 'text-purple-400'}`}>
+                          {isApplicant ? 'Applicant' : 'Surety'}
+                        </Text>
+                      </View>
+                      <Text className="text-foreground/40 text-[10px] font-bold ml-2">
+                        {formatDate(item.createdAt)}
+                      </Text>
+                    </View>
+                    <Text className="text-foreground font-black text-base">{formatCurrency(item.amount)}</Text>
+                  </View>
+
+                  <View className="mb-3">
+                    {isApplicant ? (
+                      <View>
+                        <Text className="text-foreground/35 text-[9px] font-bold uppercase tracking-wider mb-0.5">Your Sureties</Text>
+                        <Text className="text-foreground font-bold text-xs" numberOfLines={2}>
+                          {item.sureties && item.sureties.length > 0
+                            ? item.sureties.map((s: any) => {
+                                const name = s.user ? `${s.user.firstName} ${s.user.lastName}` : 'Unknown member';
+                                return `${name} (${s.status})`;
+                              }).join(', ')
+                            : 'No sureties assigned'}
+                        </Text>
+                      </View>
+                    ) : (
+                      <View>
+                        <Text className="text-foreground/35 text-[9px] font-bold uppercase tracking-wider mb-0.5">Applicant</Text>
+                        <Text className="text-foreground font-bold text-xs">
+                          {item.user ? `${item.user.firstName} ${item.user.lastName}` : 'System Subject'}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View className="flex-row justify-between items-center pt-3 border-t border-border/30">
+                    <Text className="text-foreground/30 text-[8px] font-bold uppercase font-black">Verification Status</Text>
+                    <View className="flex-row items-center font-bold">
+                      {isApplicant ? (
+                        <>
+                          <MaterialCommunityIcons 
+                            name={approvedCount === totalCount ? 'check-circle' : hasRejected ? 'close-circle' : 'clock-outline'} 
+                            size={12} 
+                            color={approvedCount === totalCount ? '#10b981' : hasRejected ? '#ef4444' : '#f59e0b'} 
+                          />
+                          <Text 
+                            className="text-[9px] font-black uppercase ml-1"
+                            style={{ color: approvedCount === totalCount ? '#10b981' : hasRejected ? '#ef4444' : '#f59e0b' }}
+                          >
+                            {approvedCount}/{totalCount} Approved
+                          </Text>
+                        </>
+                      ) : (
+                        <>
+                          <MaterialCommunityIcons 
+                            name={myStatus === 'approved' ? 'check-circle' : myStatus === 'rejected' ? 'close-circle' : 'clock-outline'} 
+                            size={12} 
+                            color={getStatusColor(myStatus)} 
+                          />
+                          <Text 
+                            className="text-[9px] font-black uppercase ml-1"
+                            style={{ color: getStatusColor(myStatus) }}
+                          >
+                            {myStatus}
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              );
+            })
+          ) : (
+            <View className="py-8 bg-surface-lighter rounded-3xl border border-dashed border-border items-center">
+              <Text className="text-foreground/30 text-xs italic font-medium">No past endorsements in archive</Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
 
       {/* Surety Action Modal */}

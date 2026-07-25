@@ -25,6 +25,9 @@ export default function Members() {
   const [initialLoan, setInitialLoan] = useState('0');
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [isRecordPaymentModalVisible, setIsRecordPaymentModalVisible] = useState(false);
+  const [isSuretyHistoryVisible, setIsSuretyHistoryVisible] = useState(false);
+  const [memberSuretyHistory, setMemberSuretyHistory] = useState<any[]>([]);
+  const [isLoadingSurety, setIsLoadingSurety] = useState(false);
   const [paymentData, setPaymentData] = useState({
     amount: '',
     purpose: 'deposit' as 'deposit' | 'loan_repayment',
@@ -126,6 +129,21 @@ export default function Members() {
       Alert.alert('Success', `Role updated to ${newRole}`);
     } catch (err: any) {
       Alert.alert('Error', err.response?.data?.message || 'Failed to update role');
+    }
+  };
+
+  const handleViewSuretyHistory = async (user: User | null) => {
+    if (!user) return;
+    setIsSuretyHistoryVisible(true);
+    setIsLoadingSurety(true);
+    try {
+      const res = await api.get(`/admin/members/${user._id}/surety-history`);
+      setMemberSuretyHistory(res.data);
+    } catch (err: any) {
+      Alert.alert('Error', err.response?.data?.message || 'Failed to fetch surety records');
+      setIsSuretyHistoryVisible(false);
+    } finally {
+      setIsLoadingSurety(false);
     }
   };
 
@@ -483,6 +501,16 @@ export default function Members() {
               />
 
               <Button 
+                title="Surety History" 
+                variant="outline"
+                className="mb-3"
+                onPress={() => {
+                  setIsDetailModalVisible(false);
+                  handleViewSuretyHistory(selectedUser);
+                }}
+              />
+
+              <Button 
                 title="Close Profile" 
                 variant="outline"
                 onPress={() => {
@@ -491,6 +519,152 @@ export default function Members() {
                 }}
               />
             </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Member Surety History Modal */}
+      <Modal
+        visible={isSuretyHistoryVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsSuretyHistoryVisible(false)}
+      >
+        <View className="flex-1 justify-end bg-black/60">
+          <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border max-h-[85%]">
+            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
+            
+            <View className="flex-row justify-between items-center mb-6">
+              <View>
+                <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-1">Guarantor Protocol</Text>
+                <Text className="text-foreground font-black text-2xl" numberOfLines={1}>
+                  Surety History
+                </Text>
+                <Text className="text-primary text-[11px] font-bold">
+                  {selectedUser?.firstName} {selectedUser?.lastName}
+                </Text>
+              </View>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} className="mb-6">
+              {isLoadingSurety ? (
+                <View className="py-20 items-center justify-center">
+                  <Text className="text-foreground/50 font-bold">Loading records...</Text>
+                </View>
+              ) : memberSuretyHistory.length === 0 ? (
+                <View className="py-20 items-center justify-center bg-foreground/5 rounded-3xl border border-dashed border-border">
+                  <Text className="text-foreground/30 font-medium italic text-center px-10">
+                    No surety history records found for this member.
+                  </Text>
+                </View>
+              ) : (
+                memberSuretyHistory.map((item: any) => {
+                  const isApplicant = item.user?._id === selectedUser?._id || item.user === selectedUser?._id;
+                  
+                  // Get status for this user if they are the surety
+                  const mySuretyObj = item.sureties?.find((s: any) => s.user?._id === selectedUser?._id || s.user === selectedUser?._id);
+                  const myStatus = mySuretyObj?.status || 'unknown';
+
+                  const approvedCount = item.sureties?.filter((s: any) => s.status === 'approved').length || 0;
+                  const totalCount = item.sureties?.length || 0;
+                  const hasRejected = item.sureties?.some((s: any) => s.status === 'rejected');
+
+                  const getStatusColor = (statusVal: string) => {
+                    if (statusVal === 'approved') return '#10b981';
+                    if (statusVal === 'rejected') return '#ef4444';
+                    return '#f59e0b';
+                  };
+
+                  return (
+                    <View key={item._id} className="bg-foreground/5 rounded-3xl p-5 mb-4 border border-border/50">
+                      <View className="flex-row justify-between items-start mb-3">
+                        <View className="flex-row items-center">
+                          <View className={`px-2 py-0.5 rounded border ${
+                            isApplicant ? 'bg-blue-500/10 border-blue-500/20' : 'bg-purple-500/10 border-purple-500/20'
+                          }`}>
+                            <Text className={`text-[8px] font-black uppercase ${isApplicant ? 'text-blue-400' : 'text-purple-400'}`}>
+                              {isApplicant ? 'Applicant' : 'Surety'}
+                            </Text>
+                          </View>
+                          <Text className="text-foreground/40 text-[10px] font-bold ml-2">
+                            {formatDate(item.createdAt)}
+                          </Text>
+                        </View>
+                        <Text className="text-foreground font-black text-base">{formatCurrency(item.amount)}</Text>
+                      </View>
+
+                      <View className="mb-3">
+                        {isApplicant ? (
+                          <View>
+                            <Text className="text-foreground/35 text-[9px] font-bold uppercase tracking-wider mb-0.5">Their Sureties</Text>
+                            <Text className="text-foreground font-bold text-xs" numberOfLines={2}>
+                              {item.sureties && item.sureties.length > 0
+                                ? item.sureties.map((s: any) => {
+                                    const name = s.user ? `${s.user.firstName} ${s.user.lastName}` : 'Unknown member';
+                                    return `${name} (${s.status})`;
+                                  }).join(', ')
+                                : 'No sureties assigned'}
+                            </Text>
+                          </View>
+                        ) : (
+                          <View>
+                            <Text className="text-foreground/35 text-[9px] font-bold uppercase tracking-wider mb-0.5">Applicant</Text>
+                            <Text className="text-foreground font-bold text-xs">
+                              {item.user ? `${item.user.firstName} ${item.user.lastName}` : 'System Subject'}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+
+                      <View className="flex-row justify-between items-center pt-3 border-t border-border/30">
+                        <Text className="text-foreground/30 text-[8px] font-bold uppercase">Verification Status</Text>
+                        <View className="flex-row items-center">
+                          {isApplicant ? (
+                            <>
+                              <MaterialCommunityIcons 
+                                name={approvedCount === totalCount ? 'check-circle' : hasRejected ? 'close-circle' : 'clock-outline'} 
+                                size={12} 
+                                color={approvedCount === totalCount ? '#10b981' : hasRejected ? '#ef4444' : '#f59e0b'} 
+                              />
+                              <Text 
+                                className="text-[9px] font-black uppercase ml-1"
+                                style={{ color: approvedCount === totalCount ? '#10b981' : hasRejected ? '#ef4444' : '#f59e0b' }}
+                              >
+                                {approvedCount}/{totalCount} Approved
+                              </Text>
+                            </>
+                          ) : (
+                            <>
+                              <MaterialCommunityIcons 
+                                name={myStatus === 'approved' ? 'check-circle' : myStatus === 'rejected' ? 'close-circle' : 'clock-outline'} 
+                                size={12} 
+                                color={getStatusColor(myStatus)} 
+                              />
+                              <Text 
+                                className="text-[9px] font-black uppercase ml-1"
+                                style={{ color: getStatusColor(myStatus) }}
+                              >
+                                {myStatus}
+                              </Text>
+                            </>
+                          )}
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })
+              )}
+            </ScrollView>
+
+            <Button 
+              title="Close Record" 
+              variant="outline"
+              onPress={() => {
+                setIsSuretyHistoryVisible(false);
+                setMemberSuretyHistory([]);
+                setIsDetailModalVisible(true);
+              }}
+            />
           </View>
         </View>
       </Modal>

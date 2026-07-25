@@ -1,6 +1,6 @@
 'use client';
 
-import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle, FaBell, FaTimes, FaShieldAlt, FaKey } from 'react-icons/fa';
+import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle, FaBell, FaTimes, FaShieldAlt, FaKey, FaBullhorn } from 'react-icons/fa';
 import Link from 'next/link';
 import { useUser } from '@/app/hooks/useUser';
 import { useDashboardData } from '@/app/hooks/useDashboardData';
@@ -24,12 +24,39 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifLoading, setNotifLoading] = useState(true);
 
+  // Announcement states
+  const [announcement, setAnnouncement] = useState<any>(null);
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+
   // Take over account states
   const [showTakeoverModal, setShowTakeoverModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [takeoverLoading, setTakeoverLoading] = useState(false);
   const [takeoverError, setTakeoverError] = useState('');
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/announcements`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data && res.data.length > 0) {
+          const latest = res.data[0];
+          const dismissed = localStorage.getItem(`dismissed_announcement_${latest._id}`);
+          if (!dismissed) {
+            setAnnouncement(latest);
+            setShowAnnouncementModal(true);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch announcements:', err);
+      }
+    };
+    fetchAnnouncements();
+  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -495,6 +522,59 @@ export default function Dashboard() {
                   </button>
                 </form>
              </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Announcement Greeting Modal */}
+      <AnimatePresence>
+        {showAnnouncementModal && announcement && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-surface">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/85 backdrop-blur-3xl"
+              onClick={() => {
+                localStorage.setItem(`dismissed_announcement_${announcement._id}`, 'true');
+                setShowAnnouncementModal(false);
+              }}
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative glass-card p-12 rounded-[3.5rem] border border-border w-full max-w-xl shadow-2xl bg-surface/90 text-center"
+            >
+              <div className="mb-8">
+                <div className="w-20 h-20 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mx-auto mb-6 animate-float">
+                  <FaBullhorn className="text-3xl" />
+                </div>
+                <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">New Notice</span>
+                <h3 className="text-3xl font-black text-primary-text tracking-tighter mb-4 leading-tight">
+                  {announcement.title}
+                </h3>
+                <div className="h-0.5 w-12 bg-primary/30 mx-auto mb-6 rounded-full" />
+                <p className="text-secondary-text text-sm leading-relaxed whitespace-pre-line text-left max-h-60 overflow-y-auto px-4 custom-scrollbar">
+                  {announcement.content}
+                </p>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-border/50 flex flex-col items-center gap-4">
+                <span className="text-[9px] text-tertiary-text font-black uppercase tracking-widest leading-none">
+                  Published by {announcement.createdBy ? `${announcement.createdBy.firstName} ${announcement.createdBy.lastName}` : 'System Admin'}
+                </span>
+                <button
+                  onClick={() => {
+                    localStorage.setItem(`dismissed_announcement_${announcement._id}`, 'true');
+                    setShowAnnouncementModal(false);
+                  }}
+                  className="w-full btn-primary bg-primary hover:bg-primary/90 text-white py-5 rounded-3xl text-[11px] font-black uppercase tracking-[0.4em] shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all"
+                >
+                  Acknowledge Notice
+                </button>
+              </div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>

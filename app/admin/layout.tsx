@@ -13,7 +13,8 @@ import {
   FaUserCircle,
   FaBars,
   FaFileAlt,
-  FaHandshake
+  FaHandshake,
+  FaBullhorn
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 import { useTenant } from '@/app/context/TenantContext';
@@ -88,6 +89,7 @@ export default function AdminLayout({
     { name: 'Pending Payments', href: '/admin/payments/pending', icon: FaFileAlt },
     { name: 'Loans', href: '/admin/loans', icon: FaHandshake },
     { name: 'Reports', href: '/admin/reports', icon: FaChartLine },
+    { name: 'Announcements', href: '/admin/announcements', icon: FaBullhorn },
     { name: 'Settings', href: '/admin/settings', icon: FaCog },
     { name: 'Account', href: '/admin/account', icon: FaUserCircle },
   ];

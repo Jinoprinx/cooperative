@@ -260,10 +260,10 @@ export default function Loans() {
       {selectedLoan && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setSelectedLoan(null)} />
-          <div className="relative glass-card p-10 rounded-[3rem] border border-border shadow-2xl w-full max-w-2xl transform transition-all animate-float overflow-hidden">
+          <div className="relative glass-card p-10 rounded-[3rem] border border-border shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col transform transition-all animate-float overflow-hidden">
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
             
-            <div className="relative flex justify-between items-start mb-10">
+            <div className="relative flex justify-between items-start mb-8 flex-shrink-0">
                <div>
                   <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Ledger Insight</span>
                   <h3 className="text-3xl font-black text-primary-text tracking-tighter">Repayment <span className="text-tertiary-text">History</span></h3>
@@ -273,39 +273,114 @@ export default function Loans() {
                </button>
             </div>
 
-            <div className="card-premium bg-surface border-border p-8 mb-8 flex justify-between items-center group">
-               <div>
-                  <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest mb-1">Account Holder</p>
-                  <p className="text-xl font-bold text-primary-text group-hover:text-primary transition-colors">{selectedLoan.user ? `${selectedLoan.user.firstName} ${selectedLoan.user.lastName}` : 'System User'}</p>
-               </div>
-               <div className="text-right">
-                  <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest mb-1">Remaining</p>
-                  <p className="text-2xl font-black text-red-500 tracking-tighter">{formatCurrency(selectedLoan.remainingAmount || 0)}</p>
-               </div>
-            </div>
+            {/* Scrollable Content Container */}
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6 mb-6">
+              <div className="card-premium bg-surface border-border p-8 flex justify-between items-center group">
+                 <div>
+                    <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest mb-1">Account Holder</p>
+                    <p className="text-xl font-bold text-primary-text group-hover:text-primary transition-colors">{selectedLoan.user ? `${selectedLoan.user.firstName} ${selectedLoan.user.lastName}` : 'System User'}</p>
+                 </div>
+                 <div className="text-right">
+                    <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest mb-1">Remaining Balance</p>
+                    <p className="text-2xl font-black text-red-500 tracking-tighter">{formatCurrency(selectedLoan.remainingAmount || 0)}</p>
+                 </div>
+              </div>
 
-            <div className="max-h-[350px] overflow-y-auto space-y-4 pr-4 custom-scrollbar">
-              {selectedLoan.repaymentHistory && selectedLoan.repaymentHistory.length > 0 ? (
-                <div className="divide-y divide-border border border-border rounded-3xl overflow-hidden">
-                  <div className="grid grid-cols-2 bg-surface px-8 py-4">
-                     <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Transaction Date</span>
-                     <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Amount Applied</span>
-                  </div>
-                  {selectedLoan.repaymentHistory.map((payment, index) => (
-                    <div key={index} className="grid grid-cols-2 px-8 py-4 hover:bg-surface transition-colors">
-                       <span className="text-sm font-bold text-secondary-text">{formatDate(payment.date)}</span>
-                       <span className="text-sm font-black text-emerald-500 text-right">{formatCurrency(payment.amount)}</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Loan Details Card */}
+                <div className="bg-surface rounded-2xl p-6 border border-border">
+                  <h4 className="text-xs font-black text-tertiary-text uppercase tracking-widest mb-4">Loan Details</h4>
+                  <div className="space-y-3 font-bold text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-tertiary-text font-medium">Principal Amount:</span>
+                      <span className="text-primary-text">{formatCurrency(selectedLoan.amount)}</span>
                     </div>
-                  ))}
+                    <div className="flex justify-between">
+                      <span className="text-tertiary-text font-medium">Interest Rate:</span>
+                      <span className="text-primary-text">{selectedLoan.interestRate}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-tertiary-text font-medium">Total Repayment:</span>
+                      <span className="text-primary-text">{formatCurrency(selectedLoan.totalRepayment || selectedLoan.amount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-tertiary-text font-medium">Paid To Date:</span>
+                      <span className="text-emerald-500">{formatCurrency(selectedLoan.amountPaid || 0)}</span>
+                    </div>
+                    <hr className="border-border my-2" />
+                    <div className="flex justify-between">
+                      <span className="text-tertiary-text font-medium">Approval Date:</span>
+                      <span className="text-primary-text">{selectedLoan.approvalDate ? formatDate(selectedLoan.approvalDate) : 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-tertiary-text font-medium">Start Date:</span>
+                      <span className="text-primary-text">{selectedLoan.startDate ? formatDate(selectedLoan.startDate) : 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-tertiary-text font-medium">End Date:</span>
+                      <span className="text-primary-text">{selectedLoan.endDate ? formatDate(selectedLoan.endDate) : 'N/A'}</span>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="py-20 text-center bg-surface rounded-3xl border border-dashed border-border">
-                   <p className="text-tertiary-text text-xs font-black uppercase tracking-widest italic">No repayments recorded for this cycle</p>
+
+                {/* Sureties Card */}
+                <div className="bg-surface rounded-2xl p-6 border border-border">
+                  <h4 className="text-xs font-black text-tertiary-text uppercase tracking-widest mb-4">Guarantors / Sureties</h4>
+                  <div className="space-y-3 overflow-y-auto max-h-[180px] custom-scrollbar pr-1">
+                    {selectedLoan.sureties && selectedLoan.sureties.length > 0 ? (
+                      selectedLoan.sureties.map((surety: any, idx: number) => (
+                        <div key={idx} className="flex flex-col border-b border-border/50 pb-2 last:border-none last:pb-0 text-xs font-bold">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-primary-text">
+                              {surety.user ? `${surety.user.firstName} ${surety.user.lastName}` : 'Unknown member'}
+                            </span>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[8px] uppercase tracking-wider font-black border ${
+                              surety.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                              surety.status === 'rejected' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                              'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                            }`}>
+                              {surety.status}
+                            </span>
+                          </div>
+                          {surety.user?.phoneNumber && (
+                            <span className="text-[10px] text-tertiary-text font-mono leading-none mb-1">{surety.user.phoneNumber}</span>
+                          )}
+                          {surety.rejectionReason && (
+                            <span className="text-[10px] text-red-500 italic font-medium mt-1">Reason: "{surety.rejectionReason}"</span>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-tertiary-text text-xs italic font-medium py-4 text-center">No sureties assigned to this loan</p>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-xs font-black text-tertiary-text uppercase tracking-widest ml-1">Repayments Log</h4>
+                {selectedLoan.repaymentHistory && selectedLoan.repaymentHistory.length > 0 ? (
+                  <div className="divide-y divide-border border border-border rounded-3xl overflow-hidden font-bold">
+                    <div className="grid grid-cols-2 bg-surface px-8 py-4">
+                       <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest">Transaction Date</span>
+                       <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest text-right">Amount Applied</span>
+                    </div>
+                    {selectedLoan.repaymentHistory.map((payment, index) => (
+                      <div key={index} className="grid grid-cols-2 px-8 py-4 hover:bg-surface transition-colors">
+                         <span className="text-sm font-bold text-secondary-text">{formatDate(payment.date)}</span>
+                         <span className="text-sm font-black text-emerald-500 text-right">{formatCurrency(payment.amount)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-12 text-center bg-surface rounded-3xl border border-dashed border-border">
+                     <p className="text-tertiary-text text-xs font-black uppercase tracking-widest italic">No repayments recorded for this cycle</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="mt-10">
+            <div className="flex-shrink-0">
                <button onClick={() => setSelectedLoan(null)} className="w-full btn-primary py-4 text-xs font-black tracking-widest uppercase rounded-2xl shadow-none border-none">Dismiss Ledger</button>
             </div>
           </div>

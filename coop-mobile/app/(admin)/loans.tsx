@@ -241,21 +241,47 @@ export default function AdminLoans() {
                     <Text className="text-foreground font-bold text-lg">{formatCurrency(selectedLoan?.amount || 0)}</Text>
                   </View>
                   <View className="items-end">
+                    <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Current Balance</Text>
+                    <Text className="text-rose-500 font-bold text-lg">{formatCurrency(selectedLoan?.remainingAmount || 0)}</Text>
+                  </View>
+                </View>
+                <View className="flex-row justify-between mb-4">
+                  <View>
+                    <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Total Repayment</Text>
+                    <Text className="text-foreground font-bold text-lg">{formatCurrency(selectedLoan?.totalRepayment || 0)}</Text>
+                  </View>
+                  <View className="items-end">
                     <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Interest Rate</Text>
                     <Text className="text-foreground font-bold text-lg">{selectedLoan?.interestRate || 0}%</Text>
                   </View>
                 </View>
                 <View className="flex-row justify-between">
                   <View>
-                    <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Total Repayment</Text>
-                    <Text className="text-foreground font-bold text-lg">{formatCurrency(selectedLoan?.totalRepayment || 0)}</Text>
-                  </View>
-                  <View className="items-end">
                     <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Monthly Pay</Text>
                     <Text className="text-foreground font-bold text-lg">{formatCurrency(selectedLoan?.monthlyPayment || 0)}</Text>
                   </View>
+                  <View className="items-end">
+                    <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest mb-1">Amount Paid</Text>
+                    <Text className="text-emerald-500 font-bold text-lg">{formatCurrency(selectedLoan?.amountPaid || 0)}</Text>
+                  </View>
                 </View>
               </Card>
+
+              <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-3 ml-1">Schedule & Dates</Text>
+              <View className="bg-foreground/5 p-5 rounded-3xl mb-6">
+                <View className="flex-row justify-between mb-2">
+                  <Text className="text-foreground/40 text-xs font-medium">Approval Date</Text>
+                  <Text className="text-foreground font-bold text-xs">{selectedLoan?.approvalDate ? formatDate(selectedLoan.approvalDate) : 'N/A'}</Text>
+                </View>
+                <View className="flex-row justify-between mb-2">
+                  <Text className="text-foreground/40 text-xs font-medium">Start Date</Text>
+                  <Text className="text-foreground font-bold text-xs">{selectedLoan?.startDate ? formatDate(selectedLoan.startDate) : 'N/A'}</Text>
+                </View>
+                <View className="flex-row justify-between">
+                  <Text className="text-foreground/40 text-xs font-medium">End Date</Text>
+                  <Text className="text-foreground font-bold text-xs">{selectedLoan?.endDate ? formatDate(selectedLoan.endDate) : 'N/A'}</Text>
+                </View>
+              </View>
 
               <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-3 ml-1">Loan Purpose</Text>
               <View className="bg-foreground/5 p-5 rounded-3xl mb-6">
@@ -263,7 +289,7 @@ export default function AdminLoans() {
               </View>
 
               <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-3 ml-1">Sureties Status</Text>
-              <View className="space-y-3 mb-8">
+              <View className="space-y-3 mb-6">
                 {selectedLoan?.sureties.map((surety, idx) => (
                   <View key={idx} className="bg-foreground/5 p-4 rounded-2xl flex-row items-center justify-between">
                     <View>
@@ -285,6 +311,25 @@ export default function AdminLoans() {
                     </View>
                   </View>
                 ))}
+              </View>
+
+              <Text className="text-foreground/50 text-[10px] font-black uppercase tracking-widest mb-3 ml-1">Repayment History</Text>
+              <View className="bg-foreground/5 p-5 rounded-3xl mb-8 space-y-3">
+                {selectedLoan?.repaymentHistory && selectedLoan.repaymentHistory.length > 0 ? (
+                  selectedLoan.repaymentHistory.map((payment, idx) => (
+                    <View key={idx} className="flex-row justify-between items-center pb-2 border-b border-border/20 last:border-none last:pb-0">
+                      <View>
+                        <Text className="text-foreground font-bold text-xs">{formatDate(payment.date)}</Text>
+                        {payment.reference && (
+                          <Text className="text-foreground/30 text-[9px] font-mono">{payment.reference}</Text>
+                        )}
+                      </View>
+                      <Text className="text-emerald-500 font-bold text-xs">+{formatCurrency(payment.amount)}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text className="text-foreground/30 text-xs italic py-2 text-center">No repayments recorded for this cycle</Text>
+                )}
               </View>
 
               {selectedLoan?.status === 'pending' && (

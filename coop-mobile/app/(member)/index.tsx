@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Modal, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../../hooks/useUser';
@@ -14,6 +14,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
 import { usePrivacy } from '../../hooks/usePrivacy';
+import { storage } from '../../lib/storage';
 
 export default function Dashboard() {
   usePrivacy();
@@ -26,8 +27,31 @@ export default function Dashboard() {
   const [description, setDescription] = useState('');
   const [receipt, setReceipt] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
+  // Announcement states
+  const [announcement, setAnnouncement] = useState<any>(null);
+  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
+
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const checkAnnouncements = async () => {
+      try {
+        const res = await api.get('/announcements');
+        if (res.data && res.data.length > 0) {
+          const latest = res.data[0];
+          const dismissed = await storage.getItem(`dismissed_announcement_${latest._id}`);
+          if (dismissed !== 'true') {
+            setAnnouncement(latest);
+            setIsAnnouncementVisible(true);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load announcements for mobile:', err);
+      }
+    };
+    checkAnnouncements();
+  }, []);
 
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -312,6 +336,57 @@ export default function Dashboard() {
                 onPress={handlePayment}
               />
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Announcement Modal */}
+      <Modal
+        visible={isAnnouncementVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={async () => {
+          if (announcement) {
+            await storage.setItem(`dismissed_announcement_${announcement._id}`, 'true');
+          }
+          setIsAnnouncementVisible(false);
+        }}
+      >
+        <View className="flex-1 justify-center items-center bg-black/80 px-6">
+          <View className="bg-surface border border-border rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl items-center">
+            
+            <View className="w-16 h-16 bg-primary/10 border border-primary/20 rounded-3xl items-center justify-center mb-6">
+              <MaterialCommunityIcons name="bullhorn-outline" size={32} color={primaryColor} />
+            </View>
+
+            <Text className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2">New Notice</Text>
+            
+            <Text className="text-foreground font-black text-2xl mb-4 text-center leading-tight">
+              {announcement?.title}
+            </Text>
+
+            <View className="h-0.5 w-12 bg-primary/30 mb-6 rounded-full" />
+
+            <ScrollView className="max-h-48 w-full mb-8">
+              <Text className="text-foreground/75 text-sm leading-relaxed text-left">
+                {announcement?.content}
+              </Text>
+            </ScrollView>
+
+            <Text className="text-foreground/45 text-[9px] font-bold uppercase tracking-widest mb-6">
+              Published by {announcement?.createdBy ? `${announcement.createdBy.firstName} ${announcement.createdBy.lastName}` : 'System Admin'}
+            </Text>
+
+            <Button
+              title="Acknowledge Notice"
+              className="w-full py-4 rounded-2xl"
+              onPress={async () => {
+                if (announcement) {
+                  await storage.setItem(`dismissed_announcement_${announcement._id}`, 'true');
+                }
+                setIsAnnouncementVisible(false);
+              }}
+            />
           </View>
         </View>
       </Modal>
