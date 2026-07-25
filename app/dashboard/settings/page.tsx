@@ -12,7 +12,7 @@ export default function SettingsPage() {
     const [formData, setFormData] = useState({
         name: tenant?.name || '',
         logoUrl: tenant?.branding?.logoUrl || '',
-        primaryColor: tenant?.branding?.primaryColor || '#3b82f6',
+        primaryColor: tenant?.branding?.primaryColor || '#F59E0B',
         maxApprovalAmount: tenant?.settings?.loanRules?.maxApprovalAmount || 500000,
     });
 

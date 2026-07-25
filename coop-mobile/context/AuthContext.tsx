@@ -11,7 +11,7 @@ import * as Sentry from '@sentry/react-native';
 // Essential user fields to persist in SecureStore (2048 byte limit on Android)
 const STORED_USER_FIELDS = [
   '_id', 'firstName', 'lastName', 'email', 'phoneNumber',
-  'role', 'isVerified', 'accountNumber', 'accountBalance',
+  'role', 'isVerified', 'accountNumber', 'memberIdentifier', 'accountBalance',
   'profileImageUrl', 'tenantId', 'isMainAdmin', 'hasPin',
   'subdomain', 'tenantName', 'status',
 ] as const;

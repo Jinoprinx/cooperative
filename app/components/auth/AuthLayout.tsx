@@ -39,8 +39,8 @@ export default function AuthLayout({
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#3b82f615,transparent)]" />
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_120%,#3b82f610,transparent)]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#F59E0B15,transparent)]" />
+        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_120%,#F59E0B10,transparent)]" />
         <div className="noise-overlay opacity-[0.03]" />
       </div>
 
@@ -58,7 +58,7 @@ export default function AuthLayout({
           
           <div className="text-center mb-10">
             <Link href="/" className="inline-flex items-center space-x-3 mb-10 group/logo">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
                 <span className="text-white font-black -rotate-[12deg] italic text-2xl tracking-tighter">
                   {tenant ? tenant.name[0] : 'C'}
                 </span>

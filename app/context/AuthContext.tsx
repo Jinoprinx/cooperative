@@ -14,7 +14,13 @@ interface User {
   isMainAdmin?: boolean;
   hasPin?: boolean;
   accountNumber: string;
+  accountBalance?: number;
   profileImage?: string;
+  subdomain?: string;
+  tenantName?: string;
+  memberIdentifier?: string;
+  /** Balance that existed before the passbook system was introduced (legacy balance). */
+  prePassbookBalance?: number;
   ledgerBalances?: {
     shareCapital: number;
     thriftSavings: number;
@@ -221,6 +227,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(updatedUser);
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
+
+  // Sync profile data from backend to context / local storage
+  useEffect(() => {
+    const fetchFreshProfile = async () => {
+      if (!token) return;
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // Combine subdomain and tenantName from the active user session if they are not in /profile payload
+        const mergedUser = {
+          ...response.data,
+          subdomain: user?.subdomain || response.data.subdomain,
+          tenantName: user?.tenantName || response.data.tenantName,
+        };
+        updateUser(mergedUser);
+      } catch (err) {
+        console.error('Failed to fetch fresh user profile:', err);
+      }
+    };
+    fetchFreshProfile();
+  }, [token]);
 
   const isAuthenticated = !!token && !!user;
   const isAdmin = isAuthenticated && user?.role === 'admin';

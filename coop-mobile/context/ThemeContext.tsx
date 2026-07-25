@@ -20,7 +20,7 @@ function hexToRgb(hex: string) {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const DEFAULT_PRIMARY = '#3b82f6';
+const DEFAULT_PRIMARY = '#F59E0B';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { colorScheme, setColorScheme, toggleColorScheme } = useNativeWindColorScheme();

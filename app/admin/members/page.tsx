@@ -160,7 +160,7 @@ export default function Members() {
             <thead>
               <tr className="border-b border-border bg-surface">
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Full Name</th>
-                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Account ID</th>
+                <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Member ID / Account No.</th>
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Entry Date</th>
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Balance</th>
                 <th className="px-8 py-6 text-[10px] font-black text-tertiary-text uppercase tracking-widest">Access Role</th>
@@ -173,7 +173,7 @@ export default function Members() {
                   <td className="px-8 py-6">
                     <Link href={`/admin/members/${member._id}/payment-ledger`} className="flex items-center gap-4 group/name">
                        <div className="w-12 h-12 rounded-2xl bg-surface border border-border flex items-center justify-center font-black text-tertiary-text group-hover/name:text-primary group-hover/name:border-primary/40 transition-all duration-300">
-                         {member.firstName[0]}{member.lastName[0]}
+                          {member.firstName[0]}{member.lastName[0]}
                        </div>
                        <div className="flex flex-col">
                          <span className="text-primary-text group-hover/name:text-primary transition-colors font-bold">{member.firstName} {member.lastName}</span>
@@ -181,7 +181,12 @@ export default function Members() {
                        </div>
                     </Link>
                   </td>
-                  <td className="px-8 py-6 text-sm text-secondary-text font-mono tracking-wider">{member.accountNumber}</td>
+                  <td className="px-8 py-6">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-primary-text font-bold tracking-wider">{member.memberIdentifier || 'N/A'}</span>
+                      <span className="text-[10px] text-tertiary-text font-mono font-bold tracking-widest">{member.accountNumber}</span>
+                    </div>
+                  </td>
                   <td className="px-8 py-6 text-xs text-tertiary-text">{formatDate(member.joinDate)}</td>
                   <td className="px-8 py-6">
                      <span className="text-lg font-black text-primary-text tracking-tighter shadow-glow-sm">{formatCurrency(member.accountBalance)}</span>

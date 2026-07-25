@@ -113,7 +113,7 @@ export default function DashboardLayout({
                       onClick={() => setSidebarOpen(false)}
                       className={`group flex items-center rounded-2xl px-5 py-4 text-sm font-bold transition-all duration-300 ${
                         isActive
-                          ? 'bg-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]'
+                          ? 'bg-primary text-white shadow-[0_0_20px_rgba(245,158,11,0.3)]'
                           : 'text-secondary-text hover:bg-surface hover:text-primary-text'
                       }`}
                     >
@@ -176,7 +176,7 @@ export default function DashboardLayout({
                   href={item.href}
                   className={`group flex items-center rounded-2xl px-6 py-4 text-sm font-bold transition-all duration-500 hover:scale-[1.02] active:scale-95 ${
                     isActive
-                      ? 'bg-primary text-white shadow-[0_0_30px_rgba(59,130,246,0.3)]'
+                      ? 'bg-primary text-white shadow-[0_0_30px_rgba(245,158,11,0.3)]'
                       : 'text-secondary-text hover:bg-surface hover:text-primary-text'
                   }`}
                 >

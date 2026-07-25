@@ -11,7 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import api from '../lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-const DEFAULT_PRIMARY = '#3b82f6';
+const DEFAULT_PRIMARY = '#F59E0B';
 
 const COLORS = [
   { name: 'Blue', value: '#3b82f6' },

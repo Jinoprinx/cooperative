@@ -691,7 +691,9 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex-1 overflow-hidden">
                     <p className="font-bold text-primary-text text-sm truncate">{member.firstName} {member.lastName}</p>
-                    <p className="text-[10px] text-tertiary-text font-black tracking-tighter uppercase">{member.accountNumber}</p>
+                    <p className="text-[10px] text-tertiary-text font-black tracking-tighter uppercase">
+                      {member.memberIdentifier ? `ID: ${member.memberIdentifier} • ` : ''}{member.accountNumber}
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-black text-primary">{formatCurrency(member.accountBalance)}</p>

@@ -127,7 +127,7 @@ export default function MemberLedger() {
               {member?.firstName} {member?.lastName}
             </Text>
             <Text className="text-foreground/40 text-[10px] font-black uppercase tracking-widest">
-              ID: {member?.accountNumber} • {member?.isManual ? 'MANUAL MEMBER' : 'SELF-MANAGED'}
+              ID: {member?.memberIdentifier || 'N/A'} • ACC: {member?.accountNumber} • {member?.isManual ? 'MANUAL MEMBER' : 'SELF-MANAGED'}
             </Text>
           </View>
           <View className="bg-emerald-500/10 px-4 py-2 rounded-2xl border border-emerald-500/20">

@@ -19,8 +19,8 @@ export default function SettingsPage() {
     const [formData, setFormData] = useState({
         name: '',
         branding: {
-            primaryColor: '#3b82f6',
-            accentColor: '#f59e0b',
+            primaryColor: '#F59E0B',
+            accentColor: '#8B5CF6',
             fontFamily: 'Inter',
             logoUrl: '',
         },
@@ -47,8 +47,8 @@ export default function SettingsPage() {
             setFormData({
                 name: tenant.name || '',
                 branding: {
-                    primaryColor: tenant.branding?.primaryColor || '#3b82f6',
-                    accentColor: tenant.branding?.accentColor || '#f59e0b',
+                    primaryColor: tenant.branding?.primaryColor || '#F59E0B',
+                    accentColor: tenant.branding?.accentColor || '#8B5CF6',
                     fontFamily: tenant.branding?.fontFamily || 'Inter',
                     logoUrl: tenant.branding?.logoUrl || '',
                 },

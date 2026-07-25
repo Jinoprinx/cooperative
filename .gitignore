@@ -70,3 +70,7 @@ out/
 *.mongo
 *.dump
 .vercel
+
+# AI agent local configurations and design system
+.agents/
+design-system/

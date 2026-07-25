@@ -139,6 +139,16 @@ export default function Profile() {
         {/* Account Info */}
         <Card title="Account Details" className="mb-8">
           <View className="space-y-6">
+            {user?.memberIdentifier && (
+              <View className="flex-row items-center mb-4">
+                <MaterialCommunityIcons name="card-account-details-outline" size={20} color="rgba(var(--foreground), 0.45)" className="mr-4" />
+                <View>
+                  <Text className="text-foreground/45 text-[10px] font-bold uppercase tracking-widest">Member ID</Text>
+                  <Text className="text-foreground font-bold text-base mt-0.5">{user.memberIdentifier}</Text>
+                </View>
+              </View>
+            )}
+
             <View className="flex-row items-center">
               <MaterialCommunityIcons name="identifier" size={20} color="rgba(var(--foreground), 0.45)" className="mr-4" />
               <View>

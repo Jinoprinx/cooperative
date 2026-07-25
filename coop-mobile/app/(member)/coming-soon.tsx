@@ -11,7 +11,7 @@ export default function ComingSoon() {
   return (
     <SafeAreaView className="flex-1 bg-black">
       <LinearGradient
-        colors={['#1e3a8a', '#3b82f6', '#000000']}
+        colors={['#78350F', '#F59E0B', '#0F172A']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -40,8 +40,8 @@ export default function ComingSoon() {
         </View>
         
         <View className="mt-12 flex-row items-center space-x-2">
-          <View className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-          <Text className="text-blue-500 font-black uppercase text-[10px] tracking-[0.4em]">Development in progress</Text>
+          <View className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <Text className="text-primary font-black uppercase text-[10px] tracking-[0.4em]">Development in progress</Text>
         </View>
       </View>
     </SafeAreaView>

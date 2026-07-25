@@ -4,43 +4,43 @@
 
 :root {
   /* Default Theme Variables (mapped to Dark Mode for backward compatibility) */
-  --foreground-rgb: 255, 255, 255;
-  --background-rgb: 5, 5, 5;
+  --foreground-rgb: 248, 250, 252;
+  --background-rgb: 15, 23, 42;
   
-  --primary-color: #3b82f6;
-  --primary-dark-color: #1d4ed8;
-  --primary-light-color: #60a5fa;
-  --secondary-color: #10b981;
-  --accent-color: #f59e0b;
+  --primary-color: #F59E0B;
+  --primary-dark-color: #D97706;
+  --primary-light-color: #FBBF24;
+  --secondary-color: #FBBF24;
+  --accent-color: #8B5CF6;
 
   /* Semantic Variables - Dark (Base) */
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-tertiary: rgba(255, 255, 255, 0.4);
-  --text-muted: rgba(255, 255, 255, 0.2);
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+  --text-muted: #475569;
 
-  --surface-color: #111111;
-  --surface-hover: #1a1a1a;
-  --border-color: rgba(255, 255, 255, 0.08);
+  --surface-color: #0F172A;
+  --surface-hover: #1E293B;
+  --border-color: #334155;
 
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-bg: rgba(255, 255, 255, 0.03);
   --shadow-color: rgba(0, 0, 0, 0.36);
 
-  --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.1) 0px, transparent 50%);
+  --mesh-gradient: radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(251, 191, 36, 0.1) 0px, transparent 50%);
 }
 
 /* Explicit Dark Theme Overrides */
 [data-theme='dark'] {
-  --foreground-rgb: 255, 255, 255;
-  --background-rgb: 5, 5, 5;
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.8);
-  --text-tertiary: rgba(255, 255, 255, 0.5);
-  --text-muted: rgba(255, 255, 255, 0.25);
-  --surface-color: #0a0a0a;
-  --surface-hover: #161616;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --foreground-rgb: 248, 250, 252;
+  --background-rgb: 15, 23, 42;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+  --text-muted: #475569;
+  --surface-color: #0F172A;
+  --surface-hover: #1E293B;
+  --border-color: #334155;
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-bg: rgba(255, 255, 255, 0.03);
   --shadow-color: rgba(0, 0, 0, 0.4);
@@ -49,14 +49,14 @@
 /* Light Theme (White Luxury) */
 [data-theme='light'] {
   --foreground-rgb: 15, 23, 42;
-  --background-rgb: 255, 255, 255;
+  --background-rgb: 248, 250, 252;
 
   --text-primary: #0f172a; /* Deep Slate */
   --text-secondary: #475569; /* Slate 600 */
   --text-tertiary: #94a3b8; /* Slate 400 */
   --text-muted: #cbd5e1; /* Slate 300 */
 
-  --surface-color: #f8fafc; /* Slate 50 */
+  --surface-color: #ffffff; /* White card background */
   --surface-hover: #f1f5f9; /* Slate 100 */
   --border-color: #e2e8f0; /* Slate 200 */
 
@@ -64,7 +64,7 @@
   --glass-bg: rgba(255, 255, 255, 0.85);
   --shadow-color: rgba(148, 163, 184, 0.12);
 
-  --mesh-gradient: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.04) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.04) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.02) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.02) 0px, transparent 50%);
+  --mesh-gradient: radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.04) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.04) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.02) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(251, 191, 36, 0.02) 0px, transparent 50%);
 }
 
 @layer base {
@@ -96,14 +96,14 @@
   }
 
   .hero-gradient {
-    background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+    background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
   }
 
   /* Light mode hero gradient */
   [data-theme='light'] .hero-gradient {
-    background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+    background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
   }
 
   .btn-primary {
@@ -201,15 +201,15 @@
 }
 
 .shadow-glow-sm {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
 }
 
 .shadow-glow-lg {
-  box-shadow: 0 0 50px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 50px rgba(245, 158, 11, 0.4);
 }
 
 .mesh-glow {
-  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 70%);
 }
 
 .perspective-1000 {
@@ -236,7 +236,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgba(245, 158, 11, 0.2);
 }
 
 /* Premium Color Input Styling */

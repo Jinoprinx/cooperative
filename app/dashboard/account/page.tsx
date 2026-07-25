@@ -160,13 +160,23 @@ export default function Account() {
                 />
               </div>
               <div className="relative group/field opacity-60">
-                 <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em]">Registry ID</span>
+                 <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em]">Registry ID (Member ID)</span>
+                 <input
+                  type="text"
+                  placeholder="Member ID"
+                  value={user?.memberIdentifier || 'N/A'}
+                  disabled
+                  className="w-full bg-background border border-border rounded-2xl p-6 pt-8 text-primary-text/50 text-sm outline-none cursor-not-allowed font-mono font-bold"
+                />
+              </div>
+              <div className="relative group/field opacity-60">
+                 <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em]">Cooperative Account Number</span>
                  <input
                   type="text"
                   placeholder="Account Number"
                   value={user?.accountNumber || ''}
                   disabled
-                  className="w-full bg-background border border-border rounded-2xl p-6 pt-8 text-primary-text/50 text-sm outline-none cursor-not-allowed font-mono"
+                  className="w-full bg-background border border-border rounded-2xl p-6 pt-8 text-primary-text/50 text-sm outline-none cursor-not-allowed font-mono font-bold"
                 />
               </div>
               

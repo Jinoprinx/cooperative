@@ -5,6 +5,7 @@ export interface User {
   lastName: string;
   email: string;
   accountNumber?: string;
+  memberIdentifier?: string;
   accountBalance: number;
   phoneNumber?: string;
   role: 'member' | 'admin' | 'super-admin';

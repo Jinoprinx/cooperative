@@ -432,7 +432,9 @@ export default function Members() {
                   )}
                 </View>
                 <Text className="text-foreground font-black text-3xl">{selectedUser?.firstName} {selectedUser?.lastName}</Text>
-                <Text className="text-foreground/50 font-bold uppercase tracking-widest text-[10px] mt-1">ID: {selectedUser?.accountNumber || 'PENDING'}</Text>
+                <Text className="text-foreground/50 font-bold uppercase tracking-widest text-[10px] mt-1">
+                  ID: {selectedUser?.memberIdentifier || 'N/A'} • ACC: {selectedUser?.accountNumber || 'PENDING'}
+                </Text>
               </View>
 
               <View className="bg-foreground/5 rounded-[2rem] p-6 mb-6">

@@ -5,7 +5,16 @@ export type User = {
   email: string;
   phoneNumber: string;
   accountNumber: string;
+  memberIdentifier?: string;
   accountBalance: number;
+  /** Balance that existed before the passbook system was introduced (legacy balance). */
+  prePassbookBalance?: number;
+  ledgerBalances?: {
+    shareCapital: number;
+    thriftSavings: number;
+    deposits: number;
+    capitalMobilization: number;
+  };
   role: 'user' | 'admin' | 'super-admin';
   profileImage?: string;
   status: 'pending' | 'active' | 'rejected';
@@ -18,8 +27,17 @@ export type Member = {
   firstName: string;
   lastName: string;
   accountNumber: string;
+  memberIdentifier?: string;
   joinDate: string;
   accountBalance: number;
+  /** Balance that existed before the passbook system was introduced (legacy balance). */
+  prePassbookBalance?: number;
+  ledgerBalances?: {
+    shareCapital: number;
+    thriftSavings: number;
+    deposits: number;
+    capitalMobilization: number;
+  };
   phoneNumber: string;
   role?: 'member' | 'admin' | 'super-admin';
   status: 'pending' | 'active' | 'rejected';

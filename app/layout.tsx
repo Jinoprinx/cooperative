@@ -1,13 +1,13 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
-import { Inter, Outfit } from 'next/font/google';
+import { Inter, Calistoga } from 'next/font/google';
 import { AuthProvider } from './context/AuthContext';
 
 import { headers } from 'next/headers';
 import { TenantProvider } from './context/TenantContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
+const calistoga = Calistoga({ weight: '400', subsets: ['latin'], variable: '--font-calistoga' });
 
 async function getTenantData() {
   const headersList = headers();
@@ -70,7 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${outfit.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${calistoga.variable}`}>
       <body className="font-sans antialiased min-h-screen transition-colors duration-300">
         <ThemeProvider>
           <TenantProvider initialTenant={tenant || undefined}>

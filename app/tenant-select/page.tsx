@@ -73,7 +73,7 @@ export default function TenantSelectPage() {
         <div className="min-h-screen bg-background relative overflow-hidden transition-colors duration-300">
             {/* Dynamic Background */}
             <div className="absolute inset-0 z-0">
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#3b82f615,transparent)]" />
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#F59E0B15,transparent)]" />
                 <div className="noise-overlay opacity-[0.03]" />
             </div>
 
