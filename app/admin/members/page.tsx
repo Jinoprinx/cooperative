@@ -360,7 +360,7 @@ export default function Members() {
                     type="date"
                     value={newMember.joinDate}
                     onChange={(e) => setNewMember({ ...newMember, joinDate: e.target.value })}
-                    className="w-full bg-surface border border-border rounded-2xl p-5 pt-7 text-primary-text outline-none focus:border-primary transition-all font-bold uppercase text-xs"
+                    className="w-full bg-surface border border-border rounded-2xl p-5 pt-7 text-primary-text outline-none focus:border-primary transition-all font-bold text-xs"
                     required
                   />
                 </div>
