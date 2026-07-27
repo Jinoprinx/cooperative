@@ -9,7 +9,8 @@ import {
   FaUserShield, 
   FaSignOutAlt, 
   FaCrown,
-  FaShieldAlt
+  FaShieldAlt,
+  FaKey
 } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 
@@ -45,6 +46,7 @@ export default function SuperAdminLayout({
   const navItems = [
     { name: 'Platform Overview', href: '/super-admin/dashboard', icon: FaChartBar },
     { name: 'Cooperative Tenants', href: '/super-admin/tenants', icon: FaGlobe },
+    { name: 'Override Codes', href: '/super-admin/override-codes', icon: FaKey },
     { name: 'Account Recovery', href: '/super-admin/recovery', icon: FaUserShield },
   ];
 
