@@ -9,12 +9,14 @@ import Link from 'next/link';
 
 export default function Members() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [members, setMembers] = useState<Member[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMember, setNewMember] = useState({ firstName: '', lastName: '', accountNumber: '', joinDate: '', accountBalance: 0, phoneNumber: '', email: '' });
   const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const { isMainAdmin } = useAuth();
 
   const [showSuretyModal, setShowSuretyModal] = useState(false);
@@ -23,24 +25,33 @@ export default function Members() {
   const [loadingSurety, setLoadingSurety] = useState(false);
 
   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  useEffect(() => {
     const fetchMembers = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`, {
-          params: { page, limit: 10, search: searchQuery },
+          params: { page, limit: 10, search: debouncedSearchQuery },
           headers: { Authorization: `Bearer ${token}` },
         });
         setMembers(response.data.members || []);
         setTotalPages(response.data.totalPages || 1);
         setLoading(false);
+        setInitialLoading(false);
       } catch (error) {
         console.error('Error fetching members:', error);
         setLoading(false);
+        setInitialLoading(false);
       }
     };
     fetchMembers();
-  }, [page, searchQuery]);
+  }, [page, debouncedSearchQuery]);
 
   const filteredMembers = members;
 
@@ -132,7 +143,7 @@ export default function Members() {
     return new Date(dateString).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
@@ -164,7 +175,11 @@ export default function Members() {
       <div className="flex items-center gap-6">
         <div className="relative flex-1 group">
           <div className="absolute inset-x-0 bottom-0 h-0.5 bg-primary/20 scale-x-0 group-focus-within:scale-x-100 transition-transform duration-500" />
-          <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/50 group-focus-within:text-primary transition-colors" />
+          {loading ? (
+            <div className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-t-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+          ) : (
+            <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/50 group-focus-within:text-primary transition-colors" />
+          )}
           <input
             type="text"
             placeholder="Search by first or last name..."
@@ -178,7 +193,7 @@ export default function Members() {
         </div>
       </div>
 
-      <div className="card-premium p-0 overflow-hidden">
+      <div className={`card-premium p-0 overflow-hidden transition-all duration-300 ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
