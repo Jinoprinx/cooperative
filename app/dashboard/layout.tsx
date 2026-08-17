@@ -212,45 +212,47 @@ export default function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col lg:pl-80 transition-all duration-300">
-        <header className="sticky top-0 z-30 flex h-20 flex-shrink-0 backdrop-blur-xl bg-background/20 border-b border-border px-4 lg:px-10 items-center justify-between">
-          <button
-            type="button"
-            className="p-3 bg-surface rounded-2xl border border-border text-secondary-text lg:hidden"
-            onClick={toggleSidebar}
-          >
-            <FaBars className="h-6 w-6" />
-          </button>
+      <div className="flex flex-1 flex-col lg:pl-80 transition-all duration-300 w-full min-w-0 max-w-full overflow-x-hidden">
+        <header className="sticky top-0 z-30 flex h-16 sm:h-20 flex-shrink-0 backdrop-blur-xl bg-background/20 border-b border-border px-3 sm:px-6 lg:px-10 items-center justify-between w-full min-w-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <button
+              type="button"
+              className="p-2 sm:p-2.5 bg-surface rounded-xl sm:rounded-2xl border border-border text-secondary-text lg:hidden shrink-0"
+              onClick={toggleSidebar}
+            >
+              <FaBars className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
 
-          <div className="flex flex-col ml-4 lg:ml-0">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/80 leading-none mb-1">
-              Member Workspace
-            </span>
-            <h2 className="text-xl font-black text-primary-text tracking-tighter leading-none">
-              {navigation.find(n => n.href === pathname)?.name || 'Account'}
-            </h2>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-primary/80 leading-none mb-1 truncate">
+                Member Workspace
+              </span>
+              <h2 className="text-base sm:text-xl font-black text-primary-text tracking-tighter leading-none truncate">
+                {navigation.find(n => n.href === pathname)?.name || 'Account'}
+              </h2>
+            </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2.5 sm:gap-6 shrink-0">
             <ThemeToggle />
             
             <div className="hidden sm:flex flex-col items-end">
-              <span className="text-sm font-black text-primary-text tracking-tight leading-none mb-1">{user?.firstName} {user?.lastName}</span>
-              <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.3em] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Verified Member</span>
+              <span className="text-xs sm:text-sm font-black text-primary-text tracking-tight leading-none mb-1 truncate max-w-[180px]">{user?.firstName} {user?.lastName}</span>
+              <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em] sm:tracking-[0.3em] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Verified Member</span>
             </div>
             
-            <Link href="/dashboard/account" className="relative group">
+            <Link href="/dashboard/account" className="relative group shrink-0">
               <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative h-12 w-12 rounded-2xl bg-surface border border-border p-0.5 overflow-hidden transition-transform duration-500 group-hover:scale-105">
+              <div className="relative h-9 w-9 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-surface border border-border p-0.5 overflow-hidden transition-transform duration-500 group-hover:scale-105">
                 {user?.profileImage ? (
                   <img
                     src={getImageUrl(user.profileImage)}
                     alt="Profile"
-                    className="w-full h-full object-cover rounded-xl"
+                    className="w-full h-full object-cover rounded-lg sm:rounded-xl"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                    <FaUserCircle className="h-8 w-8 text-primary" />
+                    <FaUserCircle className="h-5 w-5 sm:h-8 sm:w-8 text-primary" />
                   </div>
                 )}
               </div>
@@ -258,12 +260,12 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="flex-1 p-6 lg:p-10 relative z-10">
+        <main className="flex-1 p-3 sm:p-5 md:p-6 lg:p-10 relative z-10 w-full min-w-0 max-w-full overflow-x-hidden">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="mx-auto max-w-6xl"
+            className="mx-auto max-w-6xl w-full min-w-0 overflow-x-hidden"
           >
             {children}
           </motion.div>

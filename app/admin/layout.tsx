@@ -242,41 +242,41 @@ export default function AdminLayout({
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col lg:pl-80 transition-all duration-300">
-        <div className="sticky top-0 z-10 flex h-20 flex-shrink-0 backdrop-blur-xl border-b border-border bg-background/20 px-4 sm:px-8">
+      <div className="flex flex-1 flex-col lg:pl-80 transition-all duration-300 min-w-0 overflow-x-hidden">
+        <div className="sticky top-0 z-10 flex h-16 sm:h-20 flex-shrink-0 backdrop-blur-xl border-b border-border bg-background/20 px-3 sm:px-8">
           <button
             type="button"
-            className="px-4 text-secondary-text hover:text-primary-text lg:hidden transition-colors"
+            className="pr-3 sm:px-4 text-secondary-text hover:text-primary-text lg:hidden transition-colors"
             onClick={toggleSidebar}
           >
             <span className="sr-only">Open sidebar</span>
-            <FaBars className="h-6 w-6" aria-hidden="true" />
+            <FaBars className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
           </button>
           
-          <div className="flex flex-1 justify-between items-center h-full">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80 leading-none mb-1">
+          <div className="flex flex-1 justify-between items-center h-full min-w-0">
+            <div className="flex flex-col min-w-0">
+              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-primary/80 leading-none mb-1 truncate">
                 {tenant?.name || 'Administrative Portal'}
               </span>
-              <h2 className="text-xl font-black text-primary-text tracking-tighter leading-none">
+              <h2 className="text-base sm:text-xl font-black text-primary-text tracking-tighter leading-none truncate">
                 {navigation.find(n => pathname.startsWith(n.href))?.name || 'Dashboard'}
               </h2>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3 sm:gap-6 shrink-0">
               <ThemeToggle />
               <div className="hidden sm:flex flex-col items-end">
-                <span className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Welcome back</span>
-                <span className="text-sm font-bold text-primary-text leading-none capitalize">{user?.firstName} {user?.lastName}</span>
+                <span className="text-tertiary-text text-[9px] sm:text-[10px] font-black uppercase tracking-widest leading-none mb-1">Welcome back</span>
+                <span className="text-xs sm:text-sm font-bold text-primary-text leading-none capitalize">{user?.firstName} {user?.lastName}</span>
               </div>
               <Link href="/admin/account" className="relative group">
                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative h-12 w-12 rounded-2xl bg-surface border border-border p-0.5 overflow-hidden transition-transform duration-500 group-hover:scale-105">
+                <div className="relative h-9 w-9 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-surface border border-border p-0.5 overflow-hidden transition-transform duration-500 group-hover:scale-105">
                   {user?.profileImage ? (
-                    <img src={getImageUrl(user.profileImage)} alt="Profile" className="h-full w-full object-cover rounded-xl" />
+                    <img src={getImageUrl(user.profileImage)} alt="Profile" className="h-full w-full object-cover rounded-lg sm:rounded-xl" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                      <FaUserCircle className="h-8 w-8 text-primary" />
+                      <FaUserCircle className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                     </div>
                   )}
                 </div>
@@ -285,8 +285,8 @@ export default function AdminLayout({
           </div>
         </div>
 
-        <main className="flex-1 relative z-10">
-          <div className="py-8 px-4 sm:px-8 max-w-7xl mx-auto">
+        <main className="flex-1 relative z-10 w-full min-w-0 overflow-x-hidden">
+          <div className="py-4 sm:py-8 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full min-w-0">
             {children}
           </div>
         </main>

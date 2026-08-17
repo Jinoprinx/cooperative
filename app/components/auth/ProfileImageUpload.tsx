@@ -61,7 +61,7 @@ export default function ProfileImageUpload({ setProfileImage }: { setProfileImag
 
   return (
     <div className="p-4 border rounded-lg shadow-sm bg-white">
-      <h2 className="text-xl font-semibold mb-4">Upload Profile Image</h2>
+      <h2 className="text-xl font-semibold mb-4 text-black !text-black">Upload Profile Image</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="profile-image" className="block text-sm font-medium text-gray-700">Choose Image</label>
@@ -89,14 +89,14 @@ export default function ProfileImageUpload({ setProfileImage }: { setProfileImag
       {success && <p className="mt-3 text-green-600 text-sm">{success}</p>}
 
       {user?.profileImage && (
-        <div className="mt-4">
-          <h3 className="text-lg font-medium mb-2">Current Profile Image:</h3>
+        <div className="mt-6 flex flex-col items-center justify-center text-center w-full">
+          <h3 className="text-sm font-bold text-gray-800 mb-3 text-center">Current Profile Image:</h3>
           <img
             src={getImageUrl(user.profileImage)}
             alt="Profile"
             width="150"
             height="150"
-            className="rounded-full object-cover border-2 border-gray-300"
+            className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-gray-300 mx-auto shadow-sm"
           />
         </div>
       )}

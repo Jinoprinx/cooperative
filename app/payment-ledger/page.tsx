@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import axios from 'axios';
 import { useAuth } from '@/app/context/AuthContext';
-import { FaHistory, FaReceipt } from 'react-icons/fa';
+import { FaHistory, FaReceipt, FaArrowLeft } from 'react-icons/fa';
 
 
 // Threshold date separating legacy (pre-passbook) from split transactions
@@ -246,108 +247,115 @@ export default function PaymentLedger() {
 
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background pt-32 pb-20 px-4 sm:px-6">
-      <main className="max-w-[100rem] mx-auto space-y-12">
+    <div className="min-h-screen bg-background pt-24 sm:pt-32 pb-20 px-3 sm:px-6">
+      <main className="max-w-[100rem] mx-auto space-y-8 sm:space-y-12">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-6">
           <div>
-            <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block font-mono">
-              Vault Settlement Ledger
+            <Link
+              href="/dashboard/transactions"
+              className="text-primary text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] sm:tracking-[0.3em] mb-3 sm:mb-4 flex items-center gap-2 hover:text-primary-text hover:-translate-x-1 transition-all w-fit group"
+            >
+              <FaArrowLeft className="text-[10px] sm:text-xs transition-transform group-hover:-translate-x-1" />
+              Back to Transactions
+            </Link>
+            <span className="text-primary text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-1.5 sm:mb-2 block font-mono">
+              Member Ledger
             </span>
-            <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-primary-text">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-primary-text">
               Membership <span className="text-tertiary-text">Passbook</span>
             </h1>
           </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
           {/* Total Assets */}
-          <div className="card-premium bg-gradient-to-br from-emerald-950/60 to-emerald-900/30 border border-emerald-500/30 p-6 rounded-2xl flex flex-col justify-between col-span-2 md:col-span-1">
-            <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest mb-4">
+          <div className="card-premium bg-gradient-to-br from-emerald-950/60 to-emerald-900/30 border border-emerald-500/30 p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col justify-between col-span-1 sm:col-span-2 xl:col-span-1">
+            <span className="text-[8px] sm:text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-3 sm:mb-4">
               Total Assets
             </span>
             <div>
-              <p className="text-2xl font-black tracking-tighter text-emerald-300 mb-1">
+              <p className="text-xl sm:text-2xl font-black tracking-tighter text-emerald-300 mb-1 truncate">
                 {fmt(totalAssetsBal)}
               </p>
-              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-wider">
+              <span className="text-[8px] sm:text-[9px] font-black text-emerald-500 uppercase tracking-wider">
                 All Categories
               </span>
             </div>
           </div>
 
           {/* Withdrawable (deposits) */}
-          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
-            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">
+          <div className="card-premium bg-surface border border-border p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-widest mb-3 sm:mb-4">
               Withdrawable (Deposits)
             </span>
             <div>
-              <p className="text-2xl font-black tracking-tighter text-primary-text mb-1">
+              <p className="text-xl sm:text-2xl font-black tracking-tighter text-primary-text mb-1 truncate">
                 {fmt(totalWithdrawable)}
               </p>
-              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-wider">
+              <span className="text-[8px] sm:text-[9px] font-black text-emerald-500 uppercase tracking-wider">
                 Liquid Balance
               </span>
             </div>
           </div>
 
           {/* Share Capital */}
-          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
-            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">
+          <div className="card-premium bg-surface border border-border p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-widest mb-3 sm:mb-4">
               Share Capital
             </span>
             <div>
-              <p className="text-2xl font-black tracking-tighter text-primary-text mb-1">
+              <p className="text-xl sm:text-2xl font-black tracking-tighter text-primary-text mb-1 truncate">
                 {fmt(shareCapitalBal)}
               </p>
-              <span className="text-[8px] font-black text-primary uppercase tracking-wider">
+              <span className="text-[8px] sm:text-[9px] font-black text-primary uppercase tracking-wider">
                 Membership Equity
               </span>
             </div>
           </div>
 
           {/* Thrift Savings */}
-          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
-            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">
+          <div className="card-premium bg-surface border border-border p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-widest mb-3 sm:mb-4">
               Thrift Savings
             </span>
             <div>
-              <p className="text-2xl font-black tracking-tighter text-primary-text mb-1">
+              <p className="text-xl sm:text-2xl font-black tracking-tighter text-primary-text mb-1 truncate">
                 {fmt(thriftSavingsBal)}
               </p>
-              <span className="text-[8px] font-black text-primary uppercase tracking-wider">
+              <span className="text-[8px] sm:text-[9px] font-black text-primary uppercase tracking-wider">
                 Mandatory Savings
               </span>
             </div>
           </div>
 
           {/* Capital Mobilization */}
-          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
-            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">
+          <div className="card-premium bg-surface border border-border p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-widest mb-3 sm:mb-4">
               Capital Mobilization
             </span>
             <div>
-              <p className="text-2xl font-black tracking-tighter text-primary-text mb-1">
+              <p className="text-xl sm:text-2xl font-black tracking-tighter text-primary-text mb-1 truncate">
                 {fmt(capitalMobilizationBal)}
               </p>
-              <span className="text-[8px] font-black text-tertiary-text uppercase tracking-wider">
+              <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-wider">
                 Special Projects
               </span>
             </div>
           </div>
 
           {/* Outstanding Loan */}
-          <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col justify-between">
-            <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest mb-4">
+          <div className="card-premium bg-surface border border-border p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col justify-between">
+            <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-widest mb-3 sm:mb-4">
               Outstanding Loan
             </span>
             <div>
-              <p className={`text-2xl font-black tracking-tighter mb-1 ${runningLoan > 0 ? 'text-rose-500' : 'text-primary-text'}`}>
+              <p className={`text-xl sm:text-2xl font-black tracking-tighter mb-1 truncate ${runningLoan > 0 ? 'text-rose-500' : 'text-primary-text'}`}>
                 {fmt(runningLoan)}
               </p>
-              <span className="text-[8px] font-black text-tertiary-text uppercase tracking-wider">
+              <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-wider">
                 Repayment Obligation
               </span>
             </div>
@@ -355,100 +363,102 @@ export default function PaymentLedger() {
         </div>
 
         {/* Date Filters */}
-        <div className="card-premium bg-surface border border-border p-6 rounded-2xl">
-          <div className="flex flex-col sm:flex-row gap-4 items-end">
-            <div className="flex-1 space-y-2">
-              <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest ml-2">
-                Epoch Start
+        <div className="card-premium bg-surface border border-border p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-end">
+            <div className="flex-1 space-y-1.5">
+              <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">
+                Start Date
               </span>
               <input
                 type="date"
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
-                className="w-full bg-surface-lighter border border-border rounded-xl p-4 text-primary-text outline-none focus:border-primary text-xs font-bold"
+                className="w-full bg-surface-lighter border border-border rounded-xl p-3 sm:p-4 text-primary-text outline-none focus:border-primary text-xs font-bold"
               />
             </div>
-            <div className="flex-1 space-y-2">
-              <span className="text-[8px] font-black text-tertiary-text uppercase tracking-widest ml-2">
-                Epoch End
+            <div className="flex-1 space-y-1.5">
+              <span className="text-[8px] sm:text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">
+                End Date
               </span>
               <input
                 type="date"
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
-                className="w-full bg-surface-lighter border border-border rounded-xl p-4 text-primary-text outline-none focus:border-primary text-xs font-bold"
+                className="w-full bg-surface-lighter border border-border rounded-xl p-3 sm:p-4 text-primary-text outline-none focus:border-primary text-xs font-bold"
               />
             </div>
-            <button
-              onClick={() => fetchTransactions({ startDate, endDate })}
-              className="btn-primary py-4 px-8 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 border-none h-12"
-            >
-              Filter Ledger
-            </button>
-            <button
-              onClick={() => { setStartDate(''); setEndDate(''); fetchTransactions(); }}
-              className="bg-surface-lighter hover:bg-surface border border-border text-primary-text font-black text-xs uppercase tracking-widest px-8 rounded-xl h-12"
-            >
-              Reset
-            </button>
+            <div className="flex gap-2 sm:gap-3">
+              <button
+                onClick={() => fetchTransactions({ startDate, endDate })}
+                className="flex-1 sm:flex-initial btn-primary py-3 sm:py-4 px-6 sm:px-8 rounded-xl text-xs font-black uppercase tracking-wider sm:tracking-widest flex items-center justify-center gap-2 border-none h-11 sm:h-12"
+              >
+                Filter
+              </button>
+              <button
+                onClick={() => { setStartDate(''); setEndDate(''); fetchTransactions(); }}
+                className="bg-surface-lighter hover:bg-surface border border-border text-primary-text font-black text-xs uppercase tracking-wider sm:tracking-widest px-4 sm:px-8 rounded-xl h-11 sm:h-12"
+              >
+                Reset
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Passbook Table */}
-        <div className="card-premium bg-surface border border-border p-6 rounded-2xl overflow-hidden">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="card-premium bg-surface border border-border p-4 sm:p-6 rounded-xl sm:rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
             <FaHistory className="text-primary h-4 w-4" />
-            <h3 className="text-sm font-black tracking-widest uppercase text-primary-text">
-              Settled Transactions Passbook
+            <h3 className="text-xs sm:text-sm font-black tracking-wider sm:tracking-widest uppercase text-primary-text">
+              Member Transaction Passbook
             </h3>
           </div>
 
           {/* Legend */}
-          <div className="flex flex-wrap gap-4 mb-6 text-[9px] font-black uppercase tracking-widest">
+          <div className="flex flex-wrap gap-3 sm:gap-4 mb-4 sm:mb-6 text-[8px] sm:text-[9px] font-black uppercase tracking-wider">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
-              Legacy (pre-passbook — full amount in Total Assets)
+              <span className="w-2 h-2 rounded-full bg-amber-400 inline-block shrink-0" />
+              Legacy (pre-passbook — Total Assets)
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-primary inline-block" />
+              <span className="w-2 h-2 rounded-full bg-primary inline-block shrink-0" />
               Post-passbook (split by category)
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs font-bold text-tertiary-text uppercase">
+          <div className="overflow-x-auto min-h-[350px]">
+            <table className="w-full text-left border-collapse text-xs font-bold text-tertiary-text uppercase min-w-[750px]">
               <thead>
-                <tr className="border-b border-border text-[8px] tracking-[0.2em] font-black text-tertiary-text">
-                  <th className="pb-4 pr-4">Date</th>
-                  <th className="pb-4 pr-4">Particulars</th>
-                  <th className="pb-4 pr-4 text-center border-l border-border/50">
+                <tr className="border-b border-border text-[8px] tracking-[0.15em] sm:tracking-[0.2em] font-black text-tertiary-text">
+                  <th className="pb-3 pr-3 sm:pb-4 sm:pr-4">Date</th>
+                  <th className="pb-3 pr-3 sm:pb-4 sm:pr-4">Particulars</th>
+                  <th className="pb-3 pr-3 sm:pb-4 sm:pr-4 text-center border-l border-border/50">
                     Share Capital<br />
                     <span className="text-[6px] text-tertiary-text/60">(CR | BAL)</span>
                   </th>
-                  <th className="pb-4 pr-4 text-center border-l border-border/50">
+                  <th className="pb-3 pr-3 sm:pb-4 sm:pr-4 text-center border-l border-border/50">
                     Thrift Savings<br />
                     <span className="text-[6px] text-tertiary-text/60">(CR | BAL)</span>
                   </th>
-                  <th className="pb-4 pr-4 text-center border-l border-border/50">
+                  <th className="pb-3 pr-3 sm:pb-4 sm:pr-4 text-center border-l border-border/50">
                     Vol. Deposits<br />
                     <span className="text-[6px] text-tertiary-text/60">(DR | CR | BAL)</span>
                   </th>
-                  <th className="pb-4 pr-4 text-center border-l border-border/50">
+                  <th className="pb-3 pr-3 sm:pb-4 sm:pr-4 text-center border-l border-border/50">
                     Member Loan<br />
                     <span className="text-[6px] text-tertiary-text/60">(DR | CR | BAL)</span>
                   </th>
-                  <th className="pb-4 pr-4 text-center border-l border-border/50">
+                  <th className="pb-3 pr-3 sm:pb-4 sm:pr-4 text-center border-l border-border/50">
                     Cap. Mobilization<br />
                     <span className="text-[6px] text-tertiary-text/60">(CR | BAL)</span>
                   </th>
-                  <th className="pb-4 pr-4 text-center border-l border-emerald-500/40 text-emerald-400">
+                  <th className="pb-3 pr-3 sm:pb-4 sm:pr-4 text-center border-l border-emerald-500/40 text-emerald-400">
                     Total Assets<br />
                     <span className="text-[6px] text-emerald-400/60">(DR | CR | BAL)</span>
                   </th>
-                  <th className="pb-4 text-right border-l border-border/50">Receipt</th>
+                  <th className="pb-3 sm:pb-4 text-right border-l border-border/50">Receipt</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50 font-mono text-[10px]">
+              <tbody className="divide-y divide-border/50 font-mono text-[9px] sm:text-[10px]">
                 {displayRows.length === 0 ? (
                   <tr>
                     <td

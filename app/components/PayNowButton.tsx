@@ -19,19 +19,19 @@ const PayNowButton: React.FC<PayNowButtonProps> = ({ className = 'w-full', butto
   };
 
   const sizeClasses = {
-    sm: 'py-2.5 px-5 text-[10px]',
-    md: 'py-4 px-8 text-xs',
-    lg: 'py-5 px-10 text-sm',
+    sm: 'py-2 sm:py-2.5 px-3 sm:px-5 text-[9px] sm:text-[10px] tracking-wider',
+    md: 'py-2.5 sm:py-3.5 md:py-4 px-3.5 sm:px-6 md:px-8 text-[10px] sm:text-xs tracking-normal sm:tracking-[0.15em]',
+    lg: 'py-3 sm:py-4 md:py-5 px-4 sm:px-8 md:px-10 text-xs sm:text-sm tracking-normal sm:tracking-[0.2em]',
   }[size];
 
   return (
-    <Link href="/payment/upload-receipt" className={`block ${className}`}>
+    <Link href="/payment/upload-receipt" className={`block ${className} max-w-full`}>
       <button
         onClick={handleClick}
-        className={`w-full bg-primary hover:bg-primary-dark text-white font-black rounded-2xl flex items-center justify-center gap-2.5 uppercase tracking-[0.2em] transition-all duration-300 shadow-glow-sm border-none active:scale-95 cursor-pointer ${sizeClasses} ${buttonClassName}`}
+        className={`w-full bg-primary hover:bg-primary-dark text-white font-black rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 sm:gap-2.5 uppercase transition-all duration-300 shadow-glow-sm border-none active:scale-95 cursor-pointer max-w-full ${sizeClasses} ${buttonClassName}`}
       >
-        <FaCreditCard className="h-4 w-4" />
-        Pay Now
+        <FaCreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+        <span className="truncate">Pay Now</span>
       </button>
     </Link>
   );

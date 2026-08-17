@@ -45,86 +45,86 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4 text-primary-text pb-20">
-            <div className="mb-10">
-              <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">System Configuration</span>
-              <h1 className="text-4xl font-black tracking-tighter">Cooperative <span className="text-tertiary-text">Settings</span></h1>
+        <div className="max-w-4xl mx-auto py-6 sm:py-8 px-3 sm:px-4 text-primary-text pb-20">
+            <div className="mb-6 sm:mb-10">
+              <span className="text-primary text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-1.5 sm:mb-2 block">System Configuration</span>
+              <h1 className="text-3xl sm:text-4xl font-black tracking-tighter">Cooperative <span className="text-tertiary-text">Settings</span></h1>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8 card-premium bg-surface border border-border p-8 rounded-[2.5rem]">
-                <section className="space-y-6">
-                    <div className="flex items-center gap-3">
-                       <FaCog className="text-primary" />
-                       <h2 className="text-lg font-black tracking-tighter uppercase">General Information</h2>
+            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 card-premium bg-surface border border-border p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem]">
+                <section className="space-y-4 sm:space-y-6">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                       <FaCog className="text-primary h-4 w-4 sm:h-5 sm:w-5" />
+                       <h2 className="text-base sm:text-lg font-black tracking-tighter uppercase">General Information</h2>
                     </div>
                     <div className="relative group/field">
-                        <label className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-widest group-focus-within/field:text-primary transition-colors">Cooperative Name</label>
+                        <label className="absolute top-2 left-4 sm:left-6 text-[7px] sm:text-[8px] font-black text-tertiary-text uppercase tracking-wider sm:tracking-widest group-focus-within/field:text-primary transition-colors">Cooperative Name</label>
                         <input
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full bg-surface-lighter border border-border rounded-2xl px-6 pt-8 pb-4 text-primary-text outline-none focus:border-primary transition-all font-bold"
+                            className="w-full bg-surface-lighter border border-border rounded-xl sm:rounded-2xl px-4 sm:px-6 pt-7 sm:pt-8 pb-3.5 sm:pb-4 text-primary-text outline-none focus:border-primary transition-all font-bold text-xs sm:text-sm"
                         />
                     </div>
                 </section>
 
-                <section className="space-y-6">
-                    <div className="flex items-center gap-3">
-                       <FaPalette className="text-primary" />
-                       <h2 className="text-lg font-black tracking-tighter uppercase">Branding & Aesthetics</h2>
+                <section className="space-y-4 sm:space-y-6">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                       <FaPalette className="text-primary h-4 w-4 sm:h-5 sm:w-5" />
+                       <h2 className="text-base sm:text-lg font-black tracking-tighter uppercase">Branding & Aesthetics</h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <div className="relative group/field">
-                            <label className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-widest group-focus-within/field:text-primary transition-colors">Primary Protocol Color</label>
-                            <div className="flex gap-3 bg-surface-lighter border border-border rounded-2xl px-4 pt-8 pb-4">
+                            <label className="absolute top-2 left-4 sm:left-6 text-[7px] sm:text-[8px] font-black text-tertiary-text uppercase tracking-wider sm:tracking-widest group-focus-within/field:text-primary transition-colors">Primary Protocol Color</label>
+                            <div className="flex gap-2.5 sm:gap-3 bg-surface-lighter border border-border rounded-xl sm:rounded-2xl px-3 sm:px-4 pt-7 sm:pt-8 pb-3 sm:pb-4 items-center">
                                 <input
                                     type="color"
                                     value={formData.primaryColor}
                                     onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                                    className="h-10 w-20 bg-transparent cursor-pointer rounded-lg border border-border overflow-hidden"
+                                    className="h-8 w-14 sm:h-10 sm:w-20 bg-transparent cursor-pointer rounded-lg border border-border overflow-hidden shrink-0"
                                 />
                                 <input
                                     type="text"
                                     value={formData.primaryColor}
                                     onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                                    className="flex-1 bg-transparent text-primary-text outline-none font-mono"
+                                    className="flex-1 min-w-0 bg-transparent text-primary-text outline-none font-mono text-xs sm:text-sm"
                                 />
                             </div>
                         </div>
                         <div className="relative group/field">
-                            <label className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-widest group-focus-within/field:text-primary transition-colors">Logo Vector URL</label>
+                            <label className="absolute top-2 left-4 sm:left-6 text-[7px] sm:text-[8px] font-black text-tertiary-text uppercase tracking-wider sm:tracking-widest group-focus-within/field:text-primary transition-colors">Logo Vector URL</label>
                             <input
                                 type="text"
                                 value={formData.logoUrl}
                                 onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
-                                className="w-full bg-surface-lighter border border-border rounded-2xl px-6 pt-8 pb-4 text-primary-text outline-none focus:border-primary transition-all font-bold"
+                                className="w-full bg-surface-lighter border border-border rounded-xl sm:rounded-2xl px-4 sm:px-6 pt-7 sm:pt-8 pb-3.5 sm:pb-4 text-primary-text outline-none focus:border-primary transition-all font-bold text-xs sm:text-sm"
                                 placeholder="https://example.com/logo.png"
                             />
                         </div>
                     </div>
                 </section>
 
-                <section className="space-y-6">
-                    <div className="flex items-center gap-3">
-                       <FaShieldAlt className="text-primary" />
-                       <h2 className="text-lg font-black tracking-tighter uppercase">Credit Thresholds</h2>
+                <section className="space-y-4 sm:space-y-6">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                       <FaShieldAlt className="text-primary h-4 w-4 sm:h-5 sm:w-5" />
+                       <h2 className="text-base sm:text-lg font-black tracking-tighter uppercase">Credit Thresholds</h2>
                     </div>
                     <div className="relative group/field">
-                        <label className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-widest group-focus-within/field:text-primary transition-colors">Maximum Approval Ceiling (NGN)</label>
+                        <label className="absolute top-2 left-4 sm:left-6 text-[7px] sm:text-[8px] font-black text-tertiary-text uppercase tracking-wider sm:tracking-widest group-focus-within/field:text-primary transition-colors">Maximum Approval Ceiling (NGN)</label>
                         <input
                             type="number"
                             value={formData.maxApprovalAmount}
                             onChange={(e) => setFormData({ ...formData, maxApprovalAmount: parseInt(e.target.value) })}
-                            className="w-full bg-surface-lighter border border-border rounded-2xl px-6 pt-8 pb-4 text-primary-text outline-none focus:border-primary transition-all font-black"
+                            className="w-full bg-surface-lighter border border-border rounded-xl sm:rounded-2xl px-4 sm:px-6 pt-7 sm:pt-8 pb-3.5 sm:pb-4 text-primary-text outline-none focus:border-primary transition-all font-black text-xs sm:text-sm"
                         />
                     </div>
                 </section>
 
-                <div className="pt-8">
+                <div className="pt-4 sm:pt-8">
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full btn-primary py-5 rounded-2xl flex justify-center items-center gap-3 text-xs font-black uppercase tracking-[0.4em] shadow-none border-none"
+                        className="w-full btn-primary py-4 sm:py-5 rounded-xl sm:rounded-2xl flex justify-center items-center gap-3 text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] shadow-none border-none"
                     >
                         {loading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <FaSave className="h-4 w-4" />}
                         Save System Changes
