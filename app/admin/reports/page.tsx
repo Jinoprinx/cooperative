@@ -19,16 +19,47 @@ import {
   FaExclamationCircle, 
   FaHandHoldingUsd, 
   FaExclamationTriangle,
-  FaShieldAlt
+  FaShieldAlt,
+  FaAward,
+  FaBalanceScale,
+  FaFileInvoiceDollar,
+  FaChartPie,
+  FaBookReader,
+  FaBuilding,
+  FaGavel,
+  FaHandshake
 } from 'react-icons/fa';
 
-type ReportCategory = 'general' | 'loans' | 'members' | 'transactions' | 'sureties';
+type ReportCategory = 'general' | 'loans' | 'members' | 'transactions' | 'sureties' | 'agm';
 
 export default function Reports() {
   const [reportCategory, setReportCategory] = useState<ReportCategory>('general');
   const [reportType, setReportType] = useState<'monthly' | 'yearly'>('monthly');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // AGM Custom variables
+  const [agmExpenses, setAgmExpenses] = useState<string>('0');
+  // Appropriation percentage rates (% of Net Surplus)
+  const [reserveFundRate, setReserveFundRate] = useState<string>('15');
+  const [educationFundRate, setEducationFundRate] = useState<string>('10');
+  // Dividend/Interest rates per equity stream
+  const [shareRate, setShareRate] = useState<string>('5');
+  const [savingsRate, setSavingsRate] = useState<string>('5');
+  const [depositRate, setDepositRate] = useState<string>('6');
+  const [capitalMobRate, setCapitalMobRate] = useState<string>('7');
+  // Percentage-based appropriation items (% of Net Surplus)
+  const [committeeSittingRate, setCommitteeSittingRate] = useState<string>('10');
+  const [secretaryHonorariumRate, setSecretaryHonorariumRate] = useState<string>('1');
+  // Fixed-amount appropriation items (₦)
+  const [entertainment, setEntertainment] = useState<string>('0');
+  const [stationery, setStationery] = useState<string>('0');
+  const [provisionBadDebt, setProvisionBadDebt] = useState<string>('0');
+  const [miscExpenses, setMiscExpenses] = useState<string>('0');
+  // Custom line items
+  const [customItems, setCustomItems] = useState<{name: string, amount: string}[]>([]);
+  // Member schedule display options
+  const [showMemberNames, setShowMemberNames] = useState<boolean>(true);
   
   // Tabs for the secondary tables depending on report category
   const [activeTab, setActiveTab] = useState<string>('overview');
@@ -93,7 +124,28 @@ export default function Reports() {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       let response;
       
-      if (reportCategory === 'general') {
+      if (reportCategory === 'agm') {
+        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/reports/agm`, {
+          ...config,
+          params: { 
+            year: selectedYear,
+            expenses: parseFloat(agmExpenses) || 0,
+            reserveFundRate: parseFloat(reserveFundRate) || 15,
+            educationFundRate: parseFloat(educationFundRate) || 10,
+            shareRate: parseFloat(shareRate) || 5,
+            savingsRate: parseFloat(savingsRate) || 5,
+            depositRate: parseFloat(depositRate) || 6,
+            capitalMobRate: parseFloat(capitalMobRate) || 7,
+            committeeSittingRate: parseFloat(committeeSittingRate) || 10,
+            secretaryHonorariumRate: parseFloat(secretaryHonorariumRate) || 1,
+            entertainment: parseFloat(entertainment) || 0,
+            stationery: parseFloat(stationery) || 0,
+            provisionBadDebt: parseFloat(provisionBadDebt) || 0,
+            miscExpenses: parseFloat(miscExpenses) || 0,
+            customItems: JSON.stringify(customItems.filter(i => i.name && parseFloat(i.amount) > 0))
+          },
+        });
+      } else if (reportCategory === 'general') {
         if (reportType === 'monthly') {
           response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/reports/monthly`, {
             ...config,
@@ -138,6 +190,45 @@ export default function Reports() {
     } catch (err: any) {
       console.error('Error generating report:', err);
       setError(err?.response?.data?.message || 'Failed to synthesize audit protocol. Please check your credentials or API connection.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateAGMReport = async (targetYearParam?: string) => {
+    const y = targetYearParam || selectedYear;
+    setReportCategory('agm');
+    setReportType('yearly');
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/reports/agm`, {
+        ...config,
+        params: { 
+          year: y,
+          expenses: parseFloat(agmExpenses) || 0,
+          reserveFundRate: parseFloat(reserveFundRate) || 15,
+          educationFundRate: parseFloat(educationFundRate) || 10,
+          shareRate: parseFloat(shareRate) || 5,
+          savingsRate: parseFloat(savingsRate) || 5,
+          depositRate: parseFloat(depositRate) || 6,
+          capitalMobRate: parseFloat(capitalMobRate) || 7,
+          committeeSittingRate: parseFloat(committeeSittingRate) || 10,
+          secretaryHonorariumRate: parseFloat(secretaryHonorariumRate) || 1,
+          entertainment: parseFloat(entertainment) || 0,
+          stationery: parseFloat(stationery) || 0,
+          provisionBadDebt: parseFloat(provisionBadDebt) || 0,
+          miscExpenses: parseFloat(miscExpenses) || 0,
+          customItems: JSON.stringify(customItems.filter(i => i.name && parseFloat(i.amount) > 0))
+        },
+      });
+      setRawReportData(response.data);
+      setActiveTab('overview');
+    } catch (err: any) {
+      console.error('Error generating AGM report:', err);
+      setError(err?.response?.data?.message || 'Failed to synthesize AGM Report. Please check your credentials or API connection.');
     } finally {
       setLoading(false);
     }
@@ -276,6 +367,70 @@ export default function Reports() {
       });
 
       downloadCSV(csvContent, `Surety_Risk_Audit_${selectedYear}.csv`);
+    } else if (reportCategory === 'agm') {
+      csvContent += "STATUTORY ANNUAL GENERAL MEETING (AGM) REPORT\n";
+      csvContent += `Cooperative Name,"${rawReportData.governance?.cooperativeName || ''}"\n`;
+      csvContent += `Fiscal Year,${rawReportData.governance?.fiscalYear || selectedYear}\n`;
+      csvContent += `Generated At,"${new Date(rawReportData.generatedAt || Date.now()).toLocaleString()}"\n\n`;
+
+      csvContent += "MEMBERSHIP DEMOGRAPHICS & GROWTH\n";
+      csvContent += `Total Members,${rawReportData.membershipStats?.totalMembers || 0}\n`;
+      csvContent += `Active Members,${rawReportData.membershipStats?.activeMembers || 0}\n`;
+      csvContent += `Pending Members,${rawReportData.membershipStats?.pendingMembers || 0}\n`;
+      csvContent += `New Members Admitted (${selectedYear}),${rawReportData.membershipStats?.newMembersCount || 0}\n`;
+      csvContent += `Self-Signup Enrolment,${rawReportData.membershipStats?.selfSignups || 0}\n`;
+      csvContent += `Manual Enrolment,${rawReportData.membershipStats?.manualEnrolments || 0}\n\n`;
+
+      csvContent += "STATEMENT OF FINANCIAL POSITION (BALANCE SHEET)\n";
+      csvContent += "Category,Amount (NGN)\n";
+      csvContent += `Liquid Bank/Account Balances,${rawReportData.balanceSheet?.assets?.liquidBalances || 0}\n`;
+      csvContent += `Outstanding Loans Receivable,${rawReportData.balanceSheet?.assets?.outstandingLoansReceivable || 0}\n`;
+      csvContent += `TOTAL COOPERATIVE ASSETS,${rawReportData.balanceSheet?.assets?.aggregateCooperativeAssets || 0}\n`;
+      csvContent += `Share Capital Pool,${rawReportData.balanceSheet?.equityAndLiabilities?.shareCapital || 0}\n`;
+      csvContent += `Thrift Savings Pool,${rawReportData.balanceSheet?.equityAndLiabilities?.thriftSavings || 0}\n`;
+      csvContent += `General Deposits Pool,${rawReportData.balanceSheet?.equityAndLiabilities?.generalDeposits || 0}\n`;
+      csvContent += `Capital Mobilization Pool,${rawReportData.balanceSheet?.equityAndLiabilities?.capitalMobilization || 0}\n`;
+      csvContent += `TOTAL MEMBERS EQUITY,${rawReportData.balanceSheet?.equityAndLiabilities?.totalMemberEquity || 0}\n\n`;
+
+      csvContent += "INCOME & EXPENDITURE STATEMENT\n";
+      csvContent += `Loan Interest Earned,${rawReportData.incomeAndExpenditure?.revenue?.loanInterestEarned || 0}\n`;
+      csvContent += `Processing Fees Earned,${rawReportData.incomeAndExpenditure?.revenue?.processingFeesEarned || 0}\n`;
+      csvContent += `Other Fee Revenue,${rawReportData.incomeAndExpenditure?.revenue?.otherFeeRevenue || 0}\n`;
+      csvContent += `Total Annual Deposits,${rawReportData.incomeAndExpenditure?.cashFlow?.totalDeposits || 0}\n`;
+      csvContent += `Total Annual Withdrawals,${rawReportData.incomeAndExpenditure?.cashFlow?.totalWithdrawals || 0}\n`;
+      csvContent += `Total Loan Disbursements,${rawReportData.incomeAndExpenditure?.cashFlow?.totalLoanDisbursements || 0}\n`;
+      csvContent += `Total Loan Repayments,${rawReportData.incomeAndExpenditure?.cashFlow?.totalLoanRepayments || 0}\n`;
+      csvContent += `NET OPERATING SURPLUS / CASH FLOW,${rawReportData.incomeAndExpenditure?.cashFlow?.netCashFlow || 0}\n\n`;
+
+      csvContent += "LOAN PORTFOLIO PERFORMANCE\n";
+      csvContent += `Loans Issued Count,${rawReportData.loanPortfolio?.totalLoansIssuedCount || 0}\n`;
+      csvContent += `Loans Issued Amount,${rawReportData.loanPortfolio?.totalLoansIssuedAmount || 0}\n`;
+      csvContent += `Active Loans Count,${rawReportData.loanPortfolio?.activeLoansCount || 0}\n`;
+      csvContent += `Active Loans Amount,${rawReportData.loanPortfolio?.activeLoansAmount || 0}\n`;
+      csvContent += `Completed Loans Count,${rawReportData.loanPortfolio?.completedLoansCount || 0}\n`;
+      csvContent += `Defaulted Loans Count,${rawReportData.loanPortfolio?.defaultedLoansCount || 0}\n`;
+      csvContent += `Delinquency Rate (%),${rawReportData.loanPortfolio?.delinquencyRate || 0}%\n\n`;
+
+      csvContent += "SURETY & RISK EXPOSURE AUDIT\n";
+      csvContent += `Total Guarantors Count,${rawReportData.suretyRisk?.totalGuarantorsCount || 0}\n`;
+      csvContent += `Total Guaranteed Exposure,${rawReportData.suretyRisk?.totalGuaranteedLiability || 0}\n`;
+      csvContent += `Guarantors Exceeding 500k Exposure,${rawReportData.suretyRisk?.highRiskGuarantorsCount || 0}\n\n`;
+
+      csvContent += "PROPOSED APPROPRIATION ACCOUNT\n";
+      csvContent += "S/N,Narration,Rate/Basis,Amount (NGN)\n";
+      rawReportData.dividendProjection?.appropriationAccount?.lineItems?.forEach((item: any, idx: number) => {
+        csvContent += `${idx + 1},"${item.name}","${item.rate} of ${item.basis}",${item.amount}\n`;
+      });
+      csvContent += `,"General Reserve (Balancing Figure)",,${rawReportData.dividendProjection?.appropriationAccount?.generalReserve || 0}\n`;
+      csvContent += `,"TOTAL",,${rawReportData.dividendProjection?.appropriationAccount?.netSurplus || 0}\n\n`;
+
+      csvContent += "MEMBER DIVIDEND SCHEDULE\n";
+      csvContent += `Member Identifier,${showMemberNames ? 'Member Name,' : ''}Share Capital (NGN),Dividend on Shares (NGN),Thrift Savings (NGN),Interest on Savings (NGN),Deposits (NGN),Interest on Deposits (NGN),Capital Mobilization (NGN),Rebate on Cap. Mob. (NGN),Total Dividend (NGN),Status\n`;
+      rawReportData.dividendProjection?.dividendSchedule?.forEach((m: any) => {
+        csvContent += `"${m.memberIdentifier || 'N/A'}",${showMemberNames ? `"${m.name}",` : ''}${m.shareCapital},${m.shareDividend || 0},${m.thriftSavings},${m.savingsInterest || 0},${m.deposits},${m.depositInterest || 0},${m.capitalMobilization},${m.capitalMobRebate || 0},${m.totalDividend || 0},"${m.status}"\n`;
+      });
+
+      downloadCSV(csvContent, `AGM_Annual_Report_${selectedYear}.csv`);
     }
   };
 
@@ -356,6 +511,170 @@ export default function Reports() {
         </div>
       </div>
 
+      {/* Statutory AGM Report Generator Banner Card */}
+      <div className="card-premium relative overflow-hidden bg-gradient-to-r from-emerald-500/10 via-primary/10 to-amber-500/10 border border-emerald-500/30 p-6 sm:p-8 rounded-3xl no-print shadow-[0_0_50px_rgba(16,185,129,0.05)]">
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl" />
+        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="bg-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-emerald-500/30">
+                Statutory AGM Feature
+              </span>
+              <span className="text-tertiary-text text-xs font-bold">• Full ICA & Statutory Compliance</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tighter text-primary-text">
+              Annual General Meeting (AGM) Comprehensive Packet
+            </h2>
+            <p className="text-sm text-secondary-text leading-relaxed">
+              Synthesize your cooperative's complete statutory AGM report from members records with a single click. Includes Governance, Balance Sheet, P&L, Loan Health, Surety Risk, and Dividend Schedules.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
+            <div className="flex flex-col gap-1 min-w-[120px]">
+              <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest ml-1">Fiscal Year</span>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="w-full bg-surface border border-border rounded-2xl px-5 py-4 text-primary-text text-sm font-black outline-none focus:border-emerald-500 transition-all cursor-pointer"
+              >
+                {years.map((y) => (
+                  <option key={y} value={y} className="bg-background">
+                    FY {y}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="flex flex-col gap-1 min-w-[150px]">
+              <span className="text-[10px] font-black text-tertiary-text uppercase tracking-widest ml-1">Expenses (₦)</span>
+              <input
+                type="number"
+                min="0"
+                placeholder="e.g. 50000"
+                value={agmExpenses}
+                onChange={(e) => setAgmExpenses(e.target.value)}
+                className="w-full bg-surface border border-border rounded-2xl px-5 py-4 text-primary-text text-sm font-bold outline-none focus:border-emerald-500 transition-all"
+              />
+            </div>
+
+            {/* Collapsible Appropriation Configuration */}
+            <details className="w-full lg:w-auto">
+              <summary className="text-[10px] font-black text-emerald-500 uppercase tracking-widest ml-1 cursor-pointer hover:text-emerald-400 transition-colors select-none">
+                ▸ Configure Appropriation Rates
+              </summary>
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                {/* Statutory Rates */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Reserve Fund (%)</span>
+                  <input type="number" min="0" max="100" value={reserveFundRate} onChange={(e) => setReserveFundRate(e.target.value)}
+                    className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Education Fund (%)</span>
+                  <input type="number" min="0" max="100" value={educationFundRate} onChange={(e) => setEducationFundRate(e.target.value)}
+                    className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest ml-1">Share Div. (%)</span>
+                  <input type="number" min="0" max="100" value={shareRate} onChange={(e) => setShareRate(e.target.value)}
+                    className="w-full bg-surface border border-emerald-500/30 rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest ml-1">Savings Int. (%)</span>
+                  <input type="number" min="0" max="100" value={savingsRate} onChange={(e) => setSavingsRate(e.target.value)}
+                    className="w-full bg-surface border border-emerald-500/30 rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest ml-1">Deposit Int. (%)</span>
+                  <input type="number" min="0" max="100" value={depositRate} onChange={(e) => setDepositRate(e.target.value)}
+                    className="w-full bg-surface border border-emerald-500/30 rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest ml-1">Cap. Mob. Rebate (%)</span>
+                  <input type="number" min="0" max="100" value={capitalMobRate} onChange={(e) => setCapitalMobRate(e.target.value)}
+                    className="w-full bg-surface border border-emerald-500/30 rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Committee (%)</span>
+                  <input type="number" min="0" max="100" value={committeeSittingRate} onChange={(e) => setCommitteeSittingRate(e.target.value)}
+                    className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Sec. Hon. (%)</span>
+                  <input type="number" min="0" max="100" value={secretaryHonorariumRate} onChange={(e) => setSecretaryHonorariumRate(e.target.value)}
+                    className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Entertainment (₦)</span>
+                  <input type="number" min="0" value={entertainment} onChange={(e) => setEntertainment(e.target.value)}
+                    className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Stationery (₦)</span>
+                  <input type="number" min="0" value={stationery} onChange={(e) => setStationery(e.target.value)}
+                    className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Prov. Bad Debt (₦)</span>
+                  <input type="number" min="0" value={provisionBadDebt} onChange={(e) => setProvisionBadDebt(e.target.value)}
+                    className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Misc. Expenses (₦)</span>
+                  <input type="number" min="0" value={miscExpenses} onChange={(e) => setMiscExpenses(e.target.value)}
+                    className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                </div>
+              </div>
+
+              {/* Custom Line Items */}
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-1">Custom Line Items</span>
+                  <button
+                    onClick={() => setCustomItems([...customItems, { name: '', amount: '0' }])}
+                    className="text-[9px] font-black text-emerald-500 uppercase tracking-widest hover:text-emerald-400 transition-colors"
+                  >
+                    + Add Item
+                  </button>
+                </div>
+                {customItems.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <input type="text" placeholder="Item name" value={item.name}
+                      onChange={(e) => { const updated = [...customItems]; updated[idx].name = e.target.value; setCustomItems(updated); }}
+                      className="flex-1 bg-surface border border-border rounded-xl px-3 py-2 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                    <input type="number" min="0" placeholder="₦ Amount" value={item.amount}
+                      onChange={(e) => { const updated = [...customItems]; updated[idx].amount = e.target.value; setCustomItems(updated); }}
+                      className="w-28 bg-surface border border-border rounded-xl px-3 py-2 text-primary-text text-xs font-bold outline-none focus:border-emerald-500 transition-all" />
+                    <button onClick={() => setCustomItems(customItems.filter((_, i) => i !== idx))}
+                      className="text-red-400 hover:text-red-300 text-xs font-black px-2">✕</button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Show Member Names Toggle */}
+              <div className="mt-3 flex items-center gap-2">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" checked={showMemberNames} onChange={(e) => setShowMemberNames(e.target.checked)} className="sr-only peer" />
+                  <div className="w-8 h-4 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+                <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest">Show Member Names</span>
+              </div>
+            </details>
+
+            <div className="flex flex-col gap-1 self-end w-full sm:w-auto">
+              <button
+                onClick={() => handleGenerateAGMReport()}
+                disabled={loading}
+                className="flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-600 to-primary text-white hover:opacity-90 px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:tracking-[0.3em] transition-all duration-500 border-none disabled:opacity-50"
+              >
+                <FaAward className="text-lg animate-pulse" />
+                <span>{loading && reportCategory === 'agm' ? 'Synthesizing AGM...' : 'Generate AGM Report'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Protocol Parameter Selector */}
       <div className="card-premium relative overflow-hidden group no-print">
         <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
@@ -373,6 +692,7 @@ export default function Reports() {
                 }}
                 className="w-full bg-surface border border-border rounded-2xl p-4 text-primary-text text-sm outline-none focus:border-primary transition-all font-bold appearance-none cursor-pointer"
               >
+                <option value="agm" className="bg-background font-black text-emerald-500">Statutory AGM Report (Annual Packet)</option>
                 <option value="general" className="bg-background">General Financial Summary</option>
                 <option value="loans" className="bg-background">Granular Loans Portfolio</option>
                 <option value="members" className="bg-background">Granular Members Registry</option>
@@ -563,6 +883,98 @@ export default function Reports() {
                     Highlights members whose total liability in backing active loans exceeds this threshold.
                   </p>
                 </div>
+              )}
+
+              {reportCategory === 'agm' && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-tertiary-text uppercase tracking-widest ml-4">
+                      Operating Expenses (₦)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={agmExpenses}
+                      onChange={(e) => setAgmExpenses(e.target.value)}
+                      className="w-full bg-surface border border-border rounded-2xl p-4 text-primary-text text-sm outline-none focus:border-emerald-500 transition-all font-bold"
+                      placeholder="e.g. 50000"
+                    />
+                    <p className="text-[9px] text-tertiary-text ml-4">
+                      Operating expenses incurred in the year under review.
+                    </p>
+                  </div>
+
+                  <details className="col-span-2" open>
+                    <summary className="text-[10px] font-black text-emerald-500 uppercase tracking-widest ml-4 cursor-pointer hover:text-emerald-400 transition-colors select-none mb-2">
+                      ▸ Appropriation Rates Configuration
+                    </summary>
+                    <div className="grid grid-cols-2 gap-3 px-2">
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">Reserve Fund (%)</label>
+                        <input type="number" min="0" max="100" value={reserveFundRate} onChange={(e) => setReserveFundRate(e.target.value)}
+                          className="w-full bg-surface border border-border rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">Education Fund (%)</label>
+                        <input type="number" min="0" max="100" value={educationFundRate} onChange={(e) => setEducationFundRate(e.target.value)}
+                          className="w-full bg-surface border border-border rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest ml-2">Share Dividend (%)</label>
+                        <input type="number" min="0" max="100" value={shareRate} onChange={(e) => setShareRate(e.target.value)}
+                          className="w-full bg-surface border border-emerald-500/30 rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest ml-2">Savings Interest (%)</label>
+                        <input type="number" min="0" max="100" value={savingsRate} onChange={(e) => setSavingsRate(e.target.value)}
+                          className="w-full bg-surface border border-emerald-500/30 rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest ml-2">Deposit Interest (%)</label>
+                        <input type="number" min="0" max="100" value={depositRate} onChange={(e) => setDepositRate(e.target.value)}
+                          className="w-full bg-surface border border-emerald-500/30 rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest ml-2">Cap. Mob. Rebate (%)</label>
+                        <input type="number" min="0" max="100" value={capitalMobRate} onChange={(e) => setCapitalMobRate(e.target.value)}
+                          className="w-full bg-surface border border-emerald-500/30 rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">Committee Sitting (%)</label>
+                        <input type="number" min="0" max="100" value={committeeSittingRate} onChange={(e) => setCommitteeSittingRate(e.target.value)}
+                          className="w-full bg-surface border border-border rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">Sec. Honorarium (%)</label>
+                        <input type="number" min="0" max="100" value={secretaryHonorariumRate} onChange={(e) => setSecretaryHonorariumRate(e.target.value)}
+                          className="w-full bg-surface border border-border rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">Entertainment (₦)</label>
+                        <input type="number" min="0" value={entertainment} onChange={(e) => setEntertainment(e.target.value)}
+                          className="w-full bg-surface border border-border rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">Stationery (₦)</label>
+                        <input type="number" min="0" value={stationery} onChange={(e) => setStationery(e.target.value)}
+                          className="w-full bg-surface border border-border rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">Prov. Bad Debt (₦)</label>
+                        <input type="number" min="0" value={provisionBadDebt} onChange={(e) => setProvisionBadDebt(e.target.value)}
+                          className="w-full bg-surface border border-border rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-tertiary-text uppercase tracking-widest ml-2">Misc. Expenses (₦)</label>
+                        <input type="number" min="0" value={miscExpenses} onChange={(e) => setMiscExpenses(e.target.value)}
+                          className="w-full bg-surface border border-border rounded-xl p-3 text-primary-text text-xs outline-none focus:border-emerald-500 transition-all font-bold" />
+                      </div>
+                    </div>
+                    <p className="text-[9px] text-tertiary-text ml-4 mt-2">
+                      Individual rates per equity stream. Dividend on shares, interest on savings/deposits, and rebate on capital mobilization are calculated as % of their respective totals.
+                    </p>
+                  </details>
+                </>
               )}
 
               {/* Float synthesize button inside filters row if column allows */}
@@ -1368,6 +1780,630 @@ export default function Reports() {
             </div>
           )}
 
+          {/* ============================================================ */}
+          {/* 6. STATUTORY ANNUAL GENERAL MEETING (AGM) COMPREHENSIVE PACKET */}
+          {/* ============================================================ */}
+          {reportCategory === 'agm' && (
+            <div className="space-y-12">
+              
+              {/* Executive AGM Cover Header */}
+              <div className="card-premium bg-gradient-to-br from-emerald-500/10 via-surface to-primary/5 border-2 border-emerald-500/30 p-8 sm:p-10 rounded-3xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-border/50 pb-8 mb-8">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="bg-emerald-500 text-white text-[10px] font-black uppercase tracking-[0.25em] px-4 py-1.5 rounded-full shadow-sm">
+                        Statutory AGM Packet • FY {data.year || selectedYear}
+                      </span>
+                      <span className="text-secondary-text text-xs font-bold">
+                        ICA Compliant
+                      </span>
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-primary-text">
+                      {data.governance?.cooperativeName || 'Cooperative Society'}
+                    </h2>
+                    <p className="text-sm text-secondary-text mt-1 font-medium">
+                      Subdomain: <span className="font-bold text-primary-text">{data.governance?.subdomain || 'N/A'}</span> • Generated on {new Date(data.generatedAt || Date.now()).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                    <button
+                      onClick={handlePrint}
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-md"
+                    >
+                      <FaPrint /> Print Booklet
+                    </button>
+                    <button
+                      onClick={handleExportCSV}
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 text-white px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-md"
+                    >
+                      <FaDownload /> Export CSV
+                    </button>
+                  </div>
+                </div>
+
+                {/* Governance & Leadership Committee */}
+                <div>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-tertiary-text mb-4 flex items-center gap-2">
+                    <FaBuilding className="text-emerald-500" /> Executive Committee & Registered Admin Officers
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {data.governance?.officers?.map((officer: any, idx: number) => (
+                      <div key={idx} className="bg-surface/80 border border-border/60 p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-black text-primary-text">
+                            {officer.firstName} {officer.lastName}
+                          </p>
+                          <p className="text-xs text-secondary-text">{officer.email || officer.phoneNumber || 'Officer'}</p>
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full border border-emerald-500/20">
+                          {officer.isMainAdmin ? 'Main Admin' : 'Admin'}
+                        </span>
+                      </div>
+                    ))}
+                    {(!data.governance?.officers || data.governance.officers.length === 0) && (
+                      <p className="text-xs text-secondary-text italic">No executive officers found.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 1: MEMBERSHIP DEMOGRAPHICS & GROWTH AUDIT */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-l-4 border-emerald-500 pl-4">
+                  <h3 className="text-xl font-black tracking-tight text-primary-text">
+                    Section 1: Membership Demographics & Growth Audit
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="card-premium border-emerald-500/20">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-xs font-black uppercase tracking-widest text-tertiary-text">Total Registry</span>
+                      <FaUsers className="text-emerald-500 text-xl" />
+                    </div>
+                    <p className="text-3xl font-black text-primary-text">{data.membershipStats?.totalMembers || 0}</p>
+                    <p className="text-xs text-secondary-text mt-2 font-medium">
+                      Active: <span className="text-emerald-500 font-bold">{data.membershipStats?.activeMembers || 0}</span> • Pending: {data.membershipStats?.pendingMembers || 0}
+                    </p>
+                  </div>
+
+                  <div className="card-premium border-blue-500/20">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-xs font-black uppercase tracking-widest text-tertiary-text">New FY Members</span>
+                      <FaUserPlus className="text-blue-500 text-xl" />
+                    </div>
+                    <p className="text-3xl font-black text-primary-text">{data.membershipStats?.newMembersCount || 0}</p>
+                    <p className="text-xs text-secondary-text mt-2 font-medium">
+                      Admitted in FY {data.year || selectedYear}
+                    </p>
+                  </div>
+
+                  <div className="card-premium border-purple-500/20">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-xs font-black uppercase tracking-widest text-tertiary-text">Self-Signup Enrolment</span>
+                      <FaAward className="text-purple-500 text-xl" />
+                    </div>
+                    <p className="text-3xl font-black text-primary-text">{data.membershipStats?.selfSignups || 0}</p>
+                    <p className="text-xs text-secondary-text mt-2 font-medium">
+                      Online Portal Registrations
+                    </p>
+                  </div>
+
+                  <div className="card-premium border-amber-500/20">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-xs font-black uppercase tracking-widest text-tertiary-text">Manual Enrolment</span>
+                      <FaBookReader className="text-amber-500 text-xl" />
+                    </div>
+                    <p className="text-3xl font-black text-primary-text">{data.membershipStats?.manualEnrolments || 0}</p>
+                    <p className="text-xs text-secondary-text mt-2 font-medium">
+                      Executive Admin Enrolments
+                    </p>
+                  </div>
+                </div>
+
+                {data.membershipStats?.newMembersList && data.membershipStats.newMembersList.length > 0 && (
+                  <div className="card-premium">
+                    <h4 className="text-sm font-black uppercase tracking-widest text-tertiary-text mb-4">
+                      New Members Admitted During Fiscal Year ({data.membershipStats.newMembersList.length})
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs text-left">
+                        <thead className="border-b border-border uppercase font-black text-tertiary-text">
+                          <tr>
+                            <th className="py-3">Member Identifier</th>
+                            <th className="py-3">Member Name</th>
+                            <th className="py-3">Email / Phone</th>
+                            <th className="py-3">Enrolment Mode</th>
+                            <th className="py-3 text-right">Join Date</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/40 font-medium">
+                          {data.membershipStats.newMembersList.slice(0, 15).map((member: any, idx: number) => (
+                            <tr key={idx} className="hover:bg-background/40 transition-colors">
+                              <td className="py-3 font-bold text-primary-text">{member.memberIdentifier || 'N/A'}</td>
+                              <td className="py-3 font-black text-primary-text">{member.firstName} {member.lastName}</td>
+                              <td className="py-3 text-secondary-text">{member.email || member.phoneNumber || 'N/A'}</td>
+                              <td className="py-3">
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary">
+                                  {member.isManual ? 'Manual Admin' : 'Self-Signup'}
+                                </span>
+                              </td>
+                              <td className="py-3 text-right text-secondary-text">
+                                {new Date(member.joinDate || member.createdAt).toLocaleDateString('en-NG')}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* SECTION 2: STATEMENT OF FINANCIAL POSITION (BALANCE SHEET) */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-l-4 border-emerald-500 pl-4">
+                  <h3 className="text-xl font-black tracking-tight text-primary-text">
+                    Section 2: Statement of Financial Position (Statutory Balance Sheet)
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Cooperative Assets */}
+                  <div className="card-premium space-y-6 border-emerald-500/30">
+                    <div className="flex items-center justify-between border-b border-border pb-4">
+                      <h4 className="text-sm font-black uppercase tracking-widest text-primary-text flex items-center gap-2">
+                        <FaPiggyBank className="text-emerald-500 text-lg" /> Cooperative Assets (Liquidity & Receivables)
+                      </h4>
+                      <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
+                        Assets
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between py-2 border-b border-border/40">
+                        <span className="text-sm text-secondary-text font-medium">Liquid Bank & Cash Account Balances</span>
+                        <span className="text-base font-black text-primary-text">
+                          {formatCurrency(data.balanceSheet?.assets?.liquidBalances || 0)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-2 border-b border-border/40">
+                        <span className="text-sm text-secondary-text font-medium">Outstanding Loan Portfolio Receivables</span>
+                        <span className="text-base font-black text-primary-text">
+                          {formatCurrency(data.balanceSheet?.assets?.outstandingLoansReceivable || 0)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-4 bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/30">
+                        <span className="text-sm font-black uppercase tracking-widest text-emerald-600">Total Cooperative Assets</span>
+                        <span className="text-xl font-black text-emerald-600">
+                          {formatCurrency(data.balanceSheet?.assets?.aggregateCooperativeAssets || 0)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Members' Equity & Liabilities */}
+                  <div className="card-premium space-y-6 border-primary/30">
+                    <div className="flex items-center justify-between border-b border-border pb-4">
+                      <h4 className="text-sm font-black uppercase tracking-widest text-primary-text flex items-center gap-2">
+                        <FaBalanceScale className="text-primary text-lg" /> Members' Equity & Ledgers
+                      </h4>
+                      <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
+                        Equity & Reserves
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between py-2 border-b border-border/40">
+                        <span className="text-sm text-secondary-text font-medium">Share Capital Pool</span>
+                        <span className="text-base font-black text-primary-text">
+                          {formatCurrency(data.balanceSheet?.equityAndLiabilities?.shareCapital || 0)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-2 border-b border-border/40">
+                        <span className="text-sm text-secondary-text font-medium">Thrift Savings Pool</span>
+                        <span className="text-base font-black text-primary-text">
+                          {formatCurrency(data.balanceSheet?.equityAndLiabilities?.thriftSavings || 0)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-2 border-b border-border/40">
+                        <span className="text-sm text-secondary-text font-medium">General Deposits Pool</span>
+                        <span className="text-base font-black text-primary-text">
+                          {formatCurrency(data.balanceSheet?.equityAndLiabilities?.generalDeposits || 0)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-2 border-b border-border/40">
+                        <span className="text-sm text-secondary-text font-medium">Capital Mobilization Reserves</span>
+                        <span className="text-base font-black text-primary-text">
+                          {formatCurrency(data.balanceSheet?.equityAndLiabilities?.capitalMobilization || 0)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-4 bg-primary/10 p-4 rounded-2xl border border-primary/30">
+                        <span className="text-sm font-black uppercase tracking-widest text-primary-text">Total Member Equity Pool</span>
+                        <span className="text-xl font-black text-primary-text">
+                          {formatCurrency(data.balanceSheet?.equityAndLiabilities?.totalMemberEquity || 0)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 3: INCOME, EXPENDITURE & ANNUAL SURPLUS STATEMENT */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-l-4 border-emerald-500 pl-4">
+                  <h3 className="text-xl font-black tracking-tight text-primary-text">
+                    Section 3: Income, Expenditure & Operating Surplus Statement (P&L)
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">
+                      Loan Interest Earned
+                    </span>
+                    <p className="text-2xl font-black text-emerald-500">
+                      {formatCurrency(data.incomeAndExpenditure?.revenue?.loanInterestEarned || 0)}
+                    </p>
+                    <p className="text-xs text-secondary-text mt-1">From active & repaid loan contracts</p>
+                  </div>
+
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">
+                      Processing Fees Earned
+                    </span>
+                    <p className="text-2xl font-black text-blue-500">
+                      {formatCurrency(data.incomeAndExpenditure?.revenue?.processingFeesEarned || 0)}
+                    </p>
+                    <p className="text-xs text-secondary-text mt-1">Loan origination & processing fees</p>
+                  </div>
+
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">
+                      Other Fee Revenue
+                    </span>
+                    <p className="text-2xl font-black text-purple-500">
+                      {formatCurrency(data.incomeAndExpenditure?.revenue?.otherFeeRevenue || 0)}
+                    </p>
+                    <p className="text-xs text-secondary-text mt-1">Portal & administrative charges</p>
+                  </div>
+                </div>
+
+                {/* Cash Flow Summary Card */}
+                <div className="card-premium bg-gradient-to-r from-surface to-background border-border p-6 rounded-3xl">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-tertiary-text mb-6">
+                    Annual Cash Flow & Operating Surplus Audit
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 items-center">
+                    <div>
+                      <span className="text-xs text-secondary-text block">Total Deposits (Inflows)</span>
+                      <span className="text-lg font-black text-emerald-500">{formatCurrency(data.incomeAndExpenditure?.cashFlow?.totalDeposits || 0)}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs text-secondary-text block">Loan Repayments (Inflows)</span>
+                      <span className="text-lg font-black text-emerald-500">{formatCurrency(data.incomeAndExpenditure?.cashFlow?.totalLoanRepayments || 0)}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs text-secondary-text block">Withdrawals (Outflows)</span>
+                      <span className="text-lg font-black text-red-500">{formatCurrency(data.incomeAndExpenditure?.cashFlow?.totalWithdrawals || 0)}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs text-secondary-text block">Loan Disbursements (Outflows)</span>
+                      <span className="text-lg font-black text-red-500">{formatCurrency(data.incomeAndExpenditure?.cashFlow?.totalLoanDisbursements || 0)}</span>
+                    </div>
+                    <div className={`p-4 rounded-2xl border ${
+                      (data.incomeAndExpenditure?.cashFlow?.netCashFlow || 0) >= 0 
+                        ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-600' 
+                        : 'bg-red-500/10 border-red-500/40 text-red-600'
+                    }`}>
+                      <span className="text-[10px] font-black uppercase tracking-widest block">Net FY Cash Flow Surplus</span>
+                      <span className="text-xl font-black">{formatCurrency(data.incomeAndExpenditure?.cashFlow?.netCashFlow || 0)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: CREDIT COMMITTEE PORTFOLIO HEALTH & SURETY AUDIT */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-l-4 border-emerald-500 pl-4">
+                  <h3 className="text-xl font-black tracking-tight text-primary-text">
+                    Section 4: Credit Committee Portfolio Health & Surety Risk Audit
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">FY Loans Issued</span>
+                    <p className="text-2xl font-black text-primary-text">{data.loanPortfolio?.totalLoansIssuedCount || 0}</p>
+                    <p className="text-xs font-bold text-emerald-500 mt-1">{formatCurrency(data.loanPortfolio?.totalLoansIssuedAmount || 0)}</p>
+                  </div>
+
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">Active Portfolio</span>
+                    <p className="text-2xl font-black text-blue-500">{data.loanPortfolio?.activeLoansCount || 0} Loans</p>
+                    <p className="text-xs font-bold text-secondary-text mt-1">{formatCurrency(data.loanPortfolio?.activeLoansAmount || 0)} Outstanding</p>
+                  </div>
+
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">Completed / Repaid</span>
+                    <p className="text-2xl font-black text-emerald-500">{data.loanPortfolio?.completedLoansCount || 0}</p>
+                    <p className="text-xs text-secondary-text mt-1">Successfully retired loans</p>
+                  </div>
+
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">Delinquency Rate</span>
+                    <p className={`text-2xl font-black ${(data.loanPortfolio?.delinquencyRate || 0) > 5 ? 'text-red-500' : 'text-emerald-500'}`}>
+                      {data.loanPortfolio?.delinquencyRate || 0}%
+                    </p>
+                    <p className="text-xs text-secondary-text mt-1">{data.loanPortfolio?.defaultedLoansCount || 0} Defaulted loans</p>
+                  </div>
+                </div>
+
+                {/* Surety & Guarantor Risk Card */}
+                <div className="card-premium bg-surface border border-border p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="space-y-1">
+                    <h4 className="text-base font-black text-primary-text flex items-center gap-2">
+                      <FaShieldAlt className="text-amber-500" /> Supervisory Committee Surety & Guarantor Risk Exposure
+                    </h4>
+                    <p className="text-xs text-secondary-text">
+                      Combined exposure across {data.suretyRisk?.totalGuarantorsCount || 0} active guarantors
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="text-right">
+                      <span className="text-[10px] uppercase font-black tracking-wider text-tertiary-text block">Total Guaranteed Liability</span>
+                      <span className="text-lg font-black text-primary-text">{formatCurrency(data.suretyRisk?.totalGuaranteedLiability || 0)}</span>
+                    </div>
+                    <div className="text-right pl-6 border-l border-border">
+                      <span className="text-[10px] uppercase font-black tracking-wider text-tertiary-text block">&gt; ₦500k High-Risk Guarantors</span>
+                      <span className="text-lg font-black text-amber-500">{data.suretyRisk?.highRiskGuarantorsCount || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 5: PROPOSED APPROPRIATION ACCOUNT & MEMBER DIVIDEND SCHEDULE */}
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 border-emerald-500 pl-4">
+                  <div>
+                    <h3 className="text-xl font-black tracking-tight text-primary-text">
+                      Section 5: Proposed Appropriation Account & Member Dividend Schedule
+                    </h3>
+                    <p className="text-xs text-secondary-text mt-1">
+                      Industry-standard surplus appropriation with individual dividend/interest rates per equity stream. General Reserve is the balancing figure.
+                    </p>
+                  </div>
+                  {data.dividendProjection?.appropriationAccount?.isOverAppropriated && (
+                    <span className="text-xs font-black uppercase tracking-wider bg-red-500/10 text-red-500 px-4 py-2 rounded-xl border border-red-500/20 animate-pulse">
+                      ⚠ Over-Appropriated
+                    </span>
+                  )}
+                </div>
+
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">Net Operating Surplus</span>
+                    <p className="text-2xl font-black text-emerald-500">
+                      {formatCurrency(data.dividendProjection?.appropriationAccount?.netSurplus || data.incomeAndExpenditure?.cashFlow?.netOperatingSurplus || 0)}
+                    </p>
+                    <p className="text-xs text-secondary-text mt-1">Surplus available for appropriation</p>
+                  </div>
+
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">Total Appropriated</span>
+                    <p className="text-2xl font-black text-blue-500">
+                      {formatCurrency(data.dividendProjection?.appropriationAccount?.totalAppropriated || 0)}
+                    </p>
+                    <p className="text-xs text-secondary-text mt-1">Sum of all appropriation items</p>
+                  </div>
+
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">Total Member Dividends</span>
+                    <p className="text-2xl font-black text-emerald-600">
+                      {formatCurrency(data.dividendProjection?.dividendTotals?.grandTotalDividends || 0)}
+                    </p>
+                    <p className="text-xs text-secondary-text mt-1">Across all 4 equity streams</p>
+                  </div>
+
+                  <div className="card-premium">
+                    <span className="text-xs font-black uppercase tracking-widest text-tertiary-text block mb-2">General Reserve</span>
+                    <p className={`text-2xl font-black ${(data.dividendProjection?.appropriationAccount?.generalReserve || 0) < 0 ? 'text-red-500' : 'text-primary-text'}`}>
+                      {formatCurrency(data.dividendProjection?.appropriationAccount?.generalReserve || 0)}
+                    </p>
+                    <p className="text-xs text-secondary-text mt-1">Balancing figure (surplus − appropriations)</p>
+                  </div>
+                </div>
+
+                {/* PROPOSED APPROPRIATION ACCOUNT TABLE */}
+                <div className="card-premium">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-primary-text mb-4 border-b border-border pb-3">
+                    Proposed Appropriation Account for the Year {data.year || ''}
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead className="border-b-2 border-emerald-500/30 uppercase font-black text-tertiary-text">
+                        <tr>
+                          <th className="py-3.5 w-12">S/N</th>
+                          <th className="py-3.5">Narration</th>
+                          <th className="py-3.5 text-center">Rate</th>
+                          <th className="py-3.5 text-right">Amount (₦)</th>
+                          <th className="py-3.5 text-right">Net Surplus (₦)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/40 font-medium">
+                        {/* Net Surplus Header Row */}
+                        <tr className="bg-emerald-500/5">
+                          <td className="py-3.5"></td>
+                          <td className="py-3.5 font-black text-emerald-600">Net Surplus</td>
+                          <td className="py-3.5"></td>
+                          <td className="py-3.5"></td>
+                          <td className="py-3.5 text-right font-black text-emerald-600 text-sm">
+                            {formatCurrency(data.dividendProjection?.appropriationAccount?.netSurplus || 0)}
+                          </td>
+                        </tr>
+
+                        {/* Line Items */}
+                        {data.dividendProjection?.appropriationAccount?.lineItems?.map((item: any, idx: number) => (
+                          <tr key={idx} className="hover:bg-background/40 transition-colors">
+                            <td className="py-3.5 text-tertiary-text">{idx + 1}.</td>
+                            <td className="py-3.5 font-bold text-primary-text">{item.name}</td>
+                            <td className="py-3.5 text-center">
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                item.rate === 'Fixed' 
+                                  ? 'bg-blue-500/10 text-blue-500'
+                                  : 'bg-emerald-500/10 text-emerald-500'
+                              }`}>
+                                {item.rate}
+                              </span>
+                            </td>
+                            <td className="py-3.5 text-right font-bold text-primary-text">
+                              {formatCurrency(item.amount || 0)}
+                            </td>
+                            <td className="py-3.5"></td>
+                          </tr>
+                        ))}
+
+                        {/* General Reserve (Balancing Figure) */}
+                        <tr className={`${(data.dividendProjection?.appropriationAccount?.generalReserve || 0) < 0 ? 'bg-red-500/5' : 'bg-blue-500/5'}`}>
+                          <td className="py-3.5 text-tertiary-text">
+                            {(data.dividendProjection?.appropriationAccount?.lineItems?.length || 0) + 1}.
+                          </td>
+                          <td className="py-3.5 font-black text-primary-text">General Reserve (Balancing Figure)</td>
+                          <td className="py-3.5 text-center">
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/10 text-purple-500">
+                              Balance
+                            </span>
+                          </td>
+                          <td className={`py-3.5 text-right font-black text-sm ${(data.dividendProjection?.appropriationAccount?.generalReserve || 0) < 0 ? 'text-red-500' : 'text-primary-text'}`}>
+                            {formatCurrency(data.dividendProjection?.appropriationAccount?.generalReserve || 0)}
+                          </td>
+                          <td className="py-3.5"></td>
+                        </tr>
+
+                        {/* Total Row */}
+                        <tr className="border-t-2 border-emerald-500/30 bg-emerald-500/5">
+                          <td className="py-4"></td>
+                          <td className="py-4 font-black text-emerald-600 text-sm uppercase tracking-wider">TOTAL</td>
+                          <td className="py-4"></td>
+                          <td className="py-4 text-right font-black text-emerald-600 text-sm">
+                            {formatCurrency(data.dividendProjection?.appropriationAccount?.netSurplus || 0)}
+                          </td>
+                          <td className="py-4 text-right font-black text-emerald-600 text-sm">
+                            {formatCurrency(data.dividendProjection?.appropriationAccount?.netSurplus || 0)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Dividend Rates Summary */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="card-premium text-center">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-tertiary-text block mb-1">Share Dividend</span>
+                    <p className="text-lg font-black text-emerald-500">{data.dividendProjection?.dividendRates?.shareRate || 0}%</p>
+                    <p className="text-[9px] text-secondary-text mt-1">{formatCurrency(data.dividendProjection?.dividendTotals?.totalShareDividend || 0)}</p>
+                  </div>
+                  <div className="card-premium text-center">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-tertiary-text block mb-1">Savings Interest</span>
+                    <p className="text-lg font-black text-blue-500">{data.dividendProjection?.dividendRates?.savingsRate || 0}%</p>
+                    <p className="text-[9px] text-secondary-text mt-1">{formatCurrency(data.dividendProjection?.dividendTotals?.totalSavingsInterest || 0)}</p>
+                  </div>
+                  <div className="card-premium text-center">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-tertiary-text block mb-1">Deposit Interest</span>
+                    <p className="text-lg font-black text-purple-500">{data.dividendProjection?.dividendRates?.depositRate || 0}%</p>
+                    <p className="text-[9px] text-secondary-text mt-1">{formatCurrency(data.dividendProjection?.dividendTotals?.totalDepositInterest || 0)}</p>
+                  </div>
+                  <div className="card-premium text-center">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-tertiary-text block mb-1">Cap. Mob. Rebate</span>
+                    <p className="text-lg font-black text-amber-500">{data.dividendProjection?.dividendRates?.capitalMobRate || 0}%</p>
+                    <p className="text-[9px] text-secondary-text mt-1">{formatCurrency(data.dividendProjection?.dividendTotals?.totalCapMobRebate || 0)}</p>
+                  </div>
+                </div>
+
+                {/* MEMBER DIVIDEND SCHEDULE TABLE */}
+                <div className="card-premium">
+                  <div className="flex items-center justify-between mb-4 border-b border-border pb-3">
+                    <h4 className="text-sm font-black uppercase tracking-widest text-primary-text">
+                      Member Dividend Schedule ({data.dividendProjection?.eligibleMembersCount || 0} Eligible Members)
+                    </h4>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <span className="text-[9px] font-black text-tertiary-text uppercase tracking-widest">Names</span>
+                      <div className="relative inline-flex items-center">
+                        <input type="checkbox" checked={showMemberNames} onChange={(e) => setShowMemberNames(e.target.checked)} className="sr-only peer" />
+                        <div className="w-8 h-4 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
+                      </div>
+                    </label>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead className="border-b border-border uppercase font-black text-tertiary-text">
+                        <tr>
+                          <th className="py-3.5">Member ID</th>
+                          {showMemberNames && <th className="py-3.5">Name</th>}
+                          <th className="py-3.5 text-right">Share Cap. (₦)</th>
+                          <th className="py-3.5 text-right">Div. on Shares (₦)</th>
+                          <th className="py-3.5 text-right">Thrift Sav. (₦)</th>
+                          <th className="py-3.5 text-right">Int. on Savings (₦)</th>
+                          <th className="py-3.5 text-right">Deposits (₦)</th>
+                          <th className="py-3.5 text-right">Int. on Deposits (₦)</th>
+                          <th className="py-3.5 text-right">Cap. Mob. (₦)</th>
+                          <th className="py-3.5 text-right">Rebate (₦)</th>
+                          <th className="py-3.5 text-right font-black text-emerald-600">Total Div. (₦)</th>
+                          <th className="py-3.5 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/40 font-medium">
+                        {data.dividendProjection?.dividendSchedule && data.dividendProjection.dividendSchedule.length > 0 ? (
+                          data.dividendProjection.dividendSchedule.map((member: any, idx: number) => (
+                            <tr key={idx} className="hover:bg-background/40 transition-colors">
+                              <td className="py-3.5 font-bold text-primary-text">{member.memberIdentifier || 'N/A'}</td>
+                              {showMemberNames && <td className="py-3.5 font-black text-primary-text">{member.name}</td>}
+                              <td className="py-3.5 text-right text-secondary-text">{formatCurrency(member.shareCapital || 0)}</td>
+                              <td className="py-3.5 text-right font-bold text-emerald-600">{formatCurrency(member.shareDividend || 0)}</td>
+                              <td className="py-3.5 text-right text-secondary-text">{formatCurrency(member.thriftSavings || 0)}</td>
+                              <td className="py-3.5 text-right font-bold text-blue-500">{formatCurrency(member.savingsInterest || 0)}</td>
+                              <td className="py-3.5 text-right text-secondary-text">{formatCurrency(member.deposits || 0)}</td>
+                              <td className="py-3.5 text-right font-bold text-purple-500">{formatCurrency(member.depositInterest || 0)}</td>
+                              <td className="py-3.5 text-right text-secondary-text">{formatCurrency(member.capitalMobilization || 0)}</td>
+                              <td className="py-3.5 text-right font-bold text-amber-500">{formatCurrency(member.capitalMobRebate || 0)}</td>
+                              <td className="py-3.5 text-right font-black text-emerald-600 text-sm">{formatCurrency(member.totalDividend || 0)}</td>
+                              <td className="py-3.5 text-center">
+                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                  member.status === 'active' || !member.status
+                                    ? 'bg-emerald-500/10 text-emerald-500'
+                                    : 'bg-amber-500/10 text-amber-500'
+                                }`}>
+                                  {member.status || 'Active'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={showMemberNames ? 12 : 11} className="py-8 text-center text-secondary-text italic">
+                              No members with active contributions found for dividend schedule.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Statutory AGM Footer Note */}
+                <div className="card-premium bg-surface/60 border border-border/60 p-6 rounded-2xl text-center">
+                  <p className="text-xs text-secondary-text">
+                    This Statutory AGM Report is compiled from real-time member records, transaction ledgers, and loan schedules on the platform in accordance with Cooperative Societies Act standards.
+                    Dividends on shares, interest on savings/deposits, and rebates on capital mobilization are calculated individually per equity stream at the rates approved by the General Meeting.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          )}
         </div>
       )}
 

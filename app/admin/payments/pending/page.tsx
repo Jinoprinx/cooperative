@@ -28,6 +28,8 @@ export default function PendingPaymentsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPendingTransactions = async () => {
@@ -56,6 +58,8 @@ export default function PendingPaymentsPage() {
       setError('Only the main admin can approve payments made on behalf of manual members.');
       return;
     }
+    if (approvingId) return;
+    setApprovingId(transaction._id);
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transactions/approve/${transaction._id}`, {}, {
@@ -66,6 +70,8 @@ export default function PendingPaymentsPage() {
       setTransactions(transactions.filter(t => t._id !== transaction._id));
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to approve payment.');
+    } finally {
+      setApprovingId(null);
     }
   };
 
@@ -74,6 +80,8 @@ export default function PendingPaymentsPage() {
       setError('Only the main admin can reject payments made on behalf of manual members.');
       return;
     }
+    if (rejectingId) return;
+    setRejectingId(transaction._id);
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transactions/reject/${transaction._id}`, {}, {
@@ -84,6 +92,8 @@ export default function PendingPaymentsPage() {
       setTransactions(transactions.filter(t => t._id !== transaction._id));
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to reject payment.');
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -179,10 +189,18 @@ export default function PendingPaymentsPage() {
                            Doc
                          </button>
                          <div className="flex gap-2 p-1 bg-surface rounded-xl border border-border">
-                            <button onClick={() => handleApprove(transaction)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all">
+                            <button 
+                              onClick={() => handleApprove(transaction)} 
+                              disabled={approvingId === transaction._id || rejectingId === transaction._id}
+                              className="w-9 h-9 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all disabled:opacity-40"
+                            >
                                <div className="w-2.5 h-2.5 border-b-2 border-r-2 border-current rotate-45 mb-1" />
                             </button>
-                            <button onClick={() => handleReject(transaction)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all relative">
+                            <button 
+                              onClick={() => handleReject(transaction)} 
+                              disabled={approvingId === transaction._id || rejectingId === transaction._id}
+                              className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all relative disabled:opacity-40"
+                            >
                                <div className="w-3 h-0.5 bg-current rotate-45 absolute" />
                                <div className="w-3 h-0.5 bg-current -rotate-45 absolute" />
                             </button>

@@ -86,9 +86,9 @@ export default function MemberPaymentLedger() {
       setDescription('');
       setFile(null);
       fetchPaymentRecords();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      alert('Failed to upload receipt');
+      alert(error.response?.data?.message || 'Failed to upload receipt');
     } finally {
       setUploading(false);
     }

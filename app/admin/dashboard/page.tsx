@@ -55,6 +55,7 @@ export default function AdminDashboard() {
   const [initialDepositAmount, setInitialDepositAmount] = useState('');
   const [initialLoanBalance, setInitialLoanBalance] = useState('');
   const [approvingRegistration, setApprovingRegistration] = useState(false);
+  const [approvingPaymentId, setApprovingPaymentId] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
   const paymentStatus = searchParams.get('payment');
@@ -186,6 +187,8 @@ export default function AdminDashboard() {
   };
 
   const handleApprovePayment = async (paymentId: string) => {
+    if (approvingPaymentId) return;
+    setApprovingPaymentId(paymentId);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -203,9 +206,11 @@ export default function AdminDashboard() {
       setPendingPayments((prevPayments) =>
         prevPayments.filter((payment) => payment._id !== paymentId)
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error approving payment:", error);
-      setError("Failed to approve payment. Please try again.");
+      setError(error.response?.data?.message || "Failed to approve payment. Please try again.");
+    } finally {
+      setApprovingPaymentId(null);
     }
   };
 
@@ -769,7 +774,13 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="flex items-center gap-3">
                     <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex-1 btn-secondary text-[10px] py-2 px-0">View Receipt</a>
-                    <button onClick={() => handleApprovePayment(payment._id)} className="flex-1 btn-primary text-[10px] py-2 px-0 bg-emerald-600 hover:bg-emerald-500 shadow-none border-none">Approve</button>
+                    <button 
+                      onClick={() => handleApprovePayment(payment._id)} 
+                      disabled={approvingPaymentId === payment._id}
+                      className="flex-1 btn-primary text-[10px] py-2 px-0 bg-emerald-600 hover:bg-emerald-500 shadow-none border-none disabled:opacity-50"
+                    >
+                      {approvingPaymentId === payment._id ? "Approving..." : "Approve"}
+                    </button>
                     <button onClick={() => openRejectModal(payment._id)} className="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 transition-colors">
                       <FaExclamationTriangle className="h-4 w-4" />
                     </button>

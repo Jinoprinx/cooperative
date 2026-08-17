@@ -237,22 +237,27 @@ export default function Dashboard() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Account Balance Card */}
-        <div className="card-premium group relative overflow-hidden bg-surface">
+        <div className="card-premium group relative overflow-hidden bg-surface flex flex-col justify-between">
           <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Total Assets</p>
-              <h3 className="text-3xl font-black text-primary-text tracking-tighter shadow-glow-sm">{formatCurrency(user?.accountBalance || 0)}</h3>
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <p className="text-tertiary-text text-[10px] font-black uppercase tracking-widest leading-none mb-1">Total Assets</p>
+                <h3 className="text-3xl font-black text-primary-text tracking-tighter shadow-glow-sm">{formatCurrency(user?.accountBalance || 0)}</h3>
+              </div>
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+                <FaMoneyBillWave className="h-6 w-6" />
+              </div>
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-              <FaMoneyBillWave className="h-6 w-6" />
+            <div className="flex flex-col">
+              <span className="text-tertiary-text/40 text-[10px] font-black uppercase tracking-widest mb-1">Member ID / Account No.</span>
+              <p className="text-sm font-mono font-bold text-secondary-text tracking-wider">
+                {user?.memberIdentifier ? `${user.memberIdentifier} • ` : ''}{user?.accountNumber}
+              </p>
             </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-tertiary-text/40 text-[10px] font-black uppercase tracking-widest mb-1">Member ID / Account No.</span>
-            <p className="text-sm font-mono font-bold text-secondary-text tracking-wider">
-              {user?.memberIdentifier ? `${user.memberIdentifier} • ` : ''}{user?.accountNumber}
-            </p>
+          <div className="pt-4 mt-4 border-t border-border/40">
+            <PayNowButton size="sm" />
           </div>
         </div>
 
