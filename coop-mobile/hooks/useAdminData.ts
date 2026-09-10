@@ -18,6 +18,9 @@ export function useAdminData() {
       return res.data as AdminStats;
     },
     enabled: isAuthenticated,
+    staleTime: 0,              // Always treat data as stale — refetch on every mount
+    refetchOnMount: 'always',  // Refetch even if data is cached when screen is visited
+    refetchInterval: 30_000,   // Auto-refresh every 30 seconds while on the dashboard
   });
 
   return { 
@@ -27,3 +30,4 @@ export function useAdminData() {
     refetch 
   };
 }
+

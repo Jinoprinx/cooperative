@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   FaUsers,
@@ -71,75 +71,86 @@ export default function AdminDashboard() {
     }
   }, [paymentStatus]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Authentication required. Please log in.');
-          setLoading(false);
-          return;
-        }
-
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-
-        // Fetch members for recent members
-        const membersResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`, config);
-        const members: Member[] = membersResponse.data.members;
-        const sortedMembers = members
-          .sort((a, b) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime())
-          .slice(0, 3);
-        setRecentMembers(sortedMembers);
-
-        // Fetch loans for pending loans
-        const loansResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans/pending`, config);
-        const loans: Loan[] = loansResponse.data;
-        const pending = loans
-          .filter(loan => loan.status === 'pending')
-          .slice(0, 3)
-          .map(loan => ({
-            ...loan,
-            // Use populated user from loan object if available, otherwise fallback to member search
-            user: (typeof loan.user === 'object' && loan.user !== null)
-              ? loan.user
-              : (members.find(m => m._id === (loan.memberId || loan.user)) || { _id: '', firstName: 'Unknown', lastName: '', accountNumber: '' }),
-            createdAt: loan.createdAt || new Date().toISOString().split('T')[0],
-          }));
-        setPendingLoans(pending);
-
-        // Fetch stats
-        const statsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats`, config);
-        setStats(statsResponse.data);
-
-        // Fetch recent transactions
-        const transactionsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transactions`, config);
-        const allTransactions = transactionsResponse.data.map((t: any) => ({ ...t, type: t.type || 'transaction' }));
-
-        const allLoans = loans.map((l: any) => ({ ...l, type: 'loan' }));
-
-        const combined = [...allTransactions, ...allLoans]
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-          .slice(0, 5);
-
-        setRecentTransactions(combined);
-
-        // Fetch pending payments
-        const pendingPaymentsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/pending-payments`, config);
-        setPendingPayments(pendingPaymentsResponse.data.pendingPayments);
-
-        // Fetch pending registrations
-        const pendingRegistrationsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/registrations/pending`, config);
-        setPendingRegistrations(pendingRegistrationsResponse.data);
-
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        setError('Failed to load dashboard data. Please try again.');
-        setLoading(false);
+  const fetchData = useCallback(async (showLoadingSpinner = true) => {
+    try {
+      if (showLoadingSpinner) {
+        setLoading(true);
       }
-    };
-    fetchData();
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Authentication required. Please log in.');
+        setLoading(false);
+        return;
+      }
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      // Fetch latest registered members for the New Members card
+      const membersResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/members`, {
+        params: { sortBy: 'createdAt', sortOrder: 'desc', limit: 10 },
+        ...config
+      });
+      const members: Member[] = membersResponse.data.members || [];
+      const sortedMembers = [...members]
+        .sort((a, b) => {
+          const dateA = new Date(a.createdAt || a.joinDate || 0).getTime();
+          const dateB = new Date(b.createdAt || b.joinDate || 0).getTime();
+          return dateB - dateA;
+        })
+        .slice(0, 5);
+      setRecentMembers(sortedMembers);
+
+      // Fetch loans for pending loans
+      const loansResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/loans/pending`, config);
+      const loans: Loan[] = loansResponse.data;
+      const pending = loans
+        .filter(loan => loan.status === 'pending')
+        .slice(0, 3)
+        .map(loan => ({
+          ...loan,
+          // Use populated user from loan object if available, otherwise fallback to member search
+          user: (typeof loan.user === 'object' && loan.user !== null)
+            ? loan.user
+            : (members.find(m => m._id === (loan.memberId || loan.user)) || { _id: '', firstName: 'Unknown', lastName: '', accountNumber: '' }),
+          createdAt: loan.createdAt || new Date().toISOString().split('T')[0],
+        }));
+      setPendingLoans(pending);
+
+      // Fetch stats
+      const statsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats`, config);
+      setStats(statsResponse.data);
+
+      // Fetch recent transactions
+      const transactionsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transactions`, config);
+      const allTransactions = transactionsResponse.data.map((t: any) => ({ ...t, type: t.type || 'transaction' }));
+
+      const allLoans = loans.map((l: any) => ({ ...l, type: 'loan' }));
+
+      const combined = [...allTransactions, ...allLoans]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
+
+      setRecentTransactions(combined);
+
+      // Fetch pending payments
+      const pendingPaymentsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/pending-payments`, config);
+      setPendingPayments(pendingPaymentsResponse.data.pendingPayments || []);
+
+      // Fetch pending registrations
+      const pendingRegistrationsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/admin/registrations/pending`, config);
+      setPendingRegistrations(pendingRegistrationsResponse.data || []);
+
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      setError('Failed to load dashboard data. Please try again.');
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   if (loading) {
     return (
@@ -206,6 +217,7 @@ export default function AdminDashboard() {
       setPendingPayments((prevPayments) =>
         prevPayments.filter((payment) => payment._id !== paymentId)
       );
+      fetchData(false);
     } catch (error: any) {
       console.error("Error approving payment:", error);
       setError(error.response?.data?.message || "Failed to approve payment. Please try again.");
@@ -238,6 +250,7 @@ export default function AdminDashboard() {
       setShowRejectionModal(false);
       setRejectionReason('');
       setSelectedPaymentId(null);
+      fetchData(false);
     } catch (error) {
       console.error("Error rejecting payment:", error);
       setError("Failed to reject payment. Please try again.");
@@ -269,6 +282,7 @@ export default function AdminDashboard() {
       setPendingLoans((prevLoans) =>
         prevLoans.filter((loan) => loan._id !== loanId)
       );
+      fetchData(false);
     } catch (error: any) {
       console.error("Error approving loan:", error);
       const message = error.response?.data?.message || "";
@@ -310,6 +324,7 @@ export default function AdminDashboard() {
       setShowLoanRejectionModal(false);
       setLoanRejectionReason('');
       setSelectedLoanId(null);
+      fetchData(false);
     } catch (error) {
       console.error("Error rejecting loan:", error);
       setError("Failed to reject loan. Please try again.");
@@ -358,6 +373,7 @@ export default function AdminDashboard() {
       setSelectedRegistrationId(null);
       setInitialDepositAmount('');
       setInitialLoanBalance('');
+      fetchData(false);
     } catch (error) {
       console.error("Error approving registration:", error);
       setError("Failed to approve registration. Please try again.");
@@ -384,6 +400,7 @@ export default function AdminDashboard() {
       setPendingRegistrations((prevRegistrations) =>
         prevRegistrations.filter((user) => user._id !== userId)
       );
+      fetchData(false);
     } catch (error) {
       console.error("Error rejecting registration:", error);
       setError("Failed to reject registration. Please try again.");
@@ -689,22 +706,34 @@ export default function AdminDashboard() {
               <h2 className="text-lg font-black text-primary-text tracking-tight uppercase tracking-widest">New Members</h2>
             </div>
             <div className="p-4 space-y-4">
-              {recentMembers.map((member) => (
-                <div key={member._id} className="flex items-center gap-4 bg-surface p-4 rounded-3xl border border-border hover:border-primary/30 transition-all duration-300">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center font-black text-primary text-xs border border-primary/20">
-                    {member.firstName[0]}{member.lastName[0]}
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <p className="font-bold text-primary-text text-sm truncate">{member.firstName} {member.lastName}</p>
-                    <p className="text-[10px] text-tertiary-text font-black tracking-tighter uppercase">
-                      {member.memberIdentifier ? `ID: ${member.memberIdentifier} • ` : ''}{member.accountNumber}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-black text-primary">{formatCurrency(member.accountBalance)}</p>
-                  </div>
+              {recentMembers.length > 0 ? (
+                recentMembers.map((member) => {
+                  const initialFirst = (member.firstName?.[0] || 'M').toUpperCase();
+                  const initialLast = (member.lastName?.[0] || '').toUpperCase();
+                  const fullName = `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Unnamed Member';
+
+                  return (
+                    <div key={member._id} className="flex items-center gap-4 bg-surface p-4 rounded-3xl border border-border hover:border-primary/30 transition-all duration-300">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center font-black text-primary text-xs border border-primary/20">
+                        {initialFirst}{initialLast}
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="font-bold text-primary-text text-sm truncate">{fullName}</p>
+                        <p className="text-[10px] text-tertiary-text font-black tracking-tighter uppercase">
+                          {member.memberIdentifier ? `ID: ${member.memberIdentifier} • ` : ''}{member.accountNumber || member.phoneNumber}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-black text-primary">{formatCurrency(member.accountBalance || 0)}</p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="p-6 text-center text-tertiary-text italic text-xs font-medium">
+                  No recent members recorded.
                 </div>
-              ))}
+              )}
               <Link href="/admin/members" className="block text-center text-[10px] font-black text-tertiary-text uppercase tracking-[0.2em] py-4 hover:text-primary transition-colors">
                 View Directory
               </Link>

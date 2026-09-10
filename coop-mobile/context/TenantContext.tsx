@@ -34,15 +34,21 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     const load = async () => {
       try {
         const stored = await storage.getTenant();
+        console.log('[TenantContext] Stored tenant from SecureStore:', stored);
         if (stored) {
           setTenant(stored);
           try {
             const res = await api.get(`/tenants/resolve?subdomain=${stored.subdomain}`);
+            console.log('[TenantContext] Resolved tenant details:', res.data?.name);
             setTenantDetails(res.data);
-          } catch (e) {
-            console.warn('Could not load tenant details on mount', e);
+          } catch (e: any) {
+            console.warn('[TenantContext] Could not load tenant details on mount:', e?.message || e);
           }
+        } else {
+          console.log('[TenantContext] No tenant stored — showing landing screen');
         }
+      } catch (e: any) {
+        console.error('[TenantContext] Error reading stored tenant:', e?.message || e);
       } finally {
         setIsLoading(false);
       }
@@ -71,8 +77,15 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const searchTenants = async (query: string): Promise<Tenant[]> => {
     const q = query.trim();
     if (q.length < 2) return [];
-    const res = await api.get(`/tenants/search?q=${encodeURIComponent(q)}`);
-    return Array.isArray(res.data) ? res.data : [];
+    console.log('[TenantContext] Searching tenants for:', q);
+    try {
+      const res = await api.get(`/tenants/search?q=${encodeURIComponent(q)}`);
+      console.log('[TenantContext] Search results count:', Array.isArray(res.data) ? res.data.length : 'non-array response');
+      return Array.isArray(res.data) ? res.data : [];
+    } catch (e: any) {
+      console.error('[TenantContext] Search failed:', e?.message || e);
+      throw e;
+    }
   };
 
   return (

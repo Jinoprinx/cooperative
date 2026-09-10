@@ -29,6 +29,7 @@ export type Member = {
   accountNumber: string;
   memberIdentifier?: string;
   joinDate: string;
+  createdAt?: string;
   accountBalance: number;
   /** Balance that existed before the passbook system was introduced (legacy balance). */
   prePassbookBalance?: number;

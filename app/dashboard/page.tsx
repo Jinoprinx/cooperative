@@ -1,6 +1,6 @@
 'use client';
 
-import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle, FaBell, FaTimes, FaShieldAlt, FaKey, FaBullhorn } from 'react-icons/fa';
+import { FaMoneyBillWave, FaHistory, FaArrowUp, FaArrowDown, FaHandHoldingUsd, FaUserCircle, FaBell, FaTimes, FaShieldAlt, FaKey, FaBullhorn, FaEye, FaEyeSlash } from 'react-icons/fa';
 import Link from 'next/link';
 import { useUser } from '@/app/hooks/useUser';
 import { useDashboardData } from '@/app/hooks/useDashboardData';
@@ -23,6 +23,7 @@ export default function Dashboard() {
   const { updateUser, logout } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifLoading, setNotifLoading] = useState(true);
+  const [balanceVisible, setBalanceVisible] = useState(true);
 
   // Announcement states
   const [announcement, setAnnouncement] = useState<any>(null);
@@ -242,8 +243,21 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
               <div className="min-w-0">
-                <p className="text-tertiary-text text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest leading-none mb-1">Total Assets</p>
-                <h3 className="text-2xl sm:text-3xl font-black text-primary-text tracking-tighter shadow-glow-sm truncate">{formatCurrency(user?.accountBalance || 0)}</h3>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <p className="text-tertiary-text text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest leading-none">Total Assets</p>
+                  <button
+                    onClick={() => setBalanceVisible(prev => !prev)}
+                    className="text-tertiary-text/60 hover:text-tertiary-text transition-colors duration-200 flex-shrink-0"
+                    aria-label={balanceVisible ? 'Hide balance' : 'Show balance'}
+                  >
+                    {balanceVisible ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black text-primary-text tracking-tighter truncate">
+                  {balanceVisible
+                    ? formatCurrency(user?.accountBalance || 0)
+                    : <span className="tracking-[0.25em]">*****</span>}
+                </h3>
               </div>
               <div className="w-11 h-11 sm:w-14 sm:h-14 shrink-0 rounded-xl sm:rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                 <FaMoneyBillWave className="h-5 w-5 sm:h-6 sm:w-6" />

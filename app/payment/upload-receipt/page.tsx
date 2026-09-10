@@ -5,12 +5,14 @@ import axios from 'axios';
 import { useAuth } from '@/app/context/AuthContext';
 import { useTenant } from '@/app/context/TenantContext';
 import { useDashboardData } from '@/app/hooks/useDashboardData';
-import { FaCloudUploadAlt, FaReceipt, FaMoneyBillWave, FaInfoCircle, FaShieldAlt, FaCog } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaReceipt, FaMoneyBillWave, FaInfoCircle, FaShieldAlt, FaCog, FaArrowLeft } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
 export default function UploadReceiptPage() {
   const { user } = useAuth();
   const { tenant } = useTenant();
   const { refetch: refetchDashboardData } = useDashboardData();
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [amount, setAmount] = useState('');
   const [savingsAmount, setSavingsAmount] = useState('');
@@ -156,11 +158,22 @@ export default function UploadReceiptPage() {
   return (
     <div className="min-h-screen bg-background pt-32 pb-20 px-4">
       <main className="max-w-2xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="flex items-center gap-2 text-tertiary-text hover:text-primary-text transition-colors duration-200 mb-8 group"
+        >
+          <span className="w-8 h-8 rounded-xl bg-surface border border-border flex items-center justify-center group-hover:border-primary/40 group-hover:bg-primary/5 transition-all duration-200">
+            <FaArrowLeft className="h-3.5 w-3.5" />
+          </span>
+          <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
+        </button>
+
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-primary/20 shadow-glow-sm">
             <FaReceipt className="text-2xl text-primary" />
           </div>
-          <h1 className="text-4xl font-black text-primary-text tracking-tighter mb-2">Protocol <span className="text-tertiary-text">Settlement</span></h1>
+          <h1 className="text-4xl font-black text-primary-text tracking-tighter mb-2">Update <span className="text-tertiary-text">Account Balance</span></h1>
           <p className="text-[10px] font-black text-tertiary-text uppercase tracking-[0.4em]">Inbound Payment Authentication</p>
         </div>
 
@@ -200,7 +213,7 @@ export default function UploadReceiptPage() {
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         <FaCloudUploadAlt className="w-10 h-10 mb-3 text-tertiary-text group-hover/upload:text-primary transition-colors" />
                         <p className="text-xs font-bold text-primary-text">
-                          {file ? file.name : "Select Receipt Image"}
+                          {file ? file.name : "Upload Payment Receipt"}
                         </p>
                         <p className="text-[8px] text-tertiary-text uppercase tracking-widest mt-2">{file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : "PNG, JPG or PDF"}</p>
                       </div>
@@ -332,12 +345,12 @@ export default function UploadReceiptPage() {
               </div>
 
               <div className="relative group/field">
-                <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Protocol Annotations</span>
+                <span className="absolute top-2 left-6 text-[8px] font-black text-tertiary-text uppercase tracking-[0.2em] group-focus-within/field:text-primary transition-colors">Payment Description</span>
                 <textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Additional context for verification..."
+                  placeholder="What is this payment for?"
                   className="w-full bg-surface-lighter border border-border rounded-2xl p-6 pt-8 text-primary-text outline-none focus:border-primary transition-all font-medium h-32 resize-none"
                 />
               </div>
@@ -352,7 +365,7 @@ export default function UploadReceiptPage() {
                 className="w-full btn-primary py-5 rounded-2xl text-xs font-black uppercase tracking-[0.4em] shadow-none border-none disabled:opacity-50 transition-all duration-500 hover:tracking-[0.6em]"
                 disabled={loading}
               >
-                {loading ? 'Transmitting Data...' : 'Commit For Verification'}
+                {loading ? 'Transmitting Data...' : 'Update My Account'}
               </button>
            </form>
         </div>

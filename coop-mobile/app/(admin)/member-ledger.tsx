@@ -57,12 +57,17 @@ export default function MemberLedger() {
       
       if (data.receiptImage) {
         const uri = data.receiptImage;
+        // Extract filename from URI; for Android content:// URIs the path may not
+        // have an extension, so fall back to 'receipt.jpg'.
         const filename = uri.split('/').pop() || 'receipt.jpg';
         const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : `image/jpg`;
+        const rawExt = match ? match[1].toLowerCase() : 'jpeg';
+        // Normalise jpg → jpeg; Cloudinary and multer require the canonical MIME
+        const ext = rawExt === 'jpg' ? 'jpeg' : rawExt;
+        const type = `image/${ext}`;
         
         // @ts-ignore
-        formData.append('receipt', { uri, name: filename, type });
+        formData.append('receipt', { uri, name: filename.includes('.') ? filename : `receipt.${ext}`, type });
       }
 
       return api.post('/transactions/upload-receipt', formData, {

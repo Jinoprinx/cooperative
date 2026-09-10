@@ -65,7 +65,11 @@ export default function AdminPayments() {
       return res.data.pendingPayments as ExtendedTransaction[];
     },
     enabled: activeTab === 'pending',
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchInterval: activeTab === 'pending' ? 20_000 : false, // Poll every 20s while on tab
   });
+
 
   const { data: allTransactions, isLoading: isHistoryLoading, refetch: refetchHistory } = useQuery({
     queryKey: ['admin-all-transactions'],

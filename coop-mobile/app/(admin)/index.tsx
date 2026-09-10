@@ -245,6 +245,25 @@ export default function AdminDashboard() {
           </Card>
         )}
 
+        {/* Pending Payments Alert Banner */}
+        {(stats?.pendingPayments ?? 0) > 0 && (
+          <TouchableOpacity
+            onPress={() => router.push({ pathname: '/(admin)/payments', params: { initialTab: 'pending' } })}
+            className="bg-rose-500/15 border border-rose-500/30 p-4 rounded-2xl flex-row items-center mb-6"
+          >
+            <View className="w-9 h-9 bg-rose-500 rounded-xl items-center justify-center mr-4">
+              <MaterialCommunityIcons name="cash-sync" size={18} color="white" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-rose-500 font-black text-sm">
+                {stats?.pendingPayments} Pending Payment{(stats?.pendingPayments ?? 0) > 1 ? 's' : ''} Awaiting Review
+              </Text>
+              <Text className="text-rose-500/60 text-xs font-medium">Tap to approve or reject</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={20} color="#f43f5e" />
+          </TouchableOpacity>
+        )}
+
         {/* Actionable Metrics */}
         <Text className="text-foreground font-bold text-lg mb-4 tracking-tight">Pending Actions</Text>
         <View className="flex-row space-x-4 mb-8">
@@ -268,6 +287,19 @@ export default function AdminDashboard() {
             </View>
             <Text className="text-3xl font-black text-foreground">{stats?.pendingRegistrations || 0}</Text>
             <Text className="text-foreground/40 text-[10px] font-bold uppercase tracking-widest">Registrations</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={() => router.push({ pathname: '/(admin)/payments', params: { initialTab: 'pending' } })}
+            className={`flex-1 p-5 rounded-3xl border ${(stats?.pendingPayments ?? 0) > 0 ? 'bg-rose-500/10 border-rose-500/30' : 'bg-surface border-border'}`}
+          >
+            <View className="w-12 h-12 bg-rose-500/10 rounded-2xl items-center justify-center mb-3">
+              <MaterialCommunityIcons name="cash-sync" size={24} color="#f43f5e" />
+            </View>
+            <Text className={`text-3xl font-black ${(stats?.pendingPayments ?? 0) > 0 ? 'text-rose-500' : 'text-foreground'}`}>
+              {stats?.pendingPayments || 0}
+            </Text>
+            <Text className="text-foreground/40 text-[10px] font-bold uppercase tracking-widest">Payments</Text>
           </TouchableOpacity>
         </View>
 
@@ -298,24 +330,6 @@ export default function AdminDashboard() {
               <Text className="text-foreground font-bold">Active Loans</Text>
             </View>
             <Text className="text-foreground font-black text-lg">{stats?.activeLoans || 0}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            onPress={() => router.push({ pathname: '/(admin)/payments', params: { initialTab: 'pending' } })}
-            className="bg-surface border border-border p-5 rounded-3xl flex-row items-center justify-between"
-          >
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 bg-rose-500/10 rounded-xl items-center justify-center mr-4 border border-rose-500/20">
-                <MaterialCommunityIcons name="cash-sync" size={20} color="#f43f5e" />
-              </View>
-              <Text className="text-foreground font-bold">Pending Payments</Text>
-            </View>
-            <View className="flex-row items-center">
-              {(stats?.pendingPayments ?? 0) > 0 && (
-                <View className="bg-rose-500 w-2 h-2 rounded-full mr-3" />
-              )}
-              <Text className="text-foreground font-black text-lg">{stats?.pendingPayments || 0}</Text>
-            </View>
           </TouchableOpacity>
         </View>
 

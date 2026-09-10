@@ -22,6 +22,7 @@ export default function Dashboard() {
   const { transactions, activeLoan, isLoading, refetch: refetchDashboard } = useDashboardData();
   const { primaryColor } = useTheme();
   const [isPayModalVisible, setIsPayModalVisible] = useState(false);
+  const [balanceVisible, setBalanceVisible] = useState(true);
   const [payType, setPayType] = useState<'deposit' | 'loan_repayment'>('deposit');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -99,18 +100,25 @@ export default function Dashboard() {
     formData.append('purpose', payType);
     formData.append('description', description);
     
-    // Prepare image for upload
-    const uriParts = receipt.uri.split('.');
-    const fileType = uriParts[uriParts.length - 1];
+    // Use mimeType from ImagePicker (works on Android content:// URIs).
+    // Fallback to parsing the URI extension if mimeType is unavailable.
+    const mimeType = receipt.mimeType || (() => {
+      const uriParts = receipt.uri.split('.');
+      const ext = uriParts[uriParts.length - 1].toLowerCase();
+      return `image/${ext === 'jpg' ? 'jpeg' : ext}`;
+    })();
+    const ext = mimeType.split('/')[1] || 'jpeg';
+    const filename = receipt.fileName || `receipt.${ext}`;
 
     formData.append('receipt', {
       uri: receipt.uri,
-      name: `receipt.${fileType}`,
-      type: `image/${fileType}`,
+      name: filename,
+      type: mimeType,
     } as any);
 
     uploadMutation.mutate(formData);
   };
+
 
   const onRefresh = React.useCallback(async () => {
     await Promise.all([refetchUser(), refetchDashboard()]);
@@ -158,11 +166,24 @@ export default function Dashboard() {
 
         {/* Account Balance Header */}
         <View className="mb-8">
-          <Text className="text-foreground/45 text-xs font-bold uppercase tracking-[0.3em] mb-2">
-            Your Treasury
-          </Text>
+          <View className="flex-row items-center mb-2">
+            <Text className="text-foreground/45 text-xs font-bold uppercase tracking-[0.3em]">
+              Your Treasury
+            </Text>
+            <TouchableOpacity
+              onPress={() => setBalanceVisible(prev => !prev)}
+              className="ml-2 w-6 h-6 items-center justify-center"
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons
+                name={balanceVisible ? 'eye-outline' : 'eye-off-outline'}
+                size={16}
+                color="rgba(128,128,128,0.6)"
+              />
+            </TouchableOpacity>
+          </View>
           <Text className="text-5xl font-black text-foreground tracking-tighter">
-            {formatCurrency(user?.accountBalance || 0)}
+            {balanceVisible ? formatCurrency(user?.accountBalance || 0) : '* * * * *'}
           </Text>
           <View className="flex-row items-center mt-3">
             <View className="bg-secondary/10 px-3 py-1 rounded-full border border-secondary/20 flex-row items-center">

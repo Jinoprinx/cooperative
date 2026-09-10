@@ -159,11 +159,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('[login] Failed to persist user to SecureStore:', e);
     }
     
-    setAuthState({
+    setAuthState(prev => ({
+      ...prev,
       token: newToken,
       user: newUser,
       isLoading: false,
-    });
+    }));
     Sentry.setUser({ id: newUser._id, email: newUser.email });
   };
 
@@ -185,11 +186,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('[handleGoogleAuthSuccess] Failed to persist user:', e);
     }
     
-    setAuthState({
+    setAuthState(prev => ({
+      ...prev,
       token,
       user: newUser,
       isLoading: false,
-    });
+    }));
     Sentry.setUser({ id: newUser._id, email: newUser.email });
   };
 

@@ -183,10 +183,12 @@ export default function Members() {
         const uri = data.receiptImage;
         const filename = uri.split('/').pop() || 'receipt.jpg';
         const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : `image/jpg`;
+        const rawExt = match ? match[1].toLowerCase() : 'jpeg';
+        const ext = rawExt === 'jpg' ? 'jpeg' : rawExt;
+        const type = `image/${ext}`;
         
         // @ts-ignore
-        formData.append('receipt', { uri, name: filename, type });
+        formData.append('receipt', { uri, name: filename.includes('.') ? filename : `receipt.${ext}`, type });
       }
 
       return api.post('/transactions/upload-receipt', formData, {
