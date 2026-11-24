@@ -526,7 +526,7 @@ export default function Reports() {
               Annual General Meeting (AGM) Comprehensive Packet
             </h2>
             <p className="text-sm text-secondary-text leading-relaxed">
-              Synthesize your cooperative's complete statutory AGM report from members records with a single click. Includes Governance, Balance Sheet, P&L, Loan Health, Surety Risk, and Dividend Schedules.
+              Synthesize your cooperative&apos;s complete statutory AGM report from members records with a single click. Includes Governance, Balance Sheet, P&L, Loan Health, Surety Risk, and Dividend Schedules.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
@@ -1987,7 +1987,7 @@ export default function Reports() {
                   <div className="card-premium space-y-6 border-primary/30">
                     <div className="flex items-center justify-between border-b border-border pb-4">
                       <h4 className="text-sm font-black uppercase tracking-widest text-primary-text flex items-center gap-2">
-                        <FaBalanceScale className="text-primary text-lg" /> Members' Equity & Ledgers
+                        <FaBalanceScale className="text-primary text-lg" /> Members&apos; Equity & Ledgers
                       </h4>
                       <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
                         Equity & Reserves

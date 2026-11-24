@@ -6,9 +6,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Transaction } from '@/app/types';
-import dynamic from 'next/dynamic';
-
-const PayNowButton = dynamic(() => import('@/app/components/PayNowButton'), { ssr: false });
+import PayNowButton from '@/app/components/PayNowButton';
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);

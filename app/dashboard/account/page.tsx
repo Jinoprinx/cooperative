@@ -7,9 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Transaction } from '@/app/types';
 import ProfileImageUpload from '@/app/components/auth/ProfileImageUpload';
 import { useAuth } from '@/app/context/AuthContext';
-import dynamic from 'next/dynamic';
-
-const PayNowButton = dynamic(() => import('@/app/components/PayNowButton'), { ssr: false });
+import PayNowButton from '@/app/components/PayNowButton';
 
 export default function Account() {
   const { user, loading, isAuthenticated, updateUser } = useAuth();

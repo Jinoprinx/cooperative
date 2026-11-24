@@ -60,7 +60,7 @@ export default function Home() {
     const hostname = window.location.hostname;
     const port = window.location.port ? `:${window.location.port}` : '';
     const protocol = window.location.protocol;
-    
+
     const parts = hostname.split('.');
     let parentHostname = '';
 
@@ -87,28 +87,28 @@ export default function Home() {
 
         <main className="relative z-10 pt-40 pb-20">
           <div className="container mx-auto px-4 max-w-7xl">
-            <motion.div 
-               initial={{ opacity: 0, y: 20 }}
-               animate={{ opacity: 1, y: 0 }}
-               className="max-w-4xl mx-auto text-center"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-4xl mx-auto text-center"
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 text-[10px] font-black tracking-widest text-primary uppercase bg-primary/10 rounded-full border border-primary/20">
                 Official Portal
               </div>
-              
+
               <h1 className="text-6xl md:text-8xl font-black text-primary-text tracking-tighter leading-none mb-8">
                 {tenant.name}
               </h1>
-              
+
               <p className="text-xl md:text-2xl text-secondary-text font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
-                Welcome to your cooperative's digital home. Manage your contributions, applications, and accounts with ease in our secure environment.
+                Welcome to your cooperative&apos;s digital home. Manage your contributions, applications, and accounts with ease in our secure environment.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20">
                 {user ? (
-                   <Link href="/dashboard" className="btn-primary w-full sm:w-auto">
-                     Go to Dashboard <FaArrowRight className="ml-2" />
-                   </Link>
+                  <Link href="/dashboard" className="btn-primary w-full sm:w-auto">
+                    Go to Dashboard <FaArrowRight className="ml-2" />
+                  </Link>
                 ) : (
                   <>
                     <Link href="/auth/login" className="btn-primary w-full sm:w-auto">
@@ -122,7 +122,7 @@ export default function Home() {
               </div>
 
               <div className="pt-20 border-t border-border">
-                <button 
+                <button
                   onClick={handleVisitMainSite}
                   className="text-xs font-black text-secondary-text hover:text-primary transition-colors uppercase tracking-[0.3em] flex items-center gap-3 mx-auto"
                 >
@@ -133,7 +133,7 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
-          
+
           {/* Background Glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-5xl pointer-events-none -z-10 opacity-30">
             <div className="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full blur-[120px]" />
@@ -363,11 +363,11 @@ export default function Home() {
                     </div>
 
                     <div className="mb-12">
-                      <div className="text-6xl font-black text-primary-text mb-4 tracking-tighter">
+                      <div className="text-6xl font-black text-primary-text mb-4 tracking-tighter tabular-nums">
                         ₦124,592<span className="text-tertiary-text">.00</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center text-xs font-black text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/10">
+                        <span className="flex items-center text-xs font-black text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/10 tabular-nums">
                           +12.50%
                         </span>
                         <span className="text-[10px] text-tertiary-text uppercase tracking-[0.2em] font-black">Monthly Delta</span>
@@ -382,23 +382,25 @@ export default function Home() {
                         </div>
                         <div className="h-3 w-full bg-surface-hover rounded-full overflow-hidden">
                           <motion.div
-                            initial={{ width: 0 }}
-                            whileInView={{ width: "78%" }}
-                            transition={{ duration: 2, ease: "circOut" }}
-                            className="h-full bg-gradient-to-r from-primary to-blue-400"
+                            initial={{ scaleX: 0 }}
+                            whileInView={{ scaleX: 0.78 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+                            style={{ transformOrigin: 'left' }}
+                            className="h-full w-full bg-gradient-to-r from-primary to-blue-400"
                           ></motion.div>
                         </div>
-                        <div className="flex justify-between mt-3">
+                        <div className="flex justify-between mt-3 tabular-nums">
                           <span className="text-[10px] text-secondary-text font-bold">₦7,800 Released</span>
                           <span className="text-[10px] text-secondary-text font-bold">₦10k Ceiling</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 tabular-nums">
                       <div className="bg-surface-lighter rounded-2xl p-5 border border-border">
                         <div className="text-[9px] text-tertiary-text uppercase font-black mb-1 tracking-widest">System Uptime</div>
-                        <div className="text-xl font-bold text-primary-text">420.2 km</div>
+                        <div className="text-xl font-bold text-primary-text">99.98%</div>
                       </div>
                       <div className="bg-surface-lighter rounded-2xl p-5 border border-border">
                         <div className="text-[9px] text-tertiary-text uppercase font-black mb-1 tracking-widest">Active Units</div>

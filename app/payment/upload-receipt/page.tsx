@@ -148,8 +148,8 @@ export default function UploadReceiptPage() {
       setIncludeCapitalMobilization(false);
       setCapitalMobilizationAmount('');
       refetchDashboardData();
-    } catch (err) {
-      setError('Failed to upload receipt. Please try again.');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to upload receipt. Please try again.');
     } finally {
       setLoading(false);
     }

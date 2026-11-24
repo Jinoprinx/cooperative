@@ -463,12 +463,12 @@ export default function AdminDashboard() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 tabular-nums">
         {/* Total Members */}
         <div className="card-premium group relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all duration-700" />
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-opacity duration-300" />
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.1)] group-hover:scale-110 transition-transform duration-500">
+            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.1)] group-hover:scale-105 transition-transform duration-200 ease-[var(--ease-out)]">
               <FaUsers className="h-6 w-6 text-blue-500" />
             </div>
             <div>
@@ -482,8 +482,8 @@ export default function AdminDashboard() {
           </div>
           <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-1000" 
-              style={{ width: `${((stats?.activeMembers || 0) / (stats?.totalMembers || 1)) * 100}%` }}
+              className="h-full w-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full origin-left transition-transform duration-300 ease-[var(--ease-out)]" 
+              style={{ transform: `scaleX(${Math.min(1, (stats?.activeMembers || 0) / (stats?.totalMembers || 1))})` }}
             />
           </div>
         </div>
@@ -683,7 +683,7 @@ export default function AdminDashboard() {
                         )}
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right tabular-nums">
                       <p className={`font-black tracking-tight ${isDebit ? 'text-primary-text' : 'text-emerald-500'} ${transaction.status === 'rejected' ? 'line-through opacity-30' : ''}`}>
                         {isDebit ? '-' : '+'} {formatCurrency(transaction.amount)}
                       </p>
@@ -874,7 +874,7 @@ export default function AdminDashboard() {
       {showPinModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setShowPinModal(false)} />
-          <div className="relative glass-card bg-surface/40 p-10 rounded-[3rem] border border-border shadow-2xl w-full max-w-md transform transition-all animate-float">
+          <div className="relative glass-card bg-surface/90 p-10 rounded-[3rem] border border-border shadow-2xl w-full max-w-md animate-fade-in">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-[2rem] border border-primary/20 mb-6 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
                 <FaLock className="h-8 w-8 text-primary shadow-glow" />
@@ -892,7 +892,7 @@ export default function AdminDashboard() {
                   maxLength={4}
                   value={pin}
                   onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                  className="w-full max-w-[180px] sm:max-w-[220px] mx-auto text-center text-3xl sm:text-4xl tracking-[0.35em] sm:tracking-[0.5em] pl-[0.35em] sm:pl-[0.5em] font-black border-b-2 border-border focus:border-primary outline-none bg-transparent py-4 text-primary-text placeholder:text-tertiary-text appearance-none mb-4"
+                  className="w-full max-w-[180px] sm:max-w-[220px] mx-auto text-center text-3xl sm:text-4xl tracking-[0.35em] sm:tracking-[0.5em] pl-[0.35em] sm:pl-[0.5em] font-black border-b-2 border-border focus:border-primary outline-none bg-transparent py-4 text-primary-text placeholder:text-tertiary-text appearance-none mb-4 tabular-nums"
                   placeholder="0000"
                   autoFocus
                   required

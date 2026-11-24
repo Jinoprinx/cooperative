@@ -15,8 +15,11 @@ import {
   FaUserShield,
   FaTimes,
   FaSun,
-  FaMoon
+  FaMoon,
+  FaKey,
+  FaLock
 } from 'react-icons/fa';
+import axios from 'axios';
 import { useAuth } from '@/app/context/AuthContext';
 import { getImageUrl } from '@/app/utils/imageUtils';
 import ThemeToggle from '@/app/components/ThemeToggle';
@@ -29,7 +32,57 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, loading, logout, isAuthenticated, isAdmin } = useAuth();
+  const { user, token, loading, logout, updateSession, isAuthenticated, isAdmin } = useAuth();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
+  const [passwordChangeError, setPasswordChangeError] = useState<string | null>(null);
+
+  const handleForcedPasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordChangeError(null);
+
+    if (newPassword.length < 8) {
+      setPasswordChangeError('New password must be at least 8 characters long.');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordChangeError('New passwords do not match.');
+      return;
+    }
+    if (currentPassword === newPassword) {
+      setPasswordChangeError('New password must be different from your temporary password.');
+      return;
+    }
+
+    setPasswordChangeLoading(true);
+    try {
+      const authToken = token || localStorage.getItem('token');
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`,
+        { currentPassword, newPassword },
+        { headers: { Authorization: `Bearer ${authToken}` } }
+      );
+
+      if (response.data?.token && response.data?.user) {
+        updateSession(response.data.token, {
+          ...user,
+          ...response.data.user,
+          subdomain: user?.subdomain || response.data.user.subdomain,
+          tenantName: user?.tenantName || response.data.user.tenantName,
+          mustChangePassword: false,
+        });
+      }
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (err: any) {
+      setPasswordChangeError(err.response?.data?.message || 'Failed to update password. Please verify your temporary password and try again.');
+    } finally {
+      setPasswordChangeLoading(false);
+    }
+  };
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -64,8 +117,110 @@ export default function DashboardLayout({
     );
   }
 
+  if (isAuthenticated && user?.mustChangePassword) {
+    return (
+      <div className="flex min-h-[100dvh] items-center justify-center bg-background p-4 relative overflow-hidden">
+        <div className="fixed inset-0 z-0 bg-[var(--mesh-gradient)] opacity-30 pointer-events-none" />
+        <div className="relative z-10 glass-card p-8 sm:p-10 rounded-[2.5rem] border border-amber-500/30 w-full max-w-md shadow-2xl bg-surface">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 mx-auto mb-5">
+            <FaKey className="h-7 w-7" />
+          </div>
+          <div className="text-center mb-6">
+            <span className="text-amber-500 text-[10px] font-black uppercase tracking-[0.35em] block mb-2">
+              Security Action Required
+            </span>
+            <h1 className="text-2xl font-black text-primary-text tracking-tighter mb-2">
+              Set a New Password
+            </h1>
+            <p className="text-xs text-tertiary-text font-medium leading-relaxed">
+              Your account access role or temporary credentials were recently updated. You must create a new personal password before continuing.
+            </p>
+          </div>
+
+          {passwordChangeError && (
+            <div className="mb-5 p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs font-bold text-red-400 text-center">
+              {passwordChangeError}
+            </div>
+          )}
+
+          <form onSubmit={handleForcedPasswordChange} className="space-y-4">
+            <div className="relative">
+              <span className="absolute top-2 left-5 text-[8px] font-black text-tertiary-text uppercase tracking-widest z-10">
+                Temporary Password
+              </span>
+              <input
+                type="password"
+                required
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter temporary password"
+                className="w-full bg-surface-lighter border border-border rounded-2xl px-5 pt-7 pb-4 text-primary-text text-sm font-bold outline-none focus:border-primary transition-colors"
+              />
+            </div>
+
+            <div className="relative">
+              <span className="absolute top-2 left-5 text-[8px] font-black text-tertiary-text uppercase tracking-widest z-10">
+                New Password (min 8 chars)
+              </span>
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Create a strong password"
+                className="w-full bg-surface-lighter border border-border rounded-2xl px-5 pt-7 pb-4 text-primary-text text-sm font-bold outline-none focus:border-primary transition-colors"
+              />
+            </div>
+
+            <div className="relative">
+              <span className="absolute top-2 left-5 text-[8px] font-black text-tertiary-text uppercase tracking-widest z-10">
+                Confirm New Password
+              </span>
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                placeholder="Re-enter new password"
+                className="w-full bg-surface-lighter border border-border rounded-2xl px-5 pt-7 pb-4 text-primary-text text-sm font-bold outline-none focus:border-primary transition-colors"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={passwordChangeLoading}
+              className="w-full btn-primary py-4 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+            >
+              {passwordChangeLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Updating Password...
+                </>
+              ) : (
+                <>
+                  <FaLock className="h-3.5 w-3.5" />
+                  Update Password & Continue
+                </>
+              )}
+            </button>
+          </form>
+
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="w-full mt-4 py-3 text-[11px] font-black uppercase tracking-widest text-tertiary-text hover:text-red-400 transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen bg-background selection:bg-primary selection:text-white transition-colors duration-300">
+    <div className="flex min-h-[100dvh] bg-background selection:bg-primary selection:text-white transition-colors duration-200">
       <div className="fixed inset-0 z-0 bg-[var(--mesh-gradient)] opacity-30 pointer-events-none" />
       <div className="noise-overlay" />
 
@@ -77,6 +232,7 @@ export default function DashboardLayout({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
               className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] lg:hidden"
               onClick={toggleSidebar}
             />
@@ -84,7 +240,7 @@ export default function DashboardLayout({
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
               className="fixed inset-y-0 left-0 z-[110] flex w-full max-w-xs flex-col glass-card border-r border-border pt-5 pb-4"
             >
               <div className="px-6 flex items-center justify-between mb-10">
@@ -105,17 +261,16 @@ export default function DashboardLayout({
               <div className="flex-1 px-4 space-y-2 overflow-y-auto">
                 <div className="px-4 mb-4 text-[10px] font-black text-tertiary-text uppercase tracking-[0.3em]">Main Menu</div>
                 {navigation.map((item) => {
-                   const isActive = pathname === item.href;
-                   return (
+                  const isActive = pathname === item.href;
+                  return (
                     <Link
                       key={item.name}
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
-                      className={`group flex items-center rounded-2xl px-5 py-4 text-sm font-bold transition-all duration-300 ${
-                        isActive
+                      className={`group flex items-center rounded-2xl px-5 py-4 text-sm font-bold transition-all duration-300 ${isActive
                           ? 'bg-primary text-white shadow-[0_0_20px_rgba(245,158,11,0.3)]'
                           : 'text-secondary-text hover:bg-surface hover:text-primary-text'
-                      }`}
+                        }`}
                     >
                       <item.icon className={`mr-4 h-5 w-5 transition-transform ${isActive ? 'text-white' : 'text-current group-hover:scale-110'}`} />
                       {item.name}
@@ -165,7 +320,7 @@ export default function DashboardLayout({
               </div>
             </Link>
           </div>
-          
+
           <nav className="flex-1 space-y-2 overflow-y-auto">
             <div className="px-5 mb-4 text-[10px] font-black text-tertiary-text uppercase tracking-[0.4em]">Navigator</div>
             {navigation.map((item) => {
@@ -174,13 +329,12 @@ export default function DashboardLayout({
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center rounded-2xl px-6 py-4 text-sm font-bold transition-all duration-500 hover:scale-[1.02] active:scale-95 ${
-                    isActive
+                  className={`group flex items-center rounded-2xl px-6 py-4 text-sm font-bold transition-[background-color,color,transform] duration-150 ease-[var(--ease-out)] active:scale-[0.98] ${isActive
                       ? 'bg-primary text-white shadow-[0_0_30px_rgba(245,158,11,0.3)]'
                       : 'text-secondary-text hover:bg-surface hover:text-primary-text'
-                  }`}
+                    }`}
                 >
-                  <item.icon className={`mr-4 h-5 w-5 transition-transform duration-300 ${isActive ? 'text-white' : 'text-current group-hover:scale-110'}`} />
+                  <item.icon className={`mr-4 h-5 w-5 transition-transform duration-150 ease-[var(--ease-out)] ${isActive ? 'text-white' : 'text-current group-hover:scale-105'}`} />
                   {item.name}
                 </Link>
               );
@@ -190,7 +344,7 @@ export default function DashboardLayout({
               <div className="pt-6 mt-6 border-t border-border/50">
                 <Link
                   href="/admin/dashboard"
-                  className="group flex items-center rounded-2xl px-6 py-4 text-sm font-black bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-500 shadow-xl shadow-primary/5 hover:scale-[1.02] active:scale-95"
+                  className="group flex items-center rounded-2xl px-6 py-4 text-sm font-black bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-[background-color,color,transform] duration-150 ease-[var(--ease-out)] shadow-xl shadow-primary/5 active:scale-[0.98]"
                 >
                   <FaUserShield className="mr-4 h-5 w-5" />
                   Admin Control
@@ -235,12 +389,12 @@ export default function DashboardLayout({
 
           <div className="flex items-center gap-2.5 sm:gap-6 shrink-0">
             <ThemeToggle />
-            
+
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-xs sm:text-sm font-black text-primary-text tracking-tight leading-none mb-1 truncate max-w-[180px]">{user?.firstName} {user?.lastName}</span>
               <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em] sm:tracking-[0.3em] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Verified Member</span>
             </div>
-            
+
             <Link href="/dashboard/account" className="relative group shrink-0">
               <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative h-9 w-9 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-surface border border-border p-0.5 overflow-hidden transition-transform duration-500 group-hover:scale-105">
@@ -262,9 +416,9 @@ export default function DashboardLayout({
 
         <main className="flex-1 p-3 sm:p-5 md:p-6 lg:p-10 relative z-10 w-full min-w-0 max-w-full overflow-x-hidden">
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="mx-auto max-w-6xl w-full min-w-0 overflow-x-hidden"
           >
             {children}

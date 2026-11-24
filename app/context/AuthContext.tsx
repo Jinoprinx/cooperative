@@ -19,6 +19,8 @@ interface User {
   subdomain?: string;
   tenantName?: string;
   memberIdentifier?: string;
+  isManual?: boolean;
+  mustChangePassword?: boolean;
   /** Balance that existed before the passbook system was introduced (legacy balance). */
   prePassbookBalance?: number;
   ledgerBalances?: {
@@ -37,6 +39,7 @@ interface AuthContextType {
   register: (firstName: string, lastName: string, email: string, password: string, phoneNumber: string, tenantId?: string) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
+  updateSession: (newToken: string, updatedUser: User) => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isMainAdmin: boolean;
@@ -228,6 +231,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
+  const updateSession = (newToken: string, updatedUser: User) => {
+    setToken(newToken);
+    setUser(updatedUser);
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+  };
+
   // Sync profile data from backend to context / local storage
   useEffect(() => {
     const fetchFreshProfile = async () => {
@@ -291,6 +302,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         logout,
         updateUser,
+        updateSession,
         isAuthenticated: !!token,
         isAdmin: user?.role === 'admin' || user?.role === 'super-admin',
         isMainAdmin: user?.isMainAdmin || false,

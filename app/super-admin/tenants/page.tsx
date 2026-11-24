@@ -431,7 +431,7 @@ export default function TenantManagement() {
                     </select>
                   ) : (
                     <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl text-center text-xs text-red-500 font-bold">
-                      No active codes found for this cooperative. Create one in the Override Codes tab or choose "Generate On-the-fly".
+                      No active codes found for this cooperative. Create one in the Override Codes tab or choose &quot;Generate On-the-fly&quot;.
                     </div>
                   )}
                 </div>

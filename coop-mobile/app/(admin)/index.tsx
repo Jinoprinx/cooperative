@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Alert, Image, Modal, ActivityIndicator, Linking, TextInput } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Alert, Image, Modal, ActivityIndicator, Linking, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ExpoLinking from 'expo-linking';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../../hooks/useUser';
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
       router.setParams({ payment: undefined });
     }
   }, [params.payment]);
-  
+
   const [isUnlocked, setIsUnlocked] = React.useState(false);
   const [showPinModal, setShowPinModal] = React.useState(false);
   const [pin, setPin] = React.useState('');
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
   const handlePayBills = async () => {
     try {
       setIsProcessingPayment(true);
-      
+
       // Create a deep link to return to the mobile app's admin dashboard
       // Note: We wrap this in a backend proxy because Paystack requires a valid http/https callback URL
       const appLink = ExpoLinking.createURL('(admin)', {
@@ -70,12 +70,12 @@ export default function AdminDashboard() {
       "Are you sure you want to log out of the admin console?",
       [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Log Out", 
+        {
+          text: "Log Out",
           onPress: async () => {
             await logout();
-          }, 
-          style: "destructive" 
+          },
+          style: "destructive"
         }
       ]
     );
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={onRefresh} tintColor="#3b82f6" />
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
         {/* Welcome Header */}
         <View className="mb-8 flex-row justify-between items-center">
           <View className="flex-row items-center flex-1">
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.push('/(admin)/profile')}
               className="w-14 h-14 bg-surface border-2 border-primary/20 rounded-2xl items-center justify-center overflow-hidden mr-4"
             >
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
             </View>
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push('/(member)')}
             className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-2xl items-center justify-center ml-2"
           >
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
               <Text className="text-foreground/40 text-[10px] font-black uppercase tracking-widest mt-2">Restricted Access</Text>
             </View>
           ) : !isUnlocked ? (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setShowPinModal(true)}
               className="items-center justify-center py-4"
             >
@@ -179,14 +179,14 @@ export default function AdminDashboard() {
             </TouchableOpacity>
           ) : (
             <>
-              <Text 
-                numberOfLines={1} 
-                adjustsFontSizeToFit 
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
                 className="text-5xl font-black text-foreground tracking-tighter mb-4"
               >
                 {formatCurrency(stats?.totalBalance || 0)}
               </Text>
-              
+
               <View className="flex-row border-t border-border/50 pt-4">
                 <View className="flex-1">
                   <Text className="text-foreground/40 text-[10px] font-bold uppercase tracking-widest mb-1">Total Inbound</Text>
@@ -227,7 +227,7 @@ export default function AdminDashboard() {
 
             {/* Pay Bills Button - Visible for any paid tier during testing */}
             {stats.billing.tier !== 'free' && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={handlePayBills}
                 disabled={isProcessingPayment}
                 className="mt-6 bg-emerald-500 py-4 rounded-2xl flex-row items-center justify-center shadow-lg shadow-emerald-500/30"
@@ -256,7 +256,7 @@ export default function AdminDashboard() {
             </View>
             <View className="flex-1">
               <Text className="text-rose-500 font-black text-sm">
-                {stats?.pendingPayments} Pending Payment{(stats?.pendingPayments ?? 0) > 1 ? 's' : ''} Awaiting Review
+                {stats?.pendingPayments} Pending Payment{(stats?.pendingPayments ?? 0) === 1 ? '' : 's'} Awaiting Review
               </Text>
               <Text className="text-rose-500/60 text-xs font-medium">Tap to approve or reject</Text>
             </View>
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
         {/* Actionable Metrics */}
         <Text className="text-foreground font-bold text-lg mb-4 tracking-tight">Pending Actions</Text>
         <View className="flex-row space-x-4 mb-8">
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push({ pathname: '/(admin)/loans', params: { initialTab: 'pending' } })}
             className="flex-1 bg-surface border border-border p-5 rounded-3xl"
           >
@@ -278,7 +278,7 @@ export default function AdminDashboard() {
             <Text className="text-foreground/40 text-[10px] font-bold uppercase tracking-widest">Loan Requests</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push({ pathname: '/(admin)/members', params: { initialTab: 'pending' } })}
             className="flex-1 bg-surface border border-border p-5 rounded-3xl"
           >
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
             <Text className="text-foreground/40 text-[10px] font-bold uppercase tracking-widest">Registrations</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push({ pathname: '/(admin)/payments', params: { initialTab: 'pending' } })}
             className={`flex-1 p-5 rounded-3xl border ${(stats?.pendingPayments ?? 0) > 0 ? 'bg-rose-500/10 border-rose-500/30' : 'bg-surface border-border'}`}
           >
@@ -306,7 +306,7 @@ export default function AdminDashboard() {
         {/* General Statistics */}
         <Text className="text-foreground font-bold text-lg mb-4 tracking-tight">System Status</Text>
         <View className="space-y-3 mb-8">
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push({ pathname: '/(admin)/members', params: { initialTab: 'active' } })}
             className="bg-surface border border-border p-5 rounded-3xl flex-row items-center justify-between"
           >
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
             <Text className="text-foreground font-black text-lg">{stats?.totalMembers || 0}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push({ pathname: '/(admin)/loans', params: { initialTab: 'active' } })}
             className="bg-surface border border-border p-5 rounded-3xl flex-row items-center justify-between"
           >
@@ -342,7 +342,7 @@ export default function AdminDashboard() {
           </View>
         )}
 
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={handleLogout}
           className="bg-red-500/10 border border-red-500/20 py-5 rounded-3xl items-center mb-6"
         >
@@ -361,10 +361,17 @@ export default function AdminDashboard() {
         animationType="slide"
         onRequestClose={() => setShowPinModal(false)}
       >
-        <View className="flex-1 justify-end bg-black/80">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1 justify-end bg-black/80"
+        >
           <View className="bg-surface rounded-t-[3rem] p-10 border-t border-border">
-            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
-            
+            <TouchableOpacity
+              onPress={() => setShowPinModal(false)}
+              hitSlop={{ top: 16, bottom: 16, left: 32, right: 32 }}
+              className="w-12 h-1.5 bg-foreground/15 rounded-full self-center mb-8"
+            />
+
             <View className="items-center mb-8">
               <View className="w-20 h-20 bg-primary/10 rounded-[2rem] items-center justify-center mb-6 border border-primary/20">
                 <MaterialCommunityIcons name="lock" size={40} color={primaryColor} />
@@ -399,13 +406,13 @@ export default function AdminDashboard() {
             ) : null}
 
             <View className="flex-row space-x-4">
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setShowPinModal(false)}
                 className="flex-1 py-5 rounded-3xl items-center border border-border"
               >
                 <Text className="text-foreground font-bold">Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={handleVerifyPin}
                 disabled={pin.length !== 4 || verifyingPin}
                 className="flex-1 bg-primary py-5 rounded-3xl items-center disabled:opacity-50"
@@ -418,7 +425,7 @@ export default function AdminDashboard() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );

@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 
 import { headers } from 'next/headers';
 import { TenantProvider } from './context/TenantContext';
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const calistoga = Calistoga({ weight: '400', subsets: ['latin'], variable: '--font-calistoga' });
@@ -35,7 +36,12 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  viewportFit: 'cover',
+  interactiveWidget: 'resizes-content',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
 };
 
 import { ThemeProvider } from './context/ThemeContext';
@@ -58,7 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
             <h1 className="text-2xl font-bold mb-4">Cooperative Not Found</h1>
             <p className="text-white/50 mb-8">
-              The society <span className="text-white font-mono font-bold">"{subdomain}"</span> does not exist or has been deactivated.
+              The society <span className="text-white font-mono font-bold">&quot;{subdomain}&quot;</span> does not exist or has been deactivated.
             </p>
             <a href="/" className="btn-primary inline-flex">
               Return to Landing Page
@@ -71,10 +77,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${calistoga.variable}`}>
-      <body className="font-sans antialiased min-h-screen transition-colors duration-300">
+      <body className="font-sans antialiased min-h-[100dvh] transition-colors duration-200">
         <ThemeProvider>
           <TenantProvider initialTenant={tenant || undefined}>
             <AuthProvider>
+              <Toaster
+                position="top-center"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: 'var(--surface-color)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '1rem',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                  },
+                }}
+              />
               {children}
             </AuthProvider>
           </TenantProvider>

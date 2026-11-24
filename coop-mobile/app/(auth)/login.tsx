@@ -21,7 +21,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { login, handleGoogleAuthSuccess } = useAuth();
   const { tenant, tenantDetails, clearTenant } = useTenant();
   const router = useRouter();
@@ -49,7 +49,7 @@ export default function Login() {
     setError(null);
     try {
       const res = await api.post('/auth/google/login', { idToken });
-      
+
       if (res.data.needsSelection) {
         setAvailableTenants(res.data.tenants);
         setShowPicker(true);
@@ -91,7 +91,7 @@ export default function Login() {
       setError('Please fill in all fields');
       return;
     }
-    
+
     setIsLoading(true);
     setError(null);
     try {
@@ -107,12 +107,12 @@ export default function Login() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
         <ScrollView contentContainerStyle={{ padding: 24, flexGrow: 1 }}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => {
               clearTenant();
               router.replace('/tenant-select');
@@ -144,7 +144,7 @@ export default function Login() {
               autoCapitalize="none"
               keyboardType="email-address"
             />
-            
+
             <Input
               label="Password"
               placeholder="••••••••"
@@ -152,13 +152,13 @@ export default function Login() {
               onChangeText={setPassword}
               secureTextEntry
             />
-            
+
             <Link href="/(auth)/forgot-password" asChild>
               <TouchableOpacity className="self-end pt-1">
                 <Text className="text-primary font-bold text-xs">Forgot Password?</Text>
               </TouchableOpacity>
             </Link>
-            
+
             {error && (
               <View className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mt-2">
                 <Text className="text-red-500 text-sm font-medium text-center">{error}</Text>
@@ -166,9 +166,9 @@ export default function Login() {
             )}
           </View>
 
-          <Button 
-            title="Sign In" 
-            onPress={handleLogin} 
+          <Button
+            title="Sign In"
+            onPress={handleLogin}
             isLoading={isLoading && !showPicker}
             className="mb-6"
           />
@@ -179,12 +179,12 @@ export default function Login() {
             <View className="flex-1 h-[1px] bg-border" />
           </View>
 
-          <Button 
-            title="Sign In with Google" 
-            onPress={() => promptAsync()} 
+          <Button
+            title="Sign In with Google"
+            variant="outline"
+            onPress={() => promptAsync()}
             disabled={!request}
-            className="mb-8 bg-surface border-border"
-            textClassName="text-foreground"
+            className="mb-8"
           />
 
           <View className="flex-row justify-center items-center mt-auto pb-4">
@@ -197,10 +197,10 @@ export default function Login() {
           </View>
 
           <Link href="/" asChild>
-             <TouchableOpacity className="pb-12 pt-4 flex-row justify-center items-center">
-               <Text className="text-foreground/40 font-bold uppercase tracking-widest text-xs">Skip to Homepage</Text>
-               <MaterialCommunityIcons name="arrow-right" size={14} color="rgba(var(--foreground), 0.4)" style={{ marginLeft: 4 }} />
-             </TouchableOpacity>
+            <TouchableOpacity className="pb-12 pt-4 flex-row justify-center items-center">
+              <Text className="text-foreground/40 font-bold uppercase tracking-widest text-xs">Skip to Homepage</Text>
+              <MaterialCommunityIcons name="arrow-right" size={14} color="rgba(var(--foreground), 0.4)" style={{ marginLeft: 4 }} />
+            </TouchableOpacity>
           </Link>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -210,7 +210,7 @@ export default function Login() {
           <View className="bg-surface border border-border p-6 rounded-3xl w-full max-w-md shadow-2xl">
             <Text className="text-2xl font-bold text-foreground mb-2">Select Cooperative</Text>
             <Text className="text-sm text-foreground/60 mb-6">You are a member of multiple cooperatives. Please choose one to enter.</Text>
-            
+
             <View className="space-y-3 mb-6">
               {availableTenants.map((t) => (
                 <TouchableOpacity
@@ -230,7 +230,7 @@ export default function Login() {
               ))}
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setShowPicker(false)}
               className="py-4 border border-border rounded-2xl items-center"
             >

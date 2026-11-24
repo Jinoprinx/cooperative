@@ -86,7 +86,7 @@ export default function SuspendedPage() {
               Subscription <span className="text-red-500">Suspended</span>
             </h1>
             <p className="text-secondary-text font-medium max-w-md mx-auto leading-relaxed mb-2">
-              Your cooperative's monthly subscription payment is overdue. All administrative actions
+              Your cooperative&apos;s monthly subscription payment is overdue. All administrative actions
               have been locked until payment is received.
             </p>
             <p className="text-tertiary-text text-sm">

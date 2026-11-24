@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Modal, Image, Alert } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Modal, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../../hooks/useUser';
 import { useDashboardData } from '../../hooks/useDashboardData';
@@ -99,7 +99,7 @@ export default function Dashboard() {
     formData.append('amount', amount);
     formData.append('purpose', payType);
     formData.append('description', description);
-    
+
     // Use mimeType from ImagePicker (works on Android content:// URIs).
     // Fallback to parsing the URI extension if mimeType is unavailable.
     const mimeType = receipt.mimeType || (() => {
@@ -126,7 +126,7 @@ export default function Dashboard() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={onRefresh} tintColor="#3b82f6" />
@@ -144,14 +144,14 @@ export default function Dashboard() {
           </View>
           <View className="flex-row items-center">
             {user?.role === 'admin' && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => router.push('/(admin)')}
                 className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-2xl items-center justify-center mr-2"
               >
                 <MaterialCommunityIcons name="shield-account-outline" size={24} color={primaryColor} />
               </TouchableOpacity>
             )}
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.push('/(member)/profile')}
               className="w-14 h-14 bg-surface border-2 border-primary/20 rounded-2xl items-center justify-center overflow-hidden"
             >
@@ -172,6 +172,7 @@ export default function Dashboard() {
             </Text>
             <TouchableOpacity
               onPress={() => setBalanceVisible(prev => !prev)}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               className="ml-2 w-6 h-6 items-center justify-center"
               activeOpacity={0.7}
             >
@@ -182,19 +183,26 @@ export default function Dashboard() {
               />
             </TouchableOpacity>
           </View>
-          <Text className="text-5xl font-black text-foreground tracking-tighter">
+          <Text
+            style={{ fontVariant: ['tabular-nums'] }}
+            className="text-5xl font-black text-foreground tracking-tighter"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             {balanceVisible ? formatCurrency(user?.accountBalance || 0) : '* * * * *'}
           </Text>
           <View className="flex-row items-center mt-3">
             <View className="bg-secondary/10 px-3 py-1 rounded-full border border-secondary/20 flex-row items-center">
-              <MaterialCommunityIcons name="arrow-up" size={12} color="#10b981" />
-              <Text className="text-secondary text-[10px] font-black ml-1">
-                +12.5%
+              <MaterialCommunityIcons name="shield-check-outline" size={12} color="#10b981" />
+              <Text className="text-secondary text-[10px] font-black ml-1 uppercase tracking-wider">
+                Verified Member
               </Text>
             </View>
-            <Text className="text-foreground/45 text-[10px] font-black uppercase tracking-widest ml-3">
-              Monthly Growth
-            </Text>
+            {user?.accountNumber ? (
+              <Text style={{ fontVariant: ['tabular-nums'] }} className="text-foreground/45 text-[10px] font-black uppercase tracking-widest ml-3">
+                Acct: {user.accountNumber}
+              </Text>
+            ) : null}
           </View>
         </View>
 
@@ -227,14 +235,14 @@ export default function Dashboard() {
                 <MaterialCommunityIcons name="bank" size={24} color={primaryColor} />
               </View>
             </View>
-            
+
             <View className="h-2 w-full bg-foreground/5 rounded-full overflow-hidden mb-3">
-              <View 
-                className="h-full bg-primary rounded-full" 
+              <View
+                className="h-full bg-primary rounded-full"
                 style={{ width: `${getLoanProgress(activeLoan.amountPaid, activeLoan.totalRepayment)}%` }}
               />
             </View>
-            
+
             <View className="flex-row justify-between">
               <Text className="text-foreground/45 text-[10px] font-bold">
                 {formatCurrency(activeLoan.amountPaid)} Paid
@@ -256,40 +264,41 @@ export default function Dashboard() {
 
         <View className="space-y-4">
           {transactions.map((tx: any) => (
-            <TouchableOpacity 
+            <TouchableOpacity
               key={tx._id}
+              activeOpacity={0.7}
               className="bg-surface border border-border rounded-3xl p-5 flex-row items-center justify-between"
             >
-              <View className="flex-row items-center">
-                <View className="w-12 h-12 bg-foreground/5 rounded-2xl items-center justify-center mr-4">
-                  <MaterialCommunityIcons 
-                    name={tx.type === 'deposit' ? 'arrow-down' : 'arrow-up'} 
-                    size={20} 
-                    color={getTransactionColor(tx.type)} 
+              <View className="flex-row items-center flex-1 mr-3">
+                <View className="w-12 h-12 bg-foreground/5 rounded-2xl items-center justify-center mr-4 shrink-0">
+                  <MaterialCommunityIcons
+                    name={tx.type === 'deposit' ? 'arrow-down' : 'arrow-up'}
+                    size={20}
+                    color={getTransactionColor(tx.type)}
                   />
                 </View>
-                <View>
+                <View className="flex-1">
                   <Text className="text-foreground font-bold text-base" numberOfLines={1}>{tx.description}</Text>
                   <Text className="text-foreground/45 text-xs font-medium">{formatDate(tx.date)}</Text>
                 </View>
               </View>
-              <View className="items-end">
-                <Text 
+              <View className="items-end shrink-0">
+                <Text
                   className="font-black text-base"
-                  style={{ color: getTransactionColor(tx.type) }}
+                  style={{ color: getTransactionColor(tx.type), fontVariant: ['tabular-nums'] }}
                 >
                   {getTransactionPrefix(tx.type)} {formatCurrency(tx.amount)}
                 </Text>
-                <Text 
-                   className="text-[10px] font-bold uppercase tracking-widest"
-                   style={{ color: tx.status === 'completed' ? '#10b981' : tx.status === 'rejected' ? '#ef4444' : '#f59e0b' }}
+                <Text
+                  className="text-[10px] font-bold uppercase tracking-widest"
+                  style={{ color: tx.status === 'completed' ? '#10b981' : tx.status === 'rejected' ? '#ef4444' : '#f59e0b' }}
                 >
                   {tx.status}
                 </Text>
               </View>
             </TouchableOpacity>
           ))}
-          
+
           {transactions.length === 0 && (
             <View className="py-12 items-center">
               <MaterialCommunityIcons name="note-text-outline" size={48} color="rgba(var(--foreground), 0.35)" />
@@ -306,14 +315,21 @@ export default function Dashboard() {
         animationType="slide"
         onRequestClose={() => setIsPayModalVisible(false)}
       >
-        <View className="flex-1 justify-end bg-black/60">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1 justify-end bg-black/60"
+        >
           <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border">
-            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
-            
+            <TouchableOpacity
+              onPress={() => setIsPayModalVisible(false)}
+              hitSlop={{ top: 16, bottom: 16, left: 32, right: 32 }}
+              className="w-12 h-1.5 bg-foreground/15 rounded-full self-center mb-8"
+            />
+
             <Text className="text-foreground font-black text-2xl mb-2 capitalize">{payType.replace('_', ' ')}</Text>
             <Text className="text-foreground/50 mb-8 font-medium">Upload your proof of payment to credit your account.</Text>
 
-            <Input 
+            <Input
               label="Amount Paid (₦)"
               placeholder="0.00"
               keyboardType="numeric"
@@ -321,14 +337,14 @@ export default function Dashboard() {
               onChangeText={setAmount}
             />
 
-            <Input 
+            <Input
               label="Description (Optional)"
               placeholder="e.g. Monthly Savings"
               value={description}
               onChangeText={setDescription}
             />
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={pickImage}
               className="w-full h-40 bg-foreground/5 border-2 border-dashed border-foreground/10 rounded-3xl items-center justify-center mb-8 overflow-hidden"
             >
@@ -344,21 +360,21 @@ export default function Dashboard() {
 
 
             <View className="flex-row space-x-4">
-              <Button 
-                title="Cancel" 
+              <Button
+                title="Cancel"
                 variant="ghost"
                 className="flex-1"
                 onPress={() => setIsPayModalVisible(false)}
               />
-              <Button 
-                title="Submit Proof" 
+              <Button
+                title="Submit Proof"
                 className="flex-1"
                 isLoading={uploadMutation.isPending}
                 onPress={handlePayment}
               />
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Announcement Modal */}
@@ -375,13 +391,13 @@ export default function Dashboard() {
       >
         <View className="flex-1 justify-center items-center bg-black/80 px-6">
           <View className="bg-surface border border-border rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl items-center">
-            
+
             <View className="w-16 h-16 bg-primary/10 border border-primary/20 rounded-3xl items-center justify-center mb-6">
               <MaterialCommunityIcons name="bullhorn-outline" size={32} color={primaryColor} />
             </View>
 
             <Text className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-2">New Notice</Text>
-            
+
             <Text className="text-foreground font-black text-2xl mb-4 text-center leading-tight">
               {announcement?.title}
             </Text>

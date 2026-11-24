@@ -19,6 +19,7 @@ export type User = {
   profileImage?: string;
   status: 'pending' | 'active' | 'rejected';
   isManual?: boolean;
+  mustChangePassword?: boolean;
 };
 
 export type Member = {
@@ -43,6 +44,7 @@ export type Member = {
   role?: 'member' | 'admin' | 'super-admin';
   status: 'pending' | 'active' | 'rejected';
   isManual?: boolean;
+  mustChangePassword?: boolean;
 };
 
 export type Transaction = {

@@ -20,7 +20,7 @@ export default function TenantSelectPage() {
     const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const { searchTenants } = useTenant();
-     const router = useRouter();
+    const router = useRouter();
     const resultsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -118,12 +118,12 @@ export default function TenantSelectPage() {
                                     placeholder="Search by name or subdomain"
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
-                                    className="w-full bg-surface/50 backdrop-blur-3xl border border-border rounded-3xl py-7 pl-16 pr-36 text-primary-text text-sm font-bold focus:outline-none focus:border-primary/50 transition-all shadow-2xl placeholder:text-tertiary-text"
+                                    className="w-full bg-surface/50 backdrop-blur-3xl border border-border rounded-3xl py-7 pl-16 pr-36 text-primary-text text-base sm:text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors duration-150 shadow-2xl placeholder:text-tertiary-text"
                                 />
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="absolute right-3 top-3 bottom-3 px-8 bg-primary text-white text-[11px] font-black uppercase tracking-widest rounded-2xl hover:tracking-[0.2em] transition-all disabled:opacity-50 shadow-glow-sm"
+                                    className="absolute right-3 top-3 bottom-3 px-8 bg-primary text-white text-[11px] font-black uppercase tracking-widest rounded-2xl active:scale-[0.97] transition-transform duration-150 ease-[var(--ease-out)] disabled:opacity-50 shadow-glow-sm"
                                 >
                                     {loading ? 'Scanning...' : 'Search'}
                                 </button>

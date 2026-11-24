@@ -48,8 +48,6 @@ export default function AdminLogin() {
     <AuthLayout
       title="Admin Login"
       subtitle="Access administrative console"
-      linkText="Register"
-      linkHref="/admin/auth/register"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {error && (

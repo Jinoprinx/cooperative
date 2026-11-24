@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaSearch, FaUserPlus, FaTrash, FaUserShield, FaUserEdit, FaHistory, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaUserPlus, FaTrash, FaUserShield, FaUserEdit, FaHistory, FaTimes, FaExchangeAlt, FaKey, FaCopy, FaCheck, FaEnvelope, FaExclamationTriangle } from 'react-icons/fa';
 import { useAuth } from '@/app/context/AuthContext';
 import axios from 'axios';
 import { Member } from '@/app/types';
@@ -23,6 +23,23 @@ export default function Members() {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [suretyHistory, setSuretyHistory] = useState<any[]>([]);
   const [loadingSurety, setLoadingSurety] = useState(false);
+
+  const [showAccessRoleModal, setShowAccessRoleModal] = useState(false);
+  const [memberForAccessChange, setMemberForAccessChange] = useState<Member | null>(null);
+  const [updatingAccessRole, setUpdatingAccessRole] = useState(false);
+  const [accessRoleError, setAccessRoleError] = useState<string | null>(null);
+  const [issuedCredentials, setIssuedCredentials] = useState<{
+    memberName: string;
+    memberIdentifier?: string;
+    newAccessRole: 'Manual Member' | 'Regular Member';
+    isManual: boolean;
+    loginIdentifier: string;
+    email: string | null;
+    phoneNumber: string | null;
+    temporaryPassword: string;
+    emailSent: boolean;
+  } | null>(null);
+  const [copiedField, setCopiedField] = useState<'password' | 'all' | null>(null);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -113,6 +130,83 @@ export default function Members() {
       console.error('Error toggling admin role:', error);
       alert(error.response?.data?.message || 'Failed to update role');
     }
+  };
+
+  const handleAccessRoleClick = (member: Member) => {
+    if (!isMainAdmin) return;
+    if (member.role === 'admin' || member.role === 'super-admin') return;
+    setMemberForAccessChange(member);
+    setAccessRoleError(null);
+    setShowAccessRoleModal(true);
+  };
+
+  const handleDiscardAccessRoleChange = () => {
+    if (updatingAccessRole) return;
+    setShowAccessRoleModal(false);
+    setMemberForAccessChange(null);
+    setAccessRoleError(null);
+  };
+
+  const handleConfirmAccessRoleChange = async () => {
+    if (!memberForAccessChange || !isMainAdmin) return;
+    const targetIsManual = !memberForAccessChange.isManual;
+    setUpdatingAccessRole(true);
+    setAccessRoleError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/members/${memberForAccessChange._id}/access-type`,
+        { isManual: targetIsManual },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const updatedIsManual = Boolean(response.data?.member?.isManual ?? targetIsManual);
+      setMembers((prev) =>
+        prev.map((m) =>
+          m._id === memberForAccessChange._id
+            ? { ...m, isManual: updatedIsManual, mustChangePassword: true }
+            : m
+        )
+      );
+
+      const creds = response.data?.defaultCredentials;
+      setShowAccessRoleModal(false);
+      setMemberForAccessChange(null);
+
+      if (creds?.temporaryPassword) {
+        setIssuedCredentials({
+          memberName: `${memberForAccessChange.firstName} ${memberForAccessChange.lastName}`,
+          memberIdentifier: memberForAccessChange.memberIdentifier,
+          newAccessRole: updatedIsManual ? 'Manual Member' : 'Regular Member',
+          isManual: updatedIsManual,
+          loginIdentifier: creds.loginIdentifier || memberForAccessChange.phoneNumber || memberForAccessChange.email,
+          email: creds.email || null,
+          phoneNumber: creds.phoneNumber || null,
+          temporaryPassword: creds.temporaryPassword,
+          emailSent: Boolean(creds.emailSent),
+        });
+      }
+    } catch (error: any) {
+      console.error('Error updating member access role:', error);
+      setAccessRoleError(error.response?.data?.message || 'Failed to update member access role. Please try again.');
+    } finally {
+      setUpdatingAccessRole(false);
+    }
+  };
+
+  const handleCopyCredential = async (text: string, field: 'password' | 'all') => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch {
+      alert('Unable to copy automatically. Please highlight and copy the temporary password manually.');
+    }
+  };
+
+  const handleCloseCredentialsModal = () => {
+    setIssuedCredentials(null);
+    setCopiedField(null);
   };
 
   const handleViewSuretyHistory = async (member: Member) => {
@@ -231,15 +325,37 @@ export default function Members() {
                      <span className="text-lg font-black text-primary-text tracking-tighter shadow-glow-sm">{formatCurrency(member.accountBalance)}</span>
                   </td>
                   <td className="px-8 py-6">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                      member.role === 'admin' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-surface border-border text-tertiary-text'
-                    }`}>
-                      <div className={`w-1 h-1 rounded-full ${member.role === 'admin' ? 'bg-purple-400 animate-pulse' : 'bg-white/20'}`} />
-                      {member.role || 'member'}
-                    </span>
-                    {member.isManual && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-amber-500/10 border-amber-500/20 text-amber-500 ml-2">
-                        Manual
+                    {member.role === 'admin' || member.role === 'super-admin' ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-purple-500/10 border-purple-500/20 text-purple-400">
+                        <div className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
+                        {member.role}
+                      </span>
+                    ) : isMainAdmin ? (
+                      <button
+                        type="button"
+                        onClick={() => handleAccessRoleClick(member)}
+                        title={member.isManual ? 'Click to switch back to Regular Member' : 'Click to switch to Manual Member'}
+                        className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-200 cursor-pointer group/role ${
+                          member.isManual
+                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500'
+                            : 'bg-surface border-border text-tertiary-text hover:border-primary/60 hover:text-primary hover:bg-primary/5'
+                        }`}
+                      >
+                        <div className={`w-1.5 h-1.5 rounded-full ${member.isManual ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500/70 group-hover/role:bg-primary'}`} />
+                        <span>{member.isManual ? 'Manual' : 'Member'}</span>
+                        <FaExchangeAlt className="h-2.5 w-2.5 opacity-60 group-hover/role:opacity-100 transition-opacity" />
+                      </button>
+                    ) : (
+                      <span
+                        title="Only the Main Admin can change member access role"
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                          member.isManual
+                            ? 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                            : 'bg-surface border-border text-tertiary-text'
+                        }`}
+                      >
+                        <div className={`w-1 h-1 rounded-full ${member.isManual ? 'bg-amber-500' : 'bg-white/20'}`} />
+                        {member.isManual ? 'Manual' : 'Member'}
                       </span>
                     )}
                   </td>
@@ -382,6 +498,188 @@ export default function Members() {
                 <button type="submit" className="flex-[2] btn-primary py-4 rounded-2xl shadow-none">Enrol Member</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showAccessRoleModal && memberForAccessChange && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/75 backdrop-blur-xl" onClick={handleDiscardAccessRoleChange} />
+          <div className="relative glass-card p-8 sm:p-10 rounded-[2.5rem] border border-amber-500/25 w-full max-w-md shadow-2xl">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500 mx-auto mb-6 border border-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.15)]">
+              <FaExchangeAlt className="h-7 w-7" />
+            </div>
+
+            <div className="text-center mb-6">
+              <span className="text-amber-500 text-[10px] font-black uppercase tracking-[0.35em] block mb-2">
+                Confirm Access Role Change
+              </span>
+              <h3 className="text-2xl font-black text-primary-text tracking-tighter mb-2">
+                Switch Member Access Type?
+              </h3>
+              <p className="text-secondary-text text-sm font-bold">
+                {memberForAccessChange.firstName} {memberForAccessChange.lastName}
+                {memberForAccessChange.memberIdentifier ? ` (#${memberForAccessChange.memberIdentifier})` : ''}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center gap-3 py-4 px-5 rounded-2xl bg-surface border border-border mb-5">
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                memberForAccessChange.isManual
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-500'
+                  : 'bg-surface-lighter border-border text-tertiary-text'
+              }`}>
+                {memberForAccessChange.isManual ? 'Manual' : 'Member'}
+              </span>
+              <span className="text-tertiary-text font-black text-xs">→</span>
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                !memberForAccessChange.isManual
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-500'
+                  : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
+              }`}>
+                {!memberForAccessChange.isManual ? 'Manual Member' : 'Regular Member'}
+              </span>
+            </div>
+
+            <div className="rounded-2xl bg-amber-500/5 border border-amber-500/20 p-4 mb-6 space-y-2 text-left">
+              <div className="flex items-start gap-2.5">
+                <FaExclamationTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-secondary-text leading-relaxed font-medium">
+                  Confirming this change will immediately <strong className="text-primary-text">revoke active sessions</strong>, generate a <strong className="text-primary-text">one-time temporary login credential</strong>, and require the member to set a new password on their next login.
+                </p>
+              </div>
+            </div>
+
+            {accessRoleError && (
+              <div className="mb-5 p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs font-bold text-red-400 text-center">
+                {accessRoleError}
+              </div>
+            )}
+
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={handleDiscardAccessRoleChange}
+                disabled={updatingAccessRole}
+                className="flex-1 btn-secondary text-xs uppercase tracking-widest font-black py-3.5 rounded-2xl disabled:opacity-50"
+              >
+                Discard
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmAccessRoleChange}
+                disabled={updatingAccessRole}
+                className="flex-1 btn-primary text-xs uppercase tracking-widest font-black py-3.5 rounded-2xl shadow-none border-none disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {updatingAccessRole ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  'Confirm'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {issuedCredentials && (
+        <div className="fixed inset-0 z-[210] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-2xl" />
+          <div className="relative glass-card p-8 sm:p-10 rounded-[2.5rem] border border-emerald-500/25 w-full max-w-lg shadow-2xl">
+            <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 mx-auto mb-5 border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+              <FaKey className="h-7 w-7" />
+            </div>
+
+            <div className="text-center mb-6">
+              <span className="text-emerald-500 text-[10px] font-black uppercase tracking-[0.35em] block mb-2">
+                Default Login Credential Issued
+              </span>
+              <h3 className="text-2xl font-black text-primary-text tracking-tighter mb-1">
+                Access Role Updated
+              </h3>
+              <p className="text-tertiary-text text-xs font-bold uppercase tracking-wider">
+                {issuedCredentials.memberName} is now a{' '}
+                <span className={issuedCredentials.isManual ? 'text-amber-500' : 'text-emerald-500'}>
+                  {issuedCredentials.newAccessRole}
+                </span>
+              </p>
+            </div>
+
+            <div className="space-y-3 bg-surface border border-border rounded-2xl p-5 mb-5">
+              <div>
+                <span className="text-[9px] font-black uppercase tracking-widest text-tertiary-text block mb-1">
+                  Login Identifier (Phone / Email)
+                </span>
+                <p className="text-sm font-bold text-primary-text break-all">
+                  {issuedCredentials.loginIdentifier}
+                  {issuedCredentials.email && issuedCredentials.email !== issuedCredentials.loginIdentifier && (
+                    <span className="block text-xs text-tertiary-text font-medium mt-0.5">{issuedCredentials.email}</span>
+                  )}
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-border">
+                <span className="text-[9px] font-black uppercase tracking-widest text-tertiary-text block mb-1.5">
+                  One-Time Temporary Password
+                </span>
+                <div className="flex items-center justify-between gap-3 bg-surface-lighter border border-amber-500/30 rounded-xl px-4 py-3">
+                  <code className="text-base font-mono font-black tracking-wider text-amber-500 select-all">
+                    {issuedCredentials.temporaryPassword}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyCredential(issuedCredentials.temporaryPassword, 'password')}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-500 hover:bg-amber-500 hover:text-black text-[10px] font-black uppercase tracking-wider transition-all shrink-0"
+                  >
+                    {copiedField === 'password' ? <FaCheck className="h-3 w-3" /> : <FaCopy className="h-3 w-3" />}
+                    {copiedField === 'password' ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className={`flex items-start gap-2.5 p-3.5 rounded-2xl border mb-4 text-xs font-medium ${
+              issuedCredentials.emailSent
+                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+            }`}>
+              <FaEnvelope className="h-4 w-4 shrink-0 mt-0.5" />
+              <span>
+                {issuedCredentials.emailSent
+                  ? `A security alert with the temporary password was emailed to ${issuedCredentials.email}.`
+                  : 'No valid email was sent (placeholder email or mail delivery unavailable). Please share these credentials securely with the member.'}
+              </span>
+            </div>
+
+            <p className="text-[11px] text-tertiary-text font-medium text-center mb-6 leading-relaxed">
+              This temporary password is displayed <strong className="text-primary-text">only once</strong> and cannot be retrieved after closing. The member will be required to choose a new password immediately on next login.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() =>
+                  handleCopyCredential(
+                    `Member: ${issuedCredentials.memberName}\nAccess Role: ${issuedCredentials.newAccessRole}\nLogin: ${issuedCredentials.loginIdentifier}\nTemporary Password: ${issuedCredentials.temporaryPassword}\n(You will be prompted to change this password on your next login.)`,
+                    'all'
+                  )
+                }
+                className="flex-1 btn-secondary py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+              >
+                {copiedField === 'all' ? <FaCheck className="h-3.5 w-3.5 text-emerald-500" /> : <FaCopy className="h-3.5 w-3.5" />}
+                {copiedField === 'all' ? 'Copied All' : 'Copy Details'}
+              </button>
+              <button
+                type="button"
+                onClick={handleCloseCredentialsModal}
+                className="flex-1 btn-primary py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-none border-none"
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
       )}

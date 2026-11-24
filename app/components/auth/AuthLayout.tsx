@@ -9,8 +9,8 @@ import { useTenant } from '@/app/context/TenantContext';
 interface AuthLayoutProps {
   title: string;
   subtitle: string;
-  linkText: string;
-  linkHref: string;
+  linkText?: string;
+  linkHref?: string;
   children: React.ReactNode;
 }
 
@@ -80,13 +80,15 @@ export default function AuthLayout({
               {title}
             </h2>
             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-tertiary-text">
-              {subtitle}{' '}
-              <Link
-                href={linkHref}
-                className="text-primary hover:text-primary-text transition-colors border-b border-primary/20 hover:border-border pb-0.5 ml-1"
-              >
-                {linkText}
-              </Link>
+              {subtitle}
+              {linkHref && linkText && (
+                <Link
+                  href={linkHref}
+                  className="text-primary hover:text-primary-text transition-colors border-b border-primary/20 hover:border-border pb-0.5 ml-1"
+                >
+                  {linkText}
+                </Link>
+              )}
             </p>
           </div>
           

@@ -2,12 +2,15 @@ import React, { useMemo } from 'react';
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { View, ActivityIndicator } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTenant } from '../../context/TenantContext';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function TabLayout() {
   const { tenant, isLoading: isTenantLoading } = useTenant();
   const { colorScheme, primaryColor } = useTheme();
+  const insets = useSafeAreaInsets();
+  const bottomPad = Math.max(insets.bottom, 12);
 
   const tabColors = useMemo(() => ({
     headerBg: colorScheme === 'dark' ? '#050505' : '#ffffff',
@@ -29,6 +32,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
+        animation: 'none',
         headerShown: true,
         headerStyle: {
           backgroundColor: tabColors.headerBg,
@@ -45,9 +49,9 @@ export default function TabLayout() {
           backgroundColor: tabColors.tabBarBg,
           borderTopWidth: 1,
           borderTopColor: tabColors.tabBarBorder,
-          height: 90,
-          paddingBottom: 30,
-          paddingTop: 10,
+          height: 58 + bottomPad,
+          paddingBottom: bottomPad,
+          paddingTop: 8,
         },
         tabBarActiveTintColor: primaryColor,
         tabBarInactiveTintColor: tabColors.inactiveText,

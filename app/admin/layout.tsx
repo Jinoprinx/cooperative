@@ -95,19 +95,19 @@ export default function AdminLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-background text-primary-text selection:bg-primary selection:text-white transition-colors duration-300">
+    <div className="min-h-[100dvh] bg-background text-primary-text selection:bg-primary selection:text-white transition-colors duration-200">
       <div className="fixed inset-0 z-0 bg-[var(--mesh-gradient)] opacity-30 pointer-events-none" />
       <div className="noise-overlay" />
 
       {/* Mobile sidebar */}
-      <div 
-        className={`fixed inset-0 z-50 lg:hidden transition-opacity duration-300 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        role="dialog" 
+      <div
+        className={`fixed inset-0 z-50 lg:hidden transition-opacity duration-200 ease-[var(--ease-out)] ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        role="dialog"
         aria-modal="true"
       >
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={toggleSidebar} aria-hidden="true"></div>
 
-        <div className="fixed inset-y-0 left-0 flex w-full max-w-xs flex-col glass-card border-r border-border pt-5 pb-4">
+        <div className={`fixed inset-y-0 left-0 flex w-full max-w-xs flex-col glass-card border-r border-border pt-5 pb-4 transition-transform duration-300 ease-[var(--ease-drawer)] ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <div className="px-6 mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
               {tenant?.branding?.logoUrl ? (
@@ -130,7 +130,7 @@ export default function AdminLayout({
               </svg>
             </button>
           </div>
-          
+
           <div className="mt-2 h-0 flex-1 overflow-y-auto px-4 custom-scrollbar">
             <nav className="space-y-2">
               {navigation.map((item) => {
@@ -140,11 +140,10 @@ export default function AdminLayout({
                     key={item.name}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                     className={`group flex items-center rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
-                      isActive
+                    className={`group flex items-center rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${isActive
                         ? 'bg-primary text-white shadow-[0_0_20px_rgba(245,158,11,0.4)]'
                         : 'text-secondary-text hover:text-primary-text hover:bg-surface'
-                    }`}
+                      }`}
                   >
                     <item.icon className={`mr-3 h-5 w-5 transition-colors ${isActive ? 'text-white' : 'text-tertiary-text group-hover:text-primary-text'}`} aria-hidden="true" />
                     {item.name}
@@ -162,7 +161,7 @@ export default function AdminLayout({
                   Member Hub
                 </Link>
               </div>
-              
+
               <div className="pt-4 mt-4 border-t border-border">
                 <button
                   onClick={handleSignOut}
@@ -205,13 +204,12 @@ export default function AdminLayout({
                   <Link
                     key={item.name}
                     href={item.href}
-                   className={`group flex items-center rounded-2xl px-5 py-4 text-sm font-bold transition-all duration-500 hover:scale-[1.02] active:scale-95 ${
-                      isActive
+                    className={`group flex items-center rounded-2xl px-5 py-4 text-sm font-bold transition-[background-color,color,transform] duration-150 ease-[var(--ease-out)] active:scale-[0.98] ${isActive
                         ? 'bg-primary text-white shadow-[0_0_30px_rgba(245,158,11,0.3)]'
                         : 'text-secondary-text hover:text-primary-text hover:bg-surface'
-                    }`}
+                      }`}
                   >
-                    <item.icon className={`mr-4 h-5 w-5 transition-all duration-300 ${isActive ? 'text-white' : 'text-tertiary-text group-hover:text-primary-text group-hover:scale-110'}`} aria-hidden="true" />
+                    <item.icon className={`mr-4 h-5 w-5 transition-transform duration-150 ease-[var(--ease-out)] ${isActive ? 'text-white' : 'text-tertiary-text group-hover:text-primary-text group-hover:scale-105'}`} aria-hidden="true" />
                     {item.name}
                   </Link>
                 );
@@ -220,7 +218,7 @@ export default function AdminLayout({
               <div className="pt-6 mt-6 border-t border-border/50">
                 <Link
                   href="/dashboard"
-                  className="group flex items-center rounded-2xl px-5 py-4 text-sm font-black bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-500 shadow-xl shadow-primary/5 hover:scale-[1.02] active:scale-95"
+                  className="group flex items-center rounded-2xl px-5 py-4 text-sm font-black bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-[background-color,color,transform] duration-150 ease-[var(--ease-out)] shadow-xl shadow-primary/5 active:scale-[0.98]"
                 >
                   <FaUserCircle className="mr-4 h-5 w-5" />
                   Member Hub
@@ -252,7 +250,7 @@ export default function AdminLayout({
             <span className="sr-only">Open sidebar</span>
             <FaBars className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
           </button>
-          
+
           <div className="flex flex-1 justify-between items-center h-full min-w-0">
             <div className="flex flex-col min-w-0">
               <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-primary/80 leading-none mb-1 truncate">

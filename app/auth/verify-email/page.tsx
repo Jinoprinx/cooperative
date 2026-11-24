@@ -105,7 +105,7 @@ function VerifyEmailContent() {
                     <FaEnvelope className="text-2xl text-primary" />
                 </div>
                 <p className="text-muted-foreground dark:text-white/60 text-sm">
-                    We've sent a 6-digit verification code to <br />
+                    We&apos;ve sent a 6-digit verification code to <br />
                     <span className="text-foreground dark:text-white font-medium">{email}</span>
                 </p>
             </div>
@@ -164,7 +164,7 @@ function VerifyEmailContent() {
 
                 <div className="text-center space-y-4">
                     <p className="text-xs text-muted-foreground dark:text-white/40">
-                        Didn't receive the code?{' '}
+                        Didn&apos;t receive the code?{' '}
                         <button
                             type="button"
                             onClick={handleResend}

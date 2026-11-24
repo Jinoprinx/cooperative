@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Modal, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Modal, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
@@ -29,7 +29,7 @@ export default function Loans() {
   const { primaryColor } = useTheme();
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false);
-// ... existing state ...
+  // ... existing state ...
   const [amount, setAmount] = useState('');
   const [duration, setDuration] = useState('12');
   const [purpose, setPurpose] = useState('');
@@ -104,58 +104,58 @@ export default function Loans() {
         return;
       }
 
-    // Search for the member
-    setSureties(prev => {
-      const updated = [...prev];
-      if (updated[index]) {
-        updated[index] = { ...updated[index], searching: true, error: undefined, found: false, name: '' };
-      }
-      return updated;
-    });
-
-    try {
-      const response = await api.get(`/users/search?phone=${phone}`);
-      const foundRole = response.data?.role;
-      const foundName = response.data?.name;
-
+      // Search for the member
       setSureties(prev => {
         const updated = [...prev];
-        // Ensure we're still looking for the SAME phone number in this slot
-        if (updated[index] && updated[index].phone === phone) {
-          if (foundRole === 'admin' || foundRole === 'super-admin') {
+        if (updated[index]) {
+          updated[index] = { ...updated[index], searching: true, error: undefined, found: false, name: '' };
+        }
+        return updated;
+      });
+
+      try {
+        const response = await api.get(`/users/search?phone=${phone}`);
+        const foundRole = response.data?.role;
+        const foundName = response.data?.name;
+
+        setSureties(prev => {
+          const updated = [...prev];
+          // Ensure we're still looking for the SAME phone number in this slot
+          if (updated[index] && updated[index].phone === phone) {
+            if (foundRole === 'admin' || foundRole === 'super-admin') {
+              updated[index] = {
+                ...updated[index],
+                name: '',
+                found: false,
+                searching: false,
+                error: 'Admins cannot be used as sureties.',
+              };
+            } else {
+              updated[index] = {
+                ...updated[index],
+                name: foundName || 'Member Found',
+                found: true,
+                searching: false,
+              };
+            }
+          }
+          return updated;
+        });
+      } catch (err: any) {
+        setSureties(prev => {
+          const updated = [...prev];
+          if (updated[index] && updated[index].phone === phone) {
             updated[index] = {
               ...updated[index],
               name: '',
               found: false,
               searching: false,
-              error: 'Admins cannot be used as sureties.',
-            };
-          } else {
-            updated[index] = {
-              ...updated[index],
-              name: foundName || 'Member Found',
-              found: true,
-              searching: false,
+              error: 'Member not found with this number.',
             };
           }
-        }
-        return updated;
-      });
-    } catch (err: any) {
-      setSureties(prev => {
-        const updated = [...prev];
-        if (updated[index] && updated[index].phone === phone) {
-          updated[index] = {
-            ...updated[index],
-            name: '',
-            found: false,
-            searching: false,
-            error: 'Member not found with this number.',
-          };
-        }
-        return updated;
-      });
-    }
+          return updated;
+        });
+      }
     }
   };
 
@@ -181,7 +181,7 @@ export default function Loans() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['left', 'right']}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={primaryColor} />
@@ -194,7 +194,7 @@ export default function Loans() {
             </Text>
             <Text className="text-4xl font-black text-foreground tracking-tighter">My Loans</Text>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => setIsHistoryModalVisible(true)}
             className="bg-foreground/5 p-3 rounded-2xl border border-foreground/5"
           >
@@ -216,8 +216,8 @@ export default function Loans() {
               </View>
 
               <View className="h-2 w-full bg-foreground/5 rounded-full overflow-hidden mb-4">
-                <View 
-                  className="h-full bg-primary rounded-full" 
+                <View
+                  className="h-full bg-primary rounded-full"
                   style={{ width: `${getLoanProgress(activeLoan.amountPaid, activeLoan.totalRepayment)}%` }}
                 />
               </View>
@@ -271,8 +271,8 @@ export default function Loans() {
               <Text className="text-foreground/40 text-center px-10 leading-relaxed mb-10 text-base">
                 Get instant access to credit with transparent terms and no hidden fees.
               </Text>
-              <Button 
-                title="Start Application" 
+              <Button
+                title="Start Application"
                 onPress={() => setIsApplyModalVisible(true)}
                 className="w-full"
               />
@@ -305,15 +305,22 @@ export default function Loans() {
         animationType="slide"
         onRequestClose={() => setIsApplyModalVisible(false)}
       >
-        <View className="flex-1 justify-end bg-black/60">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1 justify-end bg-black/60"
+        >
           <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border max-h-[90%]">
-            <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
-            
+            <TouchableOpacity
+              onPress={() => setIsApplyModalVisible(false)}
+              hitSlop={{ top: 16, bottom: 16, left: 32, right: 32 }}
+              className="w-12 h-1.5 bg-foreground/15 rounded-full self-center mb-8"
+            />
+
             <ScrollView showsVerticalScrollIndicator={false}>
               <Text className="text-foreground font-black text-3xl mb-2 tracking-tight">Apply for Loan</Text>
               <Text className="text-foreground/40 mb-8 font-medium">Please fill in the details below to submit your request.</Text>
 
-              <Input 
+              <Input
                 label="Amount (₦)"
                 placeholder="0.00"
                 keyboardType="numeric"
@@ -321,7 +328,7 @@ export default function Loans() {
                 onChangeText={setAmount}
               />
 
-              <Input 
+              <Input
                 label="Duration (Months)"
                 placeholder="e.g. 12"
                 keyboardType="numeric"
@@ -329,7 +336,7 @@ export default function Loans() {
                 onChangeText={setDuration}
               />
 
-              <Input 
+              <Input
                 label="Purpose"
                 placeholder="e.g. Business Expansion"
                 value={purpose}
@@ -346,12 +353,12 @@ export default function Loans() {
                     </TouchableOpacity>
                   )}
                 </View>
-                
+
                 {sureties.map((surety, idx) => (
                   <View key={idx} className="mb-4">
                     <View className="flex-row items-center">
                       <View className="flex-1">
-                        <Input 
+                        <Input
                           placeholder="Enter phone number"
                           keyboardType="phone-pad"
                           value={surety.phone}
@@ -361,7 +368,7 @@ export default function Loans() {
                       </View>
                       {/* Remove button — always visible if more than 1 surety */}
                       {sureties.length > 1 && (
-                        <TouchableOpacity 
+                        <TouchableOpacity
                           onPress={() => removeSurety(idx)}
                           className="ml-3 w-12 h-12 bg-red-500/10 rounded-2xl items-center justify-center border border-red-500/20"
                         >
@@ -399,14 +406,14 @@ export default function Loans() {
               </View>
 
               <View className="flex-row space-x-4 mt-4">
-                <Button 
-                  title="Cancel" 
+                <Button
+                  title="Cancel"
                   variant="ghost"
                   className="flex-1"
                   onPress={() => setIsApplyModalVisible(false)}
                 />
-                <Button 
-                  title="Submit Request" 
+                <Button
+                  title="Submit Request"
                   className="flex-1"
                   isLoading={applyMutation.isPending}
                   onPress={handleApply}
@@ -414,7 +421,7 @@ export default function Loans() {
               </View>
             </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Loan History Modal */}
@@ -427,7 +434,7 @@ export default function Loans() {
         <View className="flex-1 justify-end bg-black/60">
           <View className="bg-surface rounded-t-[3rem] p-8 pb-12 border-t border-border h-[80%]">
             <View className="w-12 h-1.5 bg-foreground/10 rounded-full self-center mb-8" />
-            
+
             <View className="flex-row justify-between items-center mb-6">
               <Text className="text-foreground font-black text-2xl tracking-tight">Loan History</Text>
               <TouchableOpacity onPress={() => setIsHistoryModalVisible(false)}>

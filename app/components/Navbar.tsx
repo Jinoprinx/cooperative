@@ -28,27 +28,26 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className={`fixed top-0 left-0 z-50 w-full transition-all duration-500 ${isScrolled ? 'py-3' : 'py-6'
+      initial={{ y: -24, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+      className={`fixed top-0 left-0 z-50 w-full transition-[padding] duration-200 ease-[var(--ease-out)] ${isScrolled ? 'py-3' : 'py-6'
         }`}
     >
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className={`flex items-center justify-between px-4 md:px-8 py-4 transition-all duration-700 rounded-[2rem] ${isScrolled ? 'glass-navbar shadow-[0_8px_32px_0_var(--shadow-color)]' : 'bg-transparent border border-transparent'
+        <div className={`flex items-center justify-between px-4 md:px-8 py-4 transition-[background-color,border-color,box-shadow] duration-200 ease-out rounded-[2rem] ${isScrolled ? 'glass-navbar shadow-[0_8px_32px_0_var(--shadow-color)]' : 'bg-transparent border border-transparent'
           }`}>
-          <Link href="/" className="flex items-center space-x-3 group">
-            <motion.div
-              whileHover={{ rotate: 12, scale: 1.1 }}
-              className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden"
+          <Link href="/" className="flex items-center space-x-3 group active:scale-[0.98] transition-transform duration-150">
+            <div
+              className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden shrink-0 transition-transform duration-200 ease-[var(--ease-out)] group-hover:scale-105"
             >
               {logoUrl ? (
                 <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-white font-black italic text-2xl tracking-tighter">{logoChar}</span>
               )}
-            </motion.div>
-            <span className="text-2xl font-display font-black text-primary-text tracking-tight group-hover:text-primary transition-colors">
+            </div>
+            <span className="text-2xl font-display font-black text-primary-text tracking-tight group-hover:text-primary transition-colors duration-150">
               {coopName}
             </span>
           </Link>
@@ -58,7 +57,7 @@ const Navbar = () => {
               <Link
                 key={item}
                 href={`#${item.toLowerCase().replace(' ', '-')}`}
-                className="text-sm font-semibold text-secondary-text hover:text-primary transition-all hover:tracking-wider"
+                className="text-sm font-semibold text-secondary-text hover:text-primary transition-colors duration-150"
               >
                 {item}
               </Link>
